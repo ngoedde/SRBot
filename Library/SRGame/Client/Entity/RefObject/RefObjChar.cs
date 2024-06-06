@@ -1,0 +1,42 @@
+﻿namespace SRGame.Client.Entity.RefObject;
+
+public class RefObjChar : RefObjCommon
+{
+    public byte Level;
+    public Gender CharGender;
+    public int MaxHealth;
+    public int MaxMP;
+    public byte InventorySize;
+    public byte CanStore_TID1;
+    public byte CanStore_TID2;
+    public byte CanStore_TID3;
+    public byte CanStore_TID4;
+    public byte CanBeVehicle;
+    public byte CanControl;
+    public byte DamagePortion;
+    public short MaxPassenger;
+    
+    public override bool Parse(EntityParser parser)
+    {
+        if (!base.Parse(parser))
+            return false;
+
+        parser.TryParse(57, out Level);
+        parser.TryParse(58, out CharGender);
+        parser.TryParse(59, out MaxHealth);
+        parser.TryParse(60, out MaxMP);
+
+        parser.TryParse(61, out InventorySize);
+
+        parser.TryParse(62, out CanStore_TID1);
+        parser.TryParse(63, out CanStore_TID2);
+        parser.TryParse(64, out CanStore_TID3);
+        parser.TryParse(65, out CanStore_TID4);
+        parser.TryParse(66, out CanBeVehicle);
+        parser.TryParse(67, out CanControl);
+        parser.TryParse(68, out DamagePortion);
+        parser.TryParse(69, out MaxPassenger);
+
+        return true;
+    }
+}

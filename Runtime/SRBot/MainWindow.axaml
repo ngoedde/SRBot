@@ -1,0 +1,104 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+                 xmlns:srBot="clr-namespace:SRBot"
+                 mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="980"
+                 x:Class="SRBot.MainWindow"
+                 Loaded="Control_OnLoaded"
+                 x:DataType="srBot:MainWindowModel"
+                 IsMenuVisible="True"
+                 Width="1280" Height="980"
+                 Title="{ Binding Title }">
+    
+    <suki:SukiWindow.MenuItems>
+        <MenuItem Header="File"></MenuItem>
+        <MenuItem Header="View"></MenuItem>
+        <MenuItem Header="Help">
+            <MenuItem Header="Show client info" Click="ShowClientInfo_OnClick" IsEnabled="{Binding IsGameInitialized}"></MenuItem>
+        </MenuItem>
+    </suki:SukiWindow.MenuItems>
+    <Grid ColumnDefinitions="Auto, *">
+        <suki:SukiSideMenu ItemsSource="{Binding Pages}" DockPanel.Dock="Left">
+            <suki:SukiSideMenu.HeaderContent>
+                <StackPanel>
+                    <Image Width="80"
+                           Height="80"
+                           Margin="30,10,30,30"
+                           Source="Assets/logo.png"/>
+                    <HyperlinkButton Click="ProfileName_OnClick" Classes="h4" Content="{Binding ActiveProfile.Name}" HorizontalAlignment="Center" />
+                </StackPanel>
+            </suki:SukiSideMenu.HeaderContent>
+            <suki:SukiSideMenu.ItemTemplate>
+                <DataTemplate>
+                    <suki:SukiSideMenuItem Header="{Binding Title}" IsVisible="{Binding Visible}">
+                        <suki:SukiSideMenuItem.Icon>
+                            <materialIcons:MaterialIcon Kind="{Binding Icon}" />
+                        </suki:SukiSideMenuItem.Icon>
+                    </suki:SukiSideMenuItem>
+                </DataTemplate>
+            </suki:SukiSideMenu.ItemTemplate>
+            <suki:SukiSideMenu.FooterContent>
+                <StackPanel>
+                    <suki:BusyArea IsBusy="{Binding IsLoading}"  BusyText="{ Binding LoadingText }">
+                    </suki:BusyArea>
+                </StackPanel>
+            </suki:SukiSideMenu.FooterContent>
+        </suki:SukiSideMenu>
+        
+        <DockPanel Grid.Column="1" Width="250" HorizontalAlignment="Right" Margin="0">
+
+            <suki:GroupBox Header="Game" Margin="16" DockPanel.Dock="Top">
+                <StackPanel>
+                    <TextBlock Classes="h4" Text="Character name"></TextBlock>
+                    <ProgressBar Value="50" ShowProgressText="True"></ProgressBar>
+                    <ProgressBar Value="50" Classes="Accent" ShowProgressText="True"></ProgressBar>
+          
+                </StackPanel>
+            </suki:GroupBox>
+            <suki:GroupBox Header="Target" Margin="16" DockPanel.Dock="Top">
+                <StackPanel>
+                    <TextBlock Classes="h4" Text="Target name"></TextBlock>
+                    <ProgressBar Value="50" ShowProgressText="True"></ProgressBar>
+                </StackPanel>
+            </suki:GroupBox>
+            <suki:GroupBox Header="Information" Margin="16" DockPanel.Dock="Top">
+                <StackPanel>
+                    <Grid ColumnDefinitions="*, *">
+                        <StackPanel>
+                            <Label>Level:</Label>
+                            <Label>STR:</Label>
+                            <Label>INT:</Label>
+                            <Label>Gold:</Label>
+                            <Label>Skill points:</Label>
+                            <Label>Kills:</Label>
+                            <Label>Weapon:</Label>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <Label>1</Label>
+                            <Label>20</Label>
+                            <Label>20</Label>
+                            <Label>0</Label>
+                            <Label>0</Label>
+                            <Label>0</Label>
+                            <Label>T-Staff</Label>
+                        </StackPanel>
+                    </Grid>
+                </StackPanel>
+            </suki:GroupBox>
+            <suki:GroupBox Header="Control" Margin="16" DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
+                <Grid ColumnDefinitions="*, *">
+                    <Button Classes="Flat Rounded Accent" Width="64" Height="38" HorizontalAlignment="Left" Click="SaveButton_OnClick">
+                        <materialIcons:MaterialIcon Kind="ContentSave" />
+                    </Button>
+                    <Button Grid.Column="1" Classes="Flat Rounded" Width="64" Height="38" HorizontalAlignment="Right" IsEnabled="{Binding !IsLoading }" Click="StartButton_OnClick">
+                        <materialIcons:MaterialIcon Kind="Play" />
+                    </Button>
+                </Grid>
+            </suki:GroupBox>
+        </DockPanel>
+    </Grid>
+    
+</suki:SukiWindow>

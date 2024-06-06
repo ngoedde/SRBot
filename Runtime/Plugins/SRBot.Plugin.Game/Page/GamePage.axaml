@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:SRBot.Plugin.Game.Page"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="700"
+             x:DataType="vm:GamePageModel"
+             Margin="8"
+             x:Class="SRBot.Plugin.Game.Page.GamePage">
+    <!-- Welcome to Avalonia!2134 -->
+    <StackPanel>
+        <Grid ColumnDefinitions="*, *" HorizontalAlignment="Center">
+            <suki:GlassCard  Width="350" Margin="8">
+                <suki:GroupBox Header="Profile">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ActiveProfile.Description}"></TextBlock>
+                        <Label>Silkroad directory:</Label>
+                        <TextBox Text="{Binding GameConfig.ClientDirectory}"></TextBox>
+                        <HyperlinkButton Click="ChangeDirectory_OnClick">
+                            <TextBlock Text="Change directory"></TextBlock>
+                        </HyperlinkButton>
+                    </StackPanel>
+               
+                    <!--     <Grid ColumnDefinitions="*,*"> -->
+                    <!--         <Label Grid.Column="0">Select a profile:</Label> -->
+                    <!--         <ComboBox ItemsSource="{Binding ProfileNames}" Grid.Column="1"></ComboBox> -->
+                    <!--     </Grid> -->
+                    <!-- -->
+                </suki:GroupBox>
+            </suki:GlassCard>
+            <suki:GlassCard Grid.Column="1" Width="350" Margin="8">
+                <suki:GroupBox Header="Auto login">
+                    <StackPanel>
+                        <Label>Silkroad directory:</Label>
+                        <TextBox Text="{Binding GameConfig.ClientDirectory}"></TextBox>
+                        <HyperlinkButton>
+                            <TextBlock Text="Change directory"></TextBlock>
+                        </HyperlinkButton>
+                    </StackPanel>
+               
+                    <!--     <Grid ColumnDefinitions="*,*"> -->
+                    <!--         <Label Grid.Column="0">Select a profile:</Label> -->
+                    <!--         <ComboBox ItemsSource="{Binding ProfileNames}" Grid.Column="1"></ComboBox> -->
+                    <!--     </Grid> -->
+                    <!-- -->
+                </suki:GroupBox>
+            </suki:GlassCard>
+        </Grid>
+    </StackPanel>
+</UserControl>

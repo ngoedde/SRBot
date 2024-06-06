@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:SRBot.Dialog"
+             xmlns:suki="using:SukiUI.Controls"
+             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="160"
+             Width="400" Height="160"
+             x:DataType="vm:ProfileDialogModel"
+             Padding="10"
+             x:Class="SRBot.Dialog.ProfileDialog">
+
+    <StackPanel Spacing="10">
+        <TextBlock FontWeight="Bold" FontSize="18" TextAlignment="Center">Profile</TextBlock>
+        <!-- <Label Content="Select your profile below:"></Label> -->
+        <ComboBox ItemsSource="{Binding ProfileNames}" SelectedItem="{Binding SelectedProfile}"></ComboBox>
+
+        <Grid ColumnDefinitions="*,*">
+            <Button Margin="8 0 0 0" Content="Cancel" Classes="Flat Accent" Grid.Column="0" Click="Button_OnClick"></Button>
+            <Button Margin="8 0 0 0" Content="Load profile" Classes="Flat" Grid.Column="1" Click="LoadProfileButtonClicked"></Button>
+        </Grid>
+    </StackPanel>
+</UserControl>

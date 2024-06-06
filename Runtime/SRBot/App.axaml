@@ -1,0 +1,17 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sukiUi="clr-namespace:SukiUI;assembly=SukiUI"
+             x:Class="SRBot.App"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:utils="clr-namespace:SRBot.Utils"
+             RequestedThemeVariant="Default">
+             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+     <Application.DataTemplates>
+         <!-- <utils:ViewLocator /> -->
+     </Application.DataTemplates>
+    <Application.Styles>
+        <FluentTheme />
+        <sukiUi:SukiTheme ThemeColor="Red"/>
+        <materialIcons:MaterialIconStyles />
+    </Application.Styles>
+</Application>

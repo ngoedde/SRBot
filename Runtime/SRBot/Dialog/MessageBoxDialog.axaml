@@ -1,0 +1,26 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="using:SRBot.Dialog"
+             x:DataType="vm:MessageBoxDialogModel"
+             xmlns:suki="using:SukiUI.Controls"
+             xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             x:Class="SRBot.Dialog.MessageBoxDialog">
+    <StackPanel>
+        <materialIcons:MaterialIcon Foreground="{Binding IconColor}" Kind="{Binding Icon}" Width="48" Height="48" Margin="0 0 0 16 "></materialIcons:MaterialIcon>
+        <TextBlock FontWeight="Bold" FontSize="18" TextAlignment="Center" Text="{Binding Title}">
+        </TextBlock>
+        <ScrollViewer>
+            <StackPanel Spacing="20">
+                <TextBlock Text="{Binding Message}"/>
+                <Separator/>
+                <Grid ColumnDefinitions="150,150" HorizontalAlignment="Center">
+                    <Button Content="Cancel" Click="CloseButton_OnClick" Classes="Accent"  ></Button>
+                    <Button Grid.Column="1" Content="Ok" Click="OkButton_OnClick" Classes="Acccent" Margin="10 0 8 0 "></Button>
+                </Grid>
+            </StackPanel>
+        </ScrollViewer>
+    </StackPanel>
+</UserControl>
