@@ -1,9 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runtime", "Runtime", "{25330185-0D14-4B0E-9A4C-CF3DB91DBC01}"
-	ProjectSection(SolutionItems) = preProject
-		Runtime\.gitignore = Runtime\.gitignore
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{FC6A0D61-CF0F-4802-AC3C-337833979377}"
 EndProject
@@ -15,7 +12,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRPack", "Library\SRPack\SR
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{AA3C535E-27D7-4592-A8BC-D8EA02C5FBD6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRBot.Plugin.Log", "Runtime\Plugins\SRBot.Plugin.Log\SRBot.Plugin.Log.csproj", "{4E0F1099-1714-4829-83BA-0A3CB60BCAF7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRBot.Plugin.Logging", "Runtime\Plugins\SRBot.Plugin.Logging\SRBot.Plugin.Logging.csproj", "{4E0F1099-1714-4829-83BA-0A3CB60BCAF7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SRBot.Plugin.Game", "Runtime\Plugins\SRBot.Plugin.Game\SRBot.Plugin.Game.csproj", "{0FE678A5-E8E0-4EF3-84A5-C21BB734270D}"
 EndProject

@@ -9,10 +9,12 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>../../Runtime/Build/Debug/</OutputPath>
+        <OutputPath>../../Runtime/Build/Debug/</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>../../Runtime/Build/Release/</OutputPath>
+        <OutputPath>../../Runtime/Build/Release/</OutputPath>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
 </Project>

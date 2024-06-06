@@ -8,22 +8,24 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>../../Build/Debug</OutputPath>
+        <OutputPath>../../Build/Debug</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>../../Build/Release</OutputPath>
+        <OutputPath>../../Build/Release</OutputPath>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\SRBot\SRBot.csproj" />
+        <ProjectReference Include="..\..\SRBot\SRBot.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Page\GamePage.axaml.cs">
-        <DependentUpon>GamePage.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+        <Compile Update="Page\GamePage.axaml.cs">
+            <DependentUpon>GamePage.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
 </Project>

@@ -5,24 +5,29 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <RootNamespace>SRBot.Plugin.Logging</RootNamespace>
+
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-        <OutputPath>../../Runtime/Build/Debug</OutputPath>
+      <OutputPath>../../Build/Debug</OutputPath>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-        <OutputPath>../../Runtime/Build/Release/</OutputPath>
+      <OutputPath>../../Build/Release/</OutputPath>
         <DebugType>none</DebugType>
         <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SRPack\SRPack.csproj"/>
+      <Compile Update="Page\LogPage.axaml.cs">
+        <DependentUpon>LogPage.axaml</DependentUpon>
+        <SubType>Code</SubType>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Serilog" Version="4.0.0-dev-02195"/>
+      <ProjectReference Include="..\..\SRBot\SRBot.csproj" />
     </ItemGroup>
-
 </Project>

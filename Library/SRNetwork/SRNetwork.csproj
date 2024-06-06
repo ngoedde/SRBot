@@ -5,11 +5,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+        <OutputPath>../../Runtime/Build/Debug</OutputPath>
+    </PropertyGroup>
 
-    <ItemGroup>
-      <Content Include="Common\Messaging\.DS_Store" />
-      <Content Include="Common\Protocol\.DS_Store" />
-    </ItemGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <OutputPath>../../Runtime/Build/Release/</OutputPath>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />

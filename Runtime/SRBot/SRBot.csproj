@@ -13,7 +13,9 @@
       <OutputPath>../Build/Debug</OutputPath>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <OutputPath>../Build/Release</OutputPath>
+        <OutputPath>../Build/Release</OutputPath>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
 
     <ItemGroup>
