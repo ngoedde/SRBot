@@ -10,20 +10,15 @@ namespace SRBot.Plugin.Game.Page;
 public class GamePageModel : PageModel
 {
     private readonly ProfileService _profileService;
-    private readonly ConfigService _configService;
 
-    public Profile? ActiveProfile => _profileService.ActiveProfile;
 
-    public IEnumerable<string> ProfileNames => _profileService.Config.Profiles.Select(p => p.Name);
+    [Reactive] public Profile? ActiveProfile => _profileService.ActiveProfile;
 
-    [Reactive] public GameConfig? GameConfig => _configService.GetConfig<GameConfig>();
 
-    public GamePageModel(ProfileService profileService, ConfigService configService) : base("srbot_page_game", "Game",
+    public GamePageModel(ProfileService profileService) : base("srbot_page_game", "Game",
         0, MaterialIconKind.Gamepad)
     {
         _profileService = profileService;
-        _configService = configService;
-        _profileService.ProfileConfigLoaded += ProfileServiceOnProfileConfigLoaded;
         _profileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;
     }
 
@@ -31,10 +26,5 @@ public class GamePageModel : PageModel
     {
         this.RaisePropertyChanged(nameof(ActiveProfile));
         this.RaisePropertyChanged(nameof(GameConfig));
-    }
-
-    private void ProfileServiceOnProfileConfigLoaded(ProfileConfig config)
-    {
-        this.RaisePropertyChanged(nameof(ProfileNames));
     }
 }

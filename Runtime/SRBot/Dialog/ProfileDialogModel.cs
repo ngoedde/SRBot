@@ -1,6 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
+using SRCore;
 using SRCore.Config;
 using SRCore.Config.Model;
 
@@ -13,23 +15,18 @@ public class ProfileDialogModel : ViewModel
     public ProfileDialogModel(ProfileService profileService)
     {
         _profileService = profileService;
-        SelectedProfile = _profileService.Config.ActiveProfile;
+
+        SelectedProfile = _profileService.ActiveProfile;
     }
 
+    [Reactive]
     public List<Profile> Profiles => _profileService.Config.Profiles;
-    
-    public IEnumerable<string> ProfileNames => Profiles.Select(x => x.Name);
-    
-    public string SelectedProfile { get; set; }
-    
-    public async Task SetActiveProfile(string name)
+
+    [Reactive]
+    public Profile? SelectedProfile { get; set; }
+
+    public async Task SetActiveProfile(Profile profile)
     {
-        var profile = _profileService.GetProfile(name);
-        if (profile == null)
-        {
-            return;
-        }
-        
         await _profileService.SetActiveProfileAsync(profile);
     }
     
@@ -37,4 +34,14 @@ public class ProfileDialogModel : ViewModel
     {
         await _profileService.SaveProfilesAsync();
     }
+
+    public void AddProfile(string name= "New profile")
+    {
+        var profile = new Profile(Kernel.ConfigDirectory, name);
+        _profileService.Config.Profiles.Add(profile);
+
+        this.RaisePropertyChanged(nameof(Profiles));
+        this.SelectedProfile = profile;
+    }
+
 }

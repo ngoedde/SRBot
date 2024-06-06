@@ -56,11 +56,11 @@ public partial class GamePage : UserControl
 
         var model = DataContext as GamePageModel;
 
-        if (model!.GameConfig.ClientDirectory != selectedFolder)
+        if (model!.ActiveProfile?.ClientDirectory != selectedFolder)
         {
-            model!.GameConfig.ClientDirectory = selectedFolder;
+            model.ActiveProfile.ClientDirectory = selectedFolder;
 
-            await kernel.InitializeGameAsync(model.GameConfig.ClientDirectory, ClientType.Vietnam188);
+            await kernel.InitializeGameAsync(model.ActiveProfile.ClientDirectory, ClientType.Vietnam188);
         }
     }
 }

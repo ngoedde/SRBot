@@ -1,3 +1,4 @@
+using System.IO;
 using Avalonia.Interactivity;
 using Microsoft.Extensions.DependencyInjection;
 using SRBot.Dialog;
@@ -32,16 +33,19 @@ public partial class MainWindow : SukiWindow
             return;
         }
 
-        if (string.IsNullOrEmpty(_profileService.Config.ActiveProfile))
+        await _profileService.SetActiveProfileAsync(_profileService.Config.ActiveProfile);
+        
+
+        if (_profileService.ActiveProfile == null || !Directory.Exists(_profileService.ActiveProfile.ClientDirectory))
         {
             OpenProfileDialog();
+
+            return;
         }
-        else
-        {
-            await _profileService.SetActiveProfileAsync(_profileService.Config.ActiveProfile);
-            await _kernel.InitializeGameAsync(_configService.GetConfig<GameConfig>()!.ClientDirectory,
-                ClientType.Vietnam188);
-        }
+
+
+        await _kernel.InitializeGameAsync(_profileService.ActiveProfile.ClientDirectory,
+            ClientType.Vietnam188);
     }
 
     private void OpenProfileDialog()

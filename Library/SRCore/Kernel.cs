@@ -57,7 +57,7 @@ public sealed class Kernel
         _fileSystem = serviceProvider.GetRequiredService<ClientFileSystem>();
         _entityManager = serviceProvider.GetRequiredService<EntityManager>();
         _clientInfoManager = serviceProvider.GetRequiredService<ClientInfoManager>();
-        _activeProfile = serviceProvider.GetRequiredService<Profile>();
+        _activeProfile = serviceProvider.GetService<Profile>();
         _clientlessManager = serviceProvider.GetRequiredService<ClientlessManager>();
         _messageHandlers = serviceProvider.GetServices<SRNetwork.MessageHandler>();
         _profileService = serviceProvider.GetRequiredService<ProfileService>();
@@ -120,6 +120,7 @@ public sealed class Kernel
             throw new Exception("Kernel is already initialized. Use ShutdownAsync before reinitializing");
         }
 
+
         //Folder structure
         Directory.CreateDirectory(ConfigDirectory);
 
@@ -127,14 +128,21 @@ public sealed class Kernel
         _proxy.Initialize(_messageHandlers, _clientlessManager);
 
         IsInitialized = true;
-        _logger.Debug("SRKernel initialized.");
 
         OnKernelInitialized(this);
         OnStopLoading(this);
+
+        _logger.Debug("SRKernel initialized.");
     }
 
     public async Task InitializeGameAsync(string clientDirectory, ClientType clientType)
     {
+        if (!Directory.Exists(clientDirectory))
+        {
+            _logger.Warning("Silkroad directory not set! Game can not be initialized.");
+
+            return;
+        }
         OnStartLoading(this);
 
         IsGameInitialized = false;
@@ -174,10 +182,14 @@ public sealed class Kernel
 
     public async Task StartNetworkAsync()
     {
-        //Testing around with NetEngine!
-        var gatewayEndPoint =
-            new IPEndPoint(IPAddress.Parse(_clientInfoManager.DivisionInfo.Divisions[0].GatewayServers[0]),
-                _clientInfoManager.GatewayPort);
+        var gatewayHost = _clientInfoManager.DivisionInfo.Divisions[0].GatewayServers[0];
+
+        EndPoint gatewayEndPoint;
+        if (IPAddress.TryParse(gatewayHost, out var gatewayIpAddress))
+            gatewayEndPoint = new IPEndPoint(gatewayIpAddress, _clientInfoManager.GatewayPort);
+        else
+            gatewayEndPoint = new DnsEndPoint(gatewayHost, _clientInfoManager.GatewayPort);
+
 
         if (_activeProfile is { Clientless: false })
         {

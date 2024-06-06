@@ -28,6 +28,7 @@
         <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9" />
         <PackageReference Include="MessageBox.Avalonia" Version="3.1.5.1" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.4.24266.19" />
+        <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
         <PackageReference Include="SukiUI" Version="6.0.0-beta6" />
     </ItemGroup>
 

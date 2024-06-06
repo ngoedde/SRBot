@@ -4,20 +4,57 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="using:SRBot.Dialog"
              xmlns:suki="using:SukiUI.Controls"
-             mc:Ignorable="d" d:DesignWidth="400" d:DesignHeight="160"
-             Width="400" Height="160"
+             mc:Ignorable="d"
+             Width="400" d:DesignHeight="400"
+             xmlns:theme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
+             xmlns:avalonia="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:DataType="vm:ProfileDialogModel"
              Padding="10"
              x:Class="SRBot.Dialog.ProfileDialog">
 
-    <StackPanel Spacing="10">
-        <TextBlock FontWeight="Bold" FontSize="18" TextAlignment="Center">Profile</TextBlock>
-        <!-- <Label Content="Select your profile below:"></Label> -->
-        <ComboBox ItemsSource="{Binding ProfileNames}" SelectedItem="{Binding SelectedProfile}"></ComboBox>
+	<StackPanel Spacing="10">
+        <avalonia:MaterialIcon Kind="User" Width="48" Height="48" Margin="0 0 0 0"></avalonia:MaterialIcon>
+		<TextBlock FontWeight="Bold" FontSize="18" TextAlignment="Center">Profile</TextBlock>
 
-        <Grid ColumnDefinitions="*,*">
-            <Button Margin="8 0 0 0" Content="Cancel" Classes="Flat Accent" Grid.Column="0" Click="Button_OnClick"></Button>
-            <Button Margin="8 0 0 0" Content="Load profile" Classes="Flat" Grid.Column="1" Click="LoadProfileButtonClicked"></Button>
-        </Grid>
-    </StackPanel>
+            <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Width="300">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="DemiBold"></TextBlock>
+                            <TextBlock Text="{Binding ClientDirectory}" FontWeight="Thin" FontSize="12"></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <!--<HyperlinkButton Grid.Column="1" Content="New profile" HorizontalAlignment="Right" Click="NewProfile_OnClick"></HyperlinkButton>-->
+    
+		<!-- <Label Content="Select your profile below:"></Label> -->
+
+      
+		<suki:GlassCard>
+            <StackPanel Spacing="10" Margin="16">
+                <TextBlock Text="Profile name"></TextBlock>
+                <TextBox Text="{Binding SelectedProfile.Name}" Watermark="The name of the profile"></TextBox>
+
+                <TextBlock Text="Profile description"></TextBlock>
+                <TextBox Text="{Binding SelectedProfile.Description}"></TextBox>
+
+                <TextBlock Text="Silkroad directory"></TextBlock>
+                <TextBox Text="{Binding SelectedProfile.ClientDirectory}" theme:TextBoxExtensions.Prefix=""></TextBox>
+                <HyperlinkButton Content="Browse" Click="BrowseButtonClicked"></HyperlinkButton>
+                <CheckBox Content="Clientless mode?" IsChecked="{Binding SelectedProfile.Clientless}" Classes="Flat Accent"></CheckBox>
+            </StackPanel>
+            <!--</ScrollViewer>-->
+        </suki:GlassCard>
+			<!--<ScrollViewer Height="200"/>-->
+ 
+
+       <HyperlinkButton Grid.Column="1" Content="New profile" HorizontalAlignment="Center" Click="NewProfile_OnClick"></HyperlinkButton>
+
+		<Grid ColumnDefinitions="*,*">
+			<Button Margin="8 0 0 0" Content="Cancel" Classes="Flat Accent" Grid.Column="0" Click="CancelButtonClicked"></Button>
+			<Button Margin="8 0 0 0" Content="Load profile" Classes="Flat" Grid.Column="1" Click="LoadProfileButtonClicked" IsEnabled="{Binding SelectedProfile.ClientDirectory}"></Button>
+		</Grid>
+	</StackPanel>
 </UserControl>

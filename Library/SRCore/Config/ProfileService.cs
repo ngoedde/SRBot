@@ -23,7 +23,7 @@ public sealed class ProfileService(ConfigService configService)
 
     public ProfileConfig Config => configService.GetConfig<ProfileConfig>() ?? new ProfileConfig();
 
-    public Profile ActiveProfile { get; private set; } = new(Kernel.ConfigDirectory, "default");
+    public Profile? ActiveProfile { get; private set; }
 
     #endregion
 
@@ -50,6 +50,19 @@ public sealed class ProfileService(ConfigService configService)
             await SaveProfilesAsync(path);
         }
 
+        //Add default profile if there are no profiles
+        if (Config.Profiles.Count == 0)
+        {
+            Config.Profiles.Add(new Profile(Path.Combine(Kernel.ConfigDirectory, "default"), "default"));
+        }
+
+        if (string.IsNullOrEmpty(Config.ActiveProfile))
+        {
+            Config.ActiveProfile = Config.Profiles.First().Name;
+        }
+
+        await SetActiveProfileAsync(Config.ActiveProfile);
+
         OnProfileConfigLoaded(Config);
     }
 
@@ -73,9 +86,7 @@ public sealed class ProfileService(ConfigService configService)
     {
         var profile = GetProfile(name);
         if (profile == null)
-        {
-            throw new Exception($"Profile {name} not found");
-        }
+            return;
 
         await SetActiveProfileAsync(profile);
     }

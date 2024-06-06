@@ -1,53 +1,98 @@
+using System.IO;
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
+using Avalonia.Media;
+using Avalonia.Platform.Storage;
+using Material.Icons;
 using Microsoft.Extensions.DependencyInjection;
 using SRCore;
-using SRCore.Config;
-using SRCore.Config.Model;
-using SRGame;
 using SRGame.Client;
 using SukiUI.Controls;
 
 namespace SRBot.Dialog;
 
-public partial class ProfileDialog : UserControl
+public partial class ProfileDialog : GlassCard
 {
     public ProfileDialog()
     {
         InitializeComponent();
-        
-        if (DataContext! is not ProfileDialogModel model)
-            return;
-
-        if (string.IsNullOrEmpty(model.SelectedProfile) && model.Profiles.Count > 0)
-        {
-            model.SelectedProfile = model.Profiles[0].Name;
-        }
     }
 
     private async void LoadProfileButtonClicked(object? sender, RoutedEventArgs e)
     {
+        SukiHost.CloseDialog();
+
         if (DataContext! is not ProfileDialogModel model)
             return;
-        
+
+        if (model.SelectedProfile == null)
+            return;
+
         await model.SetActiveProfile(model.SelectedProfile);
         await model.SaveProfiles();
-        
-        SukiHost.CloseDialog();
         
         var kernel = App.ServiceProvider.GetRequiredService<Kernel>();
         if (kernel.IsInitialized)
             await kernel.ShutdownAsync();
         
-        var configService = App.ServiceProvider.GetRequiredService<ConfigService>();
-        
         await kernel.InitializeAsync();
-        await kernel.InitializeGameAsync(configService.GetConfig<GameConfig>()!.ClientDirectory, ClientType.Vietnam188);
+        await kernel.InitializeGameAsync(model.SelectedProfile.ClientDirectory, ClientType.Vietnam188);
     }
 
-    private void Button_OnClick(object? sender, RoutedEventArgs e)
+    private void CancelButtonClicked(object? sender, RoutedEventArgs e)
     {
         SukiHost.CloseDialog();
+    }
+
+    private void NewProfile_OnClick(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext! is not ProfileDialogModel model)
+            return;
+
+        model.AddProfile();
+    }
+
+    private async void BrowseButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        var model = DataContext as ProfileDialogModel;
+        var kernel = App.ServiceProvider.GetRequiredService<Kernel>();
+
+        if (model.SelectedProfile == null)
+            return;
+
+        if (kernel.IsGameInitialized)
+        {
+            var msgBoxDialogModel = new MessageBoxDialogModel()
+            {
+                Icon = MaterialIconKind.MessageWarning,
+                IconColor = Brushes.Gold,
+                Title = "The game is already initialized.",
+                Message =
+                    "The game is already initialized. If you choose a different Silkroad Online client directory, the bot will reload all data. Do you want to continue?",
+            };
+
+            SukiHost.ShowDialog(msgBoxDialogModel);
+
+            if (await msgBoxDialogModel.WaitForResultAsync() != UserConfirmation.Ok)
+                return;
+        }
+
+        // Get top level from the current control. Alternatively, you can use Window reference instead.
+        var topLevel = TopLevel.GetTopLevel(this);
+        var selectedFolders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
+        {
+            AllowMultiple = false,
+            Title = "Select the Silkroad Online game directory",
+        });
+
+        var selectedFolder = selectedFolders.FirstOrDefault()?.Path.AbsolutePath;
+        if (selectedFolder == null)
+            return;
+
+        if (model.SelectedProfile.ClientDirectory != selectedFolder)
+        {
+            model.SelectedProfile.ClientDirectory = selectedFolder;
+        }
     }
 }
