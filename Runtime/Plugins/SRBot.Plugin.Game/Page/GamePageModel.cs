@@ -12,7 +12,7 @@ public class GamePageModel : PageModel
     private readonly ProfileService _profileService;
 
 
-    [Reactive] public Profile? ActiveProfile => _profileService.ActiveProfile;
+    [Reactive] public Profile ActiveProfile => _profileService.ActiveProfile;
 
 
     public GamePageModel(ProfileService profileService) : base("srbot_page_game", "Game",

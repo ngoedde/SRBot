@@ -1,10 +1,18 @@
 using System.Text.Json;
+using ReactiveUI.Fody.Helpers;
 using SRCore.Config.Model;
 
 namespace SRCore.Config;
 
-public sealed class ProfileService(ConfigService configService)
+public sealed class ProfileService
 {
+    private readonly ConfigService _configService;
+
+    public ProfileService(ConfigService configService)
+    {
+        _configService = configService;
+    }
+
     #region Events
 
     public delegate void ActiveProfileChangedEventHandler(Profile profile);
@@ -21,9 +29,9 @@ public sealed class ProfileService(ConfigService configService)
 
     public string ProfileConfigPath => Path.Combine(Kernel.ConfigDirectory, "profiles.json");
 
-    public ProfileConfig Config => configService.GetConfig<ProfileConfig>() ?? new ProfileConfig();
+    [Reactive] public ProfileConfig Config => _configService.GetConfig<ProfileConfig>() ?? GetDefaultProfileConfig();
 
-    public Profile? ActiveProfile { get; private set; }
+    [Reactive] public Profile ActiveProfile { get; private set; }
 
     #endregion
 
@@ -42,7 +50,7 @@ public sealed class ProfileService(ConfigService configService)
 
     public async Task LoadProfilesAsync(string? path = null)
     {
-        await configService.LoadConfigurationAsync(ProfileConfigPath, GetDefaultProfileConfig());
+        await _configService.LoadConfigurationAsync(ProfileConfigPath, GetDefaultProfileConfig());
 
         path ??= ProfileConfigPath;
         if (!File.Exists(ProfileConfigPath))
@@ -52,14 +60,7 @@ public sealed class ProfileService(ConfigService configService)
 
         //Add default profile if there are no profiles
         if (Config.Profiles.Count == 0)
-        {
-            Config.Profiles.Add(new Profile(Path.Combine(Kernel.ConfigDirectory, "default"), "default"));
-        }
-
-        if (string.IsNullOrEmpty(Config.ActiveProfile))
-        {
-            Config.ActiveProfile = Config.Profiles.First().Name;
-        }
+            Config.Profiles.Add(GetDefaultProfile());
 
         await SetActiveProfileAsync(Config.ActiveProfile);
 
@@ -67,17 +68,12 @@ public sealed class ProfileService(ConfigService configService)
     }
 
 
-    public async Task SetActiveProfileAsync(Model.Profile profile)
+    public async Task SetActiveProfileAsync(Profile profile)
     {
-        if (ActiveProfile != null)
-        {
-            await configService.SaveAllAsync();
-        }
-
-        await LoadActiveProfileConfigs(profile.ConfigDirectory);
-
         Config.ActiveProfile = profile.Name;
         ActiveProfile = profile;
+        
+        await LoadActiveProfileConfigs(profile.ConfigDirectory);
 
         OnProfileChanged(profile);
     }
@@ -91,11 +87,11 @@ public sealed class ProfileService(ConfigService configService)
         await SetActiveProfileAsync(profile);
     }
 
-    public Model.Profile? GetProfile(string name) => Config.Profiles.FirstOrDefault(p => p.Name == name);
+    public Profile? GetProfile(string name) => Config.Profiles.FirstOrDefault(p => p.Name == name);
 
     private async Task LoadActiveProfileConfigs(string configDirectory)
     {
-        _ = await configService.LoadConfigurationAsync(Path.Combine(configDirectory, GameConfig.FileName), new GameConfig()).ConfigureAwait(false);
+        _ = await _configService.LoadConfigurationAsync(Path.Combine(configDirectory, GameConfig.FileName), new GameConfig()).ConfigureAwait(false);
     }
 
     private void OnProfileChanged(Model.Profile profile)
@@ -107,9 +103,18 @@ public sealed class ProfileService(ConfigService configService)
     
     private static ProfileConfig GetDefaultProfileConfig()
     {
-        var defaultProfileConfig = new ProfileConfig();
-        defaultProfileConfig.Profiles.Add(new Model.Profile(Path.Combine(Kernel.ConfigDirectory, "default"), "default"));
+        return new ProfileConfig
+        {
+            Profiles = [GetDefaultProfile()],
+            ActiveProfile = ProfileConfig.DefaultProfileName
+        };
+    }
 
-        return defaultProfileConfig;
+    private static Profile GetDefaultProfile()
+    {
+        return new Profile(Path.Combine(Kernel.ConfigDirectory, ProfileConfig.DefaultProfileName), ProfileConfig.DefaultProfileName)
+        {
+            Description = "The default profile."
+        };
     }
 }

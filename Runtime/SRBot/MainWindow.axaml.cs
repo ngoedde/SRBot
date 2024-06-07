@@ -1,11 +1,12 @@
 using System.IO;
+using System.Net;
 using Avalonia.Interactivity;
 using Microsoft.Extensions.DependencyInjection;
 using SRBot.Dialog;
 using SRCore;
 using SRCore.Config;
-using SRCore.Config.Model;
 using SRGame.Client;
+using SRNetwork.Common;
 using SukiUI.Controls;
 using SukiUI.Enums;
 
@@ -18,6 +19,8 @@ public partial class MainWindow : SukiWindow
     private readonly EntityManager _entityManager = App.ServiceProvider.GetRequiredService<EntityManager>();
     private readonly ClientInfoManager _clientInfoManager = App.ServiceProvider.GetRequiredService<ClientInfoManager>();
     private readonly Kernel _kernel = App.ServiceProvider.GetRequiredService<Kernel>();
+    private readonly Game _game = App.ServiceProvider.GetRequiredService<Game>();
+    private readonly Proxy _proxy = App.ServiceProvider.GetRequiredService<Proxy>();
 
     public MainWindow()
     {
@@ -32,25 +35,20 @@ public partial class MainWindow : SukiWindow
 
             return;
         }
-
-        await _profileService.SetActiveProfileAsync(_profileService.Config.ActiveProfile);
         
-
-        if (_profileService.ActiveProfile == null || !Directory.Exists(_profileService.ActiveProfile.ClientDirectory))
+        if (!Directory.Exists(_profileService.ActiveProfile.ClientDirectory))
         {
             OpenProfileDialog();
-
+        
             return;
         }
-
-
-        await _kernel.InitializeGameAsync(_profileService.ActiveProfile.ClientDirectory,
-            ClientType.Vietnam188);
+        
+        await _game.LoadGameDataAsync();
     }
 
     private void OpenProfileDialog()
     {
-        var dialogModel = new ProfileDialogModel(_profileService);
+        var dialogModel = new ProfileDialogModel(_profileService, _kernel);
 
         SukiHost.ShowDialog(dialogModel);
     }
@@ -76,9 +74,19 @@ public partial class MainWindow : SukiWindow
     private async void StartButton_OnClick(object? sender, RoutedEventArgs e)
     {
         // Network has not been started yet?
-        if (!_kernel.IsNetworkInitialized)
+        if (_proxy.Context == ProxyContext.None)
         {
-            await _kernel.StartNetworkAsync();
+            var gatewayHost = _clientInfoManager.DivisionInfo.Divisions[0].GatewayServers[0];
+            EndPoint gatewayEndPoint = NetHelper.ToIPEndPoint(gatewayHost, _clientInfoManager.GatewayPort);
+
+            if (_profileService.ActiveProfile.Clientless)
+            {
+                await _proxy.ConnectToGateway(gatewayEndPoint);
+            }
+            else
+            {
+                await _proxy.StartClientProxy(_profileService.ActiveProfile.ClientListeningPort);
+            }
         }
     }
 }

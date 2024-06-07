@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
@@ -10,38 +11,46 @@ namespace SRBot.Dialog;
 
 public class ProfileDialogModel : ViewModel
 {
-    private readonly ProfileService _profileService;
+    public ProfileService ProfileService { get; }
+    
+    public Kernel Kernel { get; }
 
-    public ProfileDialogModel(ProfileService profileService)
+    public ProfileDialogModel(ProfileService profileService, Kernel kernel)
     {
-        _profileService = profileService;
-
-        SelectedProfile = _profileService.ActiveProfile;
+        ProfileService = profileService;
+        SelectedProfile = ProfileService.ActiveProfile;
+        Kernel = kernel;
     }
+    
+    public IEnumerable<Profile> Profiles => ProfileService.Config.Profiles;
 
     [Reactive]
-    public List<Profile> Profiles => _profileService.Config.Profiles;
-
-    [Reactive]
-    public Profile? SelectedProfile { get; set; }
+    public Profile SelectedProfile { get; set; }
 
     public async Task SetActiveProfile(Profile profile)
     {
-        await _profileService.SetActiveProfileAsync(profile);
+        await ProfileService.SetActiveProfileAsync(profile);
     }
     
     public async Task SaveProfiles()
     {
-        await _profileService.SaveProfilesAsync();
+        await ProfileService.SaveProfilesAsync();
     }
 
     public void AddProfile(string name= "New profile")
     {
-        var profile = new Profile(Kernel.ConfigDirectory, name);
-        _profileService.Config.Profiles.Add(profile);
+        var profile = new Profile(Path.Combine(Kernel.ConfigDirectory, name), name);
+        ProfileService.Config.Profiles.Add(profile);
 
-        this.RaisePropertyChanged(nameof(Profiles));
-        this.SelectedProfile = profile;
+        SelectedProfile = profile;
+        
+        // this.RaisePropertyChanged(nameof(Profiles));
     }
 
+    public void DeleteProfile(Profile profile)
+    {
+        ProfileService.Config.Profiles.Remove(profile);
+        
+        // this.RaisePropertyChanged(nameof(Profiles));
+    }
 }

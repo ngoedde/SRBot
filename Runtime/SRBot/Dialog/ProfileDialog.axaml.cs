@@ -1,19 +1,21 @@
-using System.IO;
 using System.Linq;
-using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Platform.Storage;
 using Material.Icons;
 using Microsoft.Extensions.DependencyInjection;
 using SRCore;
-using SRGame.Client;
+using SRCore.Config;
+using SRCore.Config.Model;
 using SukiUI.Controls;
+using SukiUI.Enums;
 
 namespace SRBot.Dialog;
 
 public partial class ProfileDialog : GlassCard
 {
+    private ProfileDialogModel? ViewModel => DataContext as ProfileDialogModel;
+    
     public ProfileDialog()
     {
         InitializeComponent();
@@ -23,21 +25,36 @@ public partial class ProfileDialog : GlassCard
     {
         SukiHost.CloseDialog();
 
-        if (DataContext! is not ProfileDialogModel model)
+        if (ViewModel == null)
             return;
-
-        if (model.SelectedProfile == null)
-            return;
-
-        await model.SetActiveProfile(model.SelectedProfile);
-        await model.SaveProfiles();
         
         var kernel = App.ServiceProvider.GetRequiredService<Kernel>();
-        if (kernel.IsInitialized)
-            await kernel.ShutdownAsync();
+        var game = App.ServiceProvider.GetRequiredService<Game>();
         
+        if (game.IsLoaded)
+        {
+            var msgBoxDialogModel = new MessageBoxDialogModel
+            {
+                Icon = MaterialIconKind.MessageWarning,
+                IconColor = Brushes.Gold,
+                Title = "The game is already initialized.",
+                Message =
+                    "The game is already initialized. If you choose a different profile, the bot will reload all data. Do you want to continue?",
+            };
+
+            SukiHost.ShowDialog(msgBoxDialogModel);
+
+            if (await msgBoxDialogModel.WaitForResultAsync() != UserConfirmation.Ok)
+                return;
+        }
+        
+        //Re-Initialize
+        await ViewModel.SetActiveProfile(ViewModel.SelectedProfile);
+        await ViewModel.SaveProfiles();
+
+        await kernel.ShutdownAsync();
         await kernel.InitializeAsync();
-        await kernel.InitializeGameAsync(model.SelectedProfile.ClientDirectory, ClientType.Vietnam188);
+        await game.LoadGameDataAsync();
     }
 
     private void CancelButtonClicked(object? sender, RoutedEventArgs e)
@@ -45,7 +62,7 @@ public partial class ProfileDialog : GlassCard
         SukiHost.CloseDialog();
     }
 
-    private void NewProfile_OnClick(object? sender, RoutedEventArgs e)
+    private void NewProfileButtonClicked(object? sender, RoutedEventArgs e)
     {
         if (DataContext! is not ProfileDialogModel model)
             return;
@@ -55,31 +72,17 @@ public partial class ProfileDialog : GlassCard
 
     private async void BrowseButtonClicked(object? sender, RoutedEventArgs e)
     {
-        var model = DataContext as ProfileDialogModel;
-        var kernel = App.ServiceProvider.GetRequiredService<Kernel>();
-
-        if (model.SelectedProfile == null)
+        if (ViewModel == null)
             return;
-
-        if (kernel.IsGameInitialized)
-        {
-            var msgBoxDialogModel = new MessageBoxDialogModel()
-            {
-                Icon = MaterialIconKind.MessageWarning,
-                IconColor = Brushes.Gold,
-                Title = "The game is already initialized.",
-                Message =
-                    "The game is already initialized. If you choose a different Silkroad Online client directory, the bot will reload all data. Do you want to continue?",
-            };
-
-            SukiHost.ShowDialog(msgBoxDialogModel);
-
-            if (await msgBoxDialogModel.WaitForResultAsync() != UserConfirmation.Ok)
-                return;
-        }
-
+        
         // Get top level from the current control. Alternatively, you can use Window reference instead.
-        var topLevel = TopLevel.GetTopLevel(this);
+        var topLevel = App.GetTopLevel();
+        if (topLevel == null) {
+            await SukiHost.ShowToast("Error", "Could not initialize file browser dialog.");
+            
+            return;
+        }
+        
         var selectedFolders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
         {
             AllowMultiple = false,
@@ -89,10 +92,40 @@ public partial class ProfileDialog : GlassCard
         var selectedFolder = selectedFolders.FirstOrDefault()?.Path.AbsolutePath;
         if (selectedFolder == null)
             return;
+        
+        ViewModel.SelectedProfile.ClientDirectory = selectedFolder;
+    }
+    
+    private async void DeleteProfileButtonClicked(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext! is not ProfileDialogModel model)
+            return;
 
-        if (model.SelectedProfile.ClientDirectory != selectedFolder)
+        var activeProfile = App.ServiceProvider.GetRequiredService<Profile>();
+        if (model.SelectedProfile == activeProfile)
         {
-            model.SelectedProfile.ClientDirectory = selectedFolder;
+            await SukiHost.ShowToast("Error", "You can't delete the active profile.", SukiToastType.Error);
+            
+            return;
         }
+        
+        var msgBoxDialogModel = new MessageBoxDialogModel
+        {
+            Icon = MaterialIconKind.PersonQuestion,
+            IconColor = Brushes.Gold,
+            Title = "Delete profile?",
+            Message =
+                $"Are you sure you want to delete the selected profile `{model.SelectedProfile.Name}`? This action can not be undone. Do you want to continue?",
+        };
+
+        SukiHost.ShowDialog(msgBoxDialogModel);
+
+        if (await msgBoxDialogModel.WaitForResultAsync() != UserConfirmation.Ok)
+            return;
+
+        var profileService = App.ServiceProvider.GetRequiredService<ProfileService>();
+        profileService.Config.Profiles.Remove(model.SelectedProfile);
+        
+        model.SelectedProfile = profileService.Config.Profiles.First();
     }
 }

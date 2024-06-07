@@ -23,9 +23,9 @@ public partial class GamePage : UserControl
 
     private async void ChangeDirectory_OnClick(object? sender, RoutedEventArgs e)
     {
-        var kernel = App.ServiceProvider.GetRequiredService<Kernel>();
+        var game = App.ServiceProvider.GetRequiredService<SRCore.Game>();
 
-        if (kernel.IsGameInitialized)
+        if (game.IsLoaded)
         {
             var msgBoxDialogModel = new MessageBoxDialogModel()
             {
@@ -60,7 +60,7 @@ public partial class GamePage : UserControl
         {
             model.ActiveProfile.ClientDirectory = selectedFolder;
 
-            await kernel.InitializeGameAsync(model.ActiveProfile.ClientDirectory, ClientType.Vietnam188);
+            await game.LoadGameDataAsync();
         }
     }
 }

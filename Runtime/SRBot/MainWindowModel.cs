@@ -1,52 +1,50 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Avalonia.Collections;
+using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SRBot.Page;
 using SRCore;
 using SRCore.Config;
 using SRCore.Config.Model;
-using SRGame.Client;
-
 namespace SRBot;
 
 public class MainWindowModel : ViewModel
 {
-    private readonly ProfileService? _profileService;
-    private readonly EntityManager _entityManager;
-    private readonly Kernel _kernel;
+    private readonly ProfileService _profileService;
+    private readonly Game _game;
 
     public IAvaloniaReadOnlyList<PageModel> Pages { get; }
     
     [Reactive] public string Title { get; set; } = "SRBot";
 
-    [Reactive] public Profile? ActiveProfile => _profileService?.ActiveProfile;
+    public Profile ActiveProfile => _profileService.ActiveProfile;
 
     [Reactive] public bool IsLoading { get; set; }
     [Reactive] public string LoadingText { get; set; }
     
-    public bool IsGameInitialized => _kernel.IsGameInitialized;
+    public bool IsGameInitialized => _game.IsLoaded;
 
-    public MainWindowModel(IEnumerable<PageModel> pages, ProfileService profileService, EntityManager entityManager, Kernel kernel)
+    public MainWindowModel(IEnumerable<PageModel> pages, ProfileService profileService, Game game)
     {
         Pages = new AvaloniaList<PageModel>(pages.OrderBy(x => x.Position));
         
         _profileService = profileService;
-        _entityManager = entityManager;
-        _kernel = kernel;
-        
+        _game = game;
+
         _profileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;   
-        _kernel.StartLoading += KernelOnStartLoading;
-        _kernel.StopLoading += KernelOnStopLoading;
+        _game.GameStopLoading += OnGameStopLoading;
+        _game.GameStartLoading += OnGameStartLoading;
     }
 
-    private void KernelOnStopLoading(Kernel kernel)
+    private void OnGameStopLoading(Game kernel)
     {
         SetLoading(false);
     }
 
-    private void KernelOnStartLoading(Kernel kernel)
+    private void OnGameStartLoading(Game kernel)
     {
         SetLoading(true, "Loading game...");
     }

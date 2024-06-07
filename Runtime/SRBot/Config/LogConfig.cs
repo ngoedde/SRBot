@@ -1,7 +1,6 @@
-using Avalonia.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using SRCore.Config;
+using Serilog.Events;
 
 namespace SRBot.Config;
 

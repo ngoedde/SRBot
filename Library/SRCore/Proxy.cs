@@ -22,7 +22,7 @@ public class Proxy
         Client.ClientConnected += Proxy_OnClientConnected;
     }
 
-    public void Initialize(IEnumerable<SRNetwork.MessageHandler> packetHandlers, ClientlessManager clientlessManager)
+    internal void Initialize(IEnumerable<SRNetwork.MessageHandler> packetHandlers, ClientlessManager clientlessManager)
     {
         _clientlessManager = clientlessManager;
         foreach (var packetHandler in packetHandlers)
