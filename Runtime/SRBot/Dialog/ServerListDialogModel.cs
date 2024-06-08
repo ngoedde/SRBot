@@ -1,14 +1,17 @@
+using System.Collections.Generic;
 using ReactiveUI;
 using SRCore.Models;
 
 namespace SRBot.Dialog;
 
-public class ServerListDialogModel : ReactiveObject
+public class ServerListDialogModel(ShardList shardList) : ReactiveObject
 {
-    public ServerListDialogModel(ShardList shardList)
+    public ShardList ShardList => shardList;
+
+    public void RefreshServerList()
     {
-        ShardList = shardList;
+        ShardList.Request();
+
+        this.RaisePropertyChanged(nameof(ShardList.Shards));
     }
-    
-    public ShardList ShardList { get; } 
 }

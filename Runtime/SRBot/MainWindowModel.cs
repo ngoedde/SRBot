@@ -105,6 +105,8 @@ public class MainWindowModel : ViewModel
                 "A new patch is required to play the game. Please restart the game to apply the patch.",
                 MessageBoxButtons.Ok, MaterialIconKind.Update, Brushes.Red);
         }
+
+        this.RaisePropertyChanged(nameof(IsServerListAvailable));
     }
 
     #region Event listener

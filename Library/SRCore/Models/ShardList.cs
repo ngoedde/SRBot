@@ -1,4 +1,6 @@
+using System.Collections.ObjectModel;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SRCore.Models.ShardInfo;
 using SRNetwork;
@@ -11,18 +13,20 @@ public class ShardList(IServiceProvider serviceProvider) : GameModel(serviceProv
     public delegate void ShardListUpdatedHandler(ShardList shardList);
     public event ShardListUpdatedHandler? ShardListUpdated;
     
-    [Reactive] public List<Shard> Shards { get; internal set; } = new();
-    [Reactive] public List<Farm> Farms { get; internal set; } = new();
+    [Reactive] public ObservableCollection<Shard> Shards { get; internal set; } = new();
+    [Reactive] public ObservableCollection<Farm> Farms { get; internal set; } = new();
     
     private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
 
     internal override bool TryParsePacket(Session session, Packet packet)
     {
-        Shards.Clear();
-        Farms.Clear();
 
+        //Problem: Observable is updated from a different thread!
         try
         {
+            Shards.Clear();
+            Farms.Clear();
+
             var hasNextFarmEntry = packet.ReadBool();
             while (hasNextFarmEntry)
             {
@@ -61,19 +65,22 @@ public class ShardList(IServiceProvider serviceProvider) : GameModel(serviceProv
                 hasNextShardEntry = packet.ReadBool();
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             return false;
         }
 
+        this.RaisePropertyChanged(nameof(Shards));
+        this.RaisePropertyChanged(nameof(Farms));
+
         OnShardListUpdated(this);
-        
+
         return true;
     }
     
     public void Request()
     {
-        var packet = new Packet(0xA101);
+        var packet = new Packet(GatewayMsgId.ShardInfoReq);
         
         _proxy.SendToServer(packet);
     }

@@ -1,8 +1,9 @@
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 
 namespace SRCore.Models.ShardInfo;
 
-public class Shard
+public class Shard : ReactiveObject
 {
     [Reactive] public ushort Id { get; init; }
     [Reactive] public string Name { get; init; }
