@@ -1,4 +1,5 @@
 using System.Net;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
 using SRNetwork;
 using SRNetwork.Common;
@@ -8,13 +9,27 @@ namespace SRCore;
 
 public class Proxy
 {
-    private ClientlessManager? _clientlessManager;
+    public delegate void ClientConnectedEventHandler(Session clientSession);
+    public delegate void GatewayConnectedEventHandler(Session serverSession);
+    public delegate void AgentConnectedEventHandler(Session serverSession);
+
+    public delegate void ClientDisconnectedEventHandler();
+    public delegate void GatewayDisconnectedEventHandler();
+    public delegate void AgentDisconnectedEventHandler();
     
-    public ProxyContext Context { get; private set; } = ProxyContext.None;
-    public NetEngine Server { get; private set; } = new();
-    public NetEngine Client { get; private set;  } = new();
-    public Session? ClientSession { get; private set; }
-    public Session? ServerSession { get; private set; }
+    public event ClientConnectedEventHandler? ClientConnected;
+    public event GatewayConnectedEventHandler? GatewayConnected;
+    public event AgentConnectedEventHandler? AgentConnected;
+    
+    public event ClientDisconnectedEventHandler? ClientDisconnected;
+    public event GatewayDisconnectedEventHandler? GatewayDisconnected;
+    public event AgentDisconnectedEventHandler? AgentDisconnected;
+    
+    [Reactive] public ProxyContext Context { get; private set; } = ProxyContext.None;
+    [Reactive] public NetEngine Server { get; private set; } = new();
+    [Reactive] public NetEngine Client { get; private set;  } = new();
+    [Reactive] public Session? ClientSession { get; private set; }
+    [Reactive] public Session? ServerSession { get; private set; }
     
     public Proxy()
     {
@@ -22,9 +37,8 @@ public class Proxy
         Client.ClientConnected += Proxy_OnClientConnected;
     }
 
-    internal void Initialize(IEnumerable<SRNetwork.MessageHandler> packetHandlers, ClientlessManager clientlessManager)
+    internal void Initialize(IEnumerable<SRNetwork.MessageHandler> packetHandlers)
     {
-        _clientlessManager = clientlessManager;
         foreach (var packetHandler in packetHandlers)
         {
             Server.SetMsgHandler(packetHandler.Opcode, packetHandler.Handler);
@@ -81,50 +95,88 @@ public class Proxy
         
         ServerSession = session;
         ServerSession.Disconnected += ServerSessionOnDisconnected;
-        
-        if ((Context & ProxyContext.Gateway) != 0 && ClientSession == null)
-        {
-            _clientlessManager.RequestPatchInfoAfterGatewayConnect();
-        }
+
+        if ((Context & ProxyContext.Gateway) != 0)
+            OnGatewayConnected(session);
+        else if ((Context & ProxyContext.Agent) != 0)
+            OnAgentConnected(session);
     }
 
     private void ServerSessionOnDisconnected(DisconnectReason reason)
     {
+        Log.Information("Disconnected from server.");
         ServerSession = null;
+        
+        if ((Context & ProxyContext.Agent) != 0) 
+            OnAgentDisconnected();
+        else if ((Context & ProxyContext.Gateway) != 0)
+            OnGatewayDisconnected();
+        
         Context &= ~ProxyContext.Gateway;
         Context &= ~ProxyContext.Agent;
-        
-        Log.Information("Disconnected from server.");
     }
 
     private void Proxy_OnClientConnected(Session session)
     {
+        Log.Information($"Client connected: {session.RemoteEndPoint}");
+
         ClientSession = session;
         ClientSession.MessageReceived += Proxy_OnClientMessageReceived;
         ClientSession.Disconnected += Proxy_OnClientDisconnected;
         
         Context |= ProxyContext.Client;
         
-        Log.Information($"Client connected: {session.RemoteEndPoint}");
+        OnClientConnected(session);
     }
 
     private void Proxy_OnClientDisconnected(DisconnectReason reason)
     {
+        Log.Information("Client disconnected.");
+        
         Context &= ~ProxyContext.Client;
-
         ClientSession = null;
         
-        Log.Information("Client disconnected.");
+        OnClientDisconnected();
     }
 
     private void Proxy_OnClientMessageReceived(Packet packet)
     {
-        ServerSession?.Send(packet);
+         ServerSession?.Send(packet);
     }
 
     public async Task ShutdownAsync()
     {
         await Client.StopAsync();
         await Server.StopAsync();
+    }
+
+    protected virtual void OnClientConnected(Session clientSession)
+    {
+        ClientConnected?.Invoke(clientSession);
+    }
+
+    protected virtual void OnGatewayConnected(Session serverSession)
+    {
+        GatewayConnected?.Invoke(serverSession);
+    }
+
+    protected virtual void OnAgentConnected(Session serverSession)
+    {
+        AgentConnected?.Invoke(serverSession);
+    }
+
+    protected virtual void OnClientDisconnected()
+    {
+        ClientDisconnected?.Invoke();
+    }
+
+    protected virtual void OnGatewayDisconnected()
+    {
+        GatewayDisconnected?.Invoke();
+    }
+
+    protected virtual void OnAgentDisconnected()
+    {
+        AgentDisconnected?.Invoke();
     }
 }

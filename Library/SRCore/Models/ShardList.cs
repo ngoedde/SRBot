@@ -78,8 +78,8 @@ public class ShardList(IServiceProvider serviceProvider) : GameModel(serviceProv
         _proxy.SendToServer(packet);
     }
 
-    protected virtual void OnShardListUpdated(ShardList shardlist)
+    protected virtual void OnShardListUpdated(ShardList shardList)
     {
-        ShardListUpdated?.Invoke(shardlist);
+        ShardListUpdated?.Invoke(shardList);
     }
 }

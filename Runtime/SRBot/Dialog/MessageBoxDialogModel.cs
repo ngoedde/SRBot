@@ -1,28 +1,41 @@
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Material.Icons;
+using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using SukiUI;
-using SukiUI.Models;
 
 namespace SRBot.Dialog;
 
-public class MessageBoxDialogModel
+public class MessageBoxDialogModel : ReactiveObject
 {
-    [Reactive] public string Title { get; set; } = "Message title";
-    [Reactive] public string Message { get; set; } = "Message content";
-    [Reactive] public MaterialIconKind Icon { get; set; } = MaterialIconKind.Information;
-    [Reactive] public UserConfirmation Result { get; set; } = UserConfirmation.None;
+    private MessageBoxButtons _buttons = MessageBoxButtons.None;
     
-    [Reactive] public IImmutableSolidColorBrush IconColor { get; set; } = Brushes.Black;
+    public string Title { get; set; } = "Message title";
+    public string Message { get; set; } = "Message content";
+    public MaterialIconKind Icon { get; set; } = MaterialIconKind.Information;
+    public MessageBoxDialogResult Result { get; set; } = MessageBoxDialogResult.None;
     
-    public async Task<UserConfirmation> WaitForResultAsync()
-    {
-        while (Result == UserConfirmation.None)
-        {
-            await Task.Delay(100);
-        }
+    public IImmutableSolidColorBrush IconColor { get; set; } = Brushes.Black;
 
-        return Result;
-    }
+    // public MessageBoxButtons Buttons
+    // {
+    //     get => _buttons;
+    //     init {
+    //         this.RaiseAndSetIfChanged(ref _buttons, value);
+    //         
+    //         this.RaisePropertyChanged(nameof(IsCancelButtonVisible));
+    //         this.RaisePropertyChanged(nameof(IsRetryButtonVisible));
+    //         this.RaisePropertyChanged(nameof(IsNoButtonVisible));
+    //         this.RaisePropertyChanged(nameof(IsYesButtonVisible));
+    //         this.RaisePropertyChanged(nameof(IsOkButtonVisible));
+    //     }
+    // }
+
+    public MessageBoxButtons Buttons { get; init; } = MessageBoxButtons.None;
+    
+    public bool IsCancelButtonVisible => (Buttons & MessageBoxButtons.Cancel) == MessageBoxButtons.Cancel;
+    public bool IsRetryButtonVisible => (Buttons & MessageBoxButtons.Retry) == MessageBoxButtons.Retry;
+    public bool IsNoButtonVisible => (Buttons & MessageBoxButtons.No) == MessageBoxButtons.No;
+    public bool IsYesButtonVisible => (Buttons & MessageBoxButtons.Yes) == MessageBoxButtons.Yes;
+    public bool IsOkButtonVisible => (Buttons & MessageBoxButtons.Ok) == MessageBoxButtons.Ok;
 }

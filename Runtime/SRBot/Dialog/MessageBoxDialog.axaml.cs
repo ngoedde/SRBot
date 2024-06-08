@@ -1,34 +1,50 @@
-using Avalonia;
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Markup.Xaml;
 using SukiUI.Controls;
 
 namespace SRBot.Dialog;
 
 public partial class MessageBoxDialog : UserControl
 {
+    private MessageBoxDialogModel ViewModel => DataContext as MessageBoxDialogModel ?? new MessageBoxDialogModel();
+    
     public MessageBoxDialog()
     {
         InitializeComponent();
     }
-
-    private void CloseButton_OnClick(object? sender, RoutedEventArgs e)
+    
+    private void CancelButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not MessageBoxDialogModel model)
-            return;
-
-        model.Result = UserConfirmation.Cancel;
+        ViewModel.Result = MessageBoxDialogResult.Cancel;
         
         SukiHost.CloseDialog();
     }
 
     private void OkButton_OnClick(object? sender, RoutedEventArgs e)
     {
-        if (DataContext is not MessageBoxDialogModel model)
-            return;
+        ViewModel.Result = MessageBoxDialogResult.Ok;
+        
+        SukiHost.CloseDialog();
+    }
 
-        model.Result = UserConfirmation.Ok;
+    private void RetryButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        ViewModel.Result = MessageBoxDialogResult.Retry;
+        
+        SukiHost.CloseDialog();
+    }
+
+    private void YesButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        ViewModel.Result = MessageBoxDialogResult.Ok;
+        
+        SukiHost.CloseDialog();
+    }
+
+    private void NoButton_OnClick(object? sender, RoutedEventArgs e)
+    {
+        ViewModel.Result = MessageBoxDialogResult.Cancel;
         
         SukiHost.CloseDialog();
     }

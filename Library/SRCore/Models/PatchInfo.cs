@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using SRCore.Models.Patch;
+using SRGame;
 using SRGame.Client;
 using SRNetwork;
 using SRNetwork.SilkroadSecurityApi;
@@ -9,10 +10,12 @@ namespace SRCore.Models;
 
 public class PatchInfo(IServiceProvider serviceProvider) : GameModel(serviceProvider)
 {
+    private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
+    private readonly ClientInfoManager _clientInfoManager = serviceProvider.GetRequiredService<ClientInfoManager>();
+    private readonly Game _game = serviceProvider.GetRequiredService<Game>();
+    
     public delegate void PatchInfoUpdatedHandler(Session session, PatchInfo patchInfo);
     public event PatchInfoUpdatedHandler? PatchInfoUpdated;
-
-    private readonly ClientInfoManager _clientInfoManager = serviceProvider.GetRequiredService<ClientInfoManager>();
     
     [Reactive] public PatchErrorCode ErrorCode { get; internal set; }
     public bool PatchRequired => ErrorCode > 0;
@@ -20,7 +23,6 @@ public class PatchInfo(IServiceProvider serviceProvider) : GameModel(serviceProv
     [Reactive] public string DownloadServerIp { get; internal set; }
     [Reactive] public ushort DownloadServerPort { get; internal set; }
 
-    private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
 
     public void Request()
     {

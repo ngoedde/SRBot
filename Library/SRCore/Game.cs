@@ -1,59 +1,90 @@
+using ReactiveUI.Fody.Helpers;
 using Serilog;
 using SRCore.Config;
+using SRGame;
 using SRGame.Client;
+using SRNetwork;
 
 namespace SRCore;
 
-public class Game(EntityManager entityManager, ClientInfoManager clientInfoManager, ClientFileSystem fileSystem, ProfileService profileService)
+public class Game
 {
+    private readonly EntityManager _entityManager;
+    private readonly ClientInfoManager _clientInfoManager;
+    private readonly ClientFileSystem _fileSystem;
+    private readonly ProfileService _profileService;
+
+    public Game(
+        EntityManager entityManager,
+        ClientInfoManager clientInfoManager,
+        ClientFileSystem fileSystem,
+        ProfileService profileService
+    )
+    {
+        _entityManager = entityManager;
+        _clientInfoManager = clientInfoManager;
+        _fileSystem = fileSystem;
+        _profileService = profileService;
+    }
+
     public delegate void GameInitializedEventHandler(Game game);
+
     public event GameInitializedEventHandler? GameInitialized;
 
     public delegate void GameStartLoadingEventHandler(Game game);
+
     public event GameStartLoadingEventHandler? GameStartLoading;
-    
+
     public delegate void GameStopLoadingEventHandler(Game game);
+
     public event GameStopLoadingEventHandler? GameStopLoading;
-    
-    public bool IsLoaded { get; private set; }
+
+    [Reactive] public bool IsLoaded { get; private set; }
 
     public async Task LoadGameDataAsync()
     {
         IsLoaded = false;
-        
+
         OnGameStartLoading(this);
-        
-        if (!Directory.Exists(profileService.ActiveProfile.ClientDirectory))
+
+        if (!Directory.Exists(_profileService.ActiveProfile.ClientDirectory))
         {
             Log.Warning("Silkroad directory not set! Game can not be initialized.");
 
             return;
         }
-        
-        //Init file system
-        if (!fileSystem.IsInitialized)
-        {
-            var mediaFile = Directory.GetFiles(profileService.ActiveProfile.ClientDirectory, "media.pk2", SearchOption.TopDirectoryOnly)
-                .FirstOrDefault();
-            var dataFile = Directory.GetFiles(profileService.ActiveProfile.ClientDirectory, "data.pk2", SearchOption.TopDirectoryOnly)
-                .FirstOrDefault();
 
-            if (mediaFile == null || dataFile == null)
+        try
+        {
+            //Init file system
+            if (!_fileSystem.IsInitialized)
             {
-                throw new Exception("Game asset packs (media.pk2, data.pk2) not found!");
+                var mediaFile = Directory.GetFiles(_profileService.ActiveProfile.ClientDirectory, "media.pk2",
+                        SearchOption.TopDirectoryOnly)
+                    .FirstOrDefault();
+                var dataFile = Directory.GetFiles(_profileService.ActiveProfile.ClientDirectory, "data.pk2",
+                        SearchOption.TopDirectoryOnly)
+                    .FirstOrDefault();
+
+                if (mediaFile == null || dataFile == null)
+                    throw new Exception("Game asset packs (media.pk2, data.pk2) not found!");
+
+                await _fileSystem.InitializeAsync(
+                    mediaFile,
+                    dataFile
+                );
             }
 
-            await fileSystem.InitializeAsync(
-                mediaFile,
-                dataFile
-            );
+            await _clientInfoManager.LoadAsync().ConfigureAwait(false);
+            await _entityManager.LoadAsync(_profileService.ActiveProfile.ClientType).ConfigureAwait(false);
+
+            IsLoaded = true;
+        }
+        catch (Exception e)
+        {
+            Log.Error("Failed to load game data: {Message}", e.Message);
         }
 
-        await clientInfoManager.LoadAsync().ConfigureAwait(false);
-        await entityManager.LoadAsync(profileService.ActiveProfile.ClientType).ConfigureAwait(false);
-
-        IsLoaded = true;
-        
         OnGameStopLoading(this);
         OnGameInitialized(this);
     }
@@ -61,12 +92,12 @@ public class Game(EntityManager entityManager, ClientInfoManager clientInfoManag
     public async Task CloseAsync()
     {
         IsLoaded = false;
-        entityManager.Clear();
+        _entityManager.Clear();
 
-        if (!fileSystem.IsInitialized) return;
-        
-        await fileSystem.Media?.CloseAsync();
-        await fileSystem.Data?.CloseAsync();
+        if (!_fileSystem.IsInitialized) return;
+
+        await _fileSystem.Media?.CloseAsync();
+        await _fileSystem.Data?.CloseAsync();
     }
 
     protected virtual void OnGameInitialized(Game game)

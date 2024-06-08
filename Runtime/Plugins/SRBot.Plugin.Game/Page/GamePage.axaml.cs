@@ -20,47 +20,4 @@ public partial class GamePage : UserControl
     {
         InitializeComponent();
     }
-
-    private async void ChangeDirectory_OnClick(object? sender, RoutedEventArgs e)
-    {
-        var game = App.ServiceProvider.GetRequiredService<SRCore.Game>();
-
-        if (game.IsLoaded)
-        {
-            var msgBoxDialogModel = new MessageBoxDialogModel()
-            {
-                Icon = MaterialIconKind.MessageWarning,
-                IconColor = Brushes.Gold,
-                Title = "The game is already initialized.",
-                Message =
-                    "The game is already initialized. If you choose a different Silkroad Online client directory, the bot will reload all data. Do you want to continue?",
-            };
-            
-            SukiHost.ShowDialog(msgBoxDialogModel);
-            
-            if (await msgBoxDialogModel.WaitForResultAsync() != UserConfirmation.Ok)
-                return;
-        }
-
-        // Get top level from the current control. Alternatively, you can use Window reference instead.
-        var topLevel = TopLevel.GetTopLevel(this);
-        var selectedFolders = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions()
-        {
-            AllowMultiple = false,
-            Title = "Select the Silkroad Online game directory",
-        });
-
-        var selectedFolder = selectedFolders.FirstOrDefault()?.Path.AbsolutePath;
-        if (selectedFolder == null)
-            return;
-
-        var model = DataContext as GamePageModel;
-
-        if (model!.ActiveProfile?.ClientDirectory != selectedFolder)
-        {
-            model.ActiveProfile.ClientDirectory = selectedFolder;
-
-            await game.LoadGameDataAsync();
-        }
-    }
 }

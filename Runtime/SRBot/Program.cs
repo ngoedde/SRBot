@@ -23,6 +23,6 @@ class Program
         => AppBuilder.Configure<App>()
             .UsePlatformDetect()
             .WithInterFont()
-            // .UseSkia()
+            .UseSkia()
             .LogToTrace();
 }

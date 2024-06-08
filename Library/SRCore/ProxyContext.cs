@@ -3,8 +3,8 @@ namespace SRCore;
 [Flags]
 public enum ProxyContext : byte
 {
-    None,
-    Gateway,
-    Agent,
-    Client
+    None = 0,
+    Gateway = 2,
+    Agent = 4,
+    Client = 8
 }

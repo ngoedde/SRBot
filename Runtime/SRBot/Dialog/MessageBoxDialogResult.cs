@@ -1,8 +1,9 @@
 namespace SRBot.Dialog;
 
-public enum UserConfirmation
+public enum MessageBoxDialogResult
 {
     Ok,
     Cancel,
+    Retry,
     None
 }

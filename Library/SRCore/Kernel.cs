@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using SRCore.Bot;
 using SRCore.Config;
 using SRCore.Config.Model;
 using SRCore.Models;
@@ -58,7 +59,7 @@ public sealed class Kernel
         Directory.CreateDirectory(ConfigDirectory);
 
         await _profileService.LoadProfilesAsync().ConfigureAwait(false);
-        _proxy.Initialize(_messageHandlers, _clientlessManager);
+        _proxy.Initialize(_messageHandlers);
         
         IsInitialized = true;
 
@@ -128,8 +129,16 @@ public static class KernelExtensions
         foreach (var type in packetHandler)
             services.AddSingleton(typeof(SRNetwork.MessageHandler), type);
         
+        //Bot bases
+        var botBases = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(s => s.GetTypes())
+            .Where(p => !p.IsAbstract && typeof(BotBase).IsAssignableFrom(p));
+        foreach (var type in botBases)
+            services.AddSingleton(typeof(BotBase), type);
+        
         services.AddSingleton<Proxy>();
         services.AddSingleton<ClientlessManager>();
+        services.AddSingleton<BotManager>();
      
         return services;
     }

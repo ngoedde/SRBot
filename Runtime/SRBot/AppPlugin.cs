@@ -9,7 +9,7 @@ public abstract class AppPlugin
 {
     public string TechnicalName { get; init; } = string.Empty;
     public string DisplayName { get; init; } = string.Empty;
-    public MaterialIconKind Icon { get; init; } = MaterialIconKind.ErrorOutline;
+    public MaterialIconKind Icon { get; init; } = MaterialIconKind.Plugin;
 
     public virtual void Shutdown(Kernel kernel)
     {

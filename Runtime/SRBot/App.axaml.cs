@@ -10,11 +10,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Core;
 using SRBot.Config;
+using SRBot.Dialog;
 using SRBot.Page;
 using SRBot.Utils;
 using SRCore;
-using SRCore.Config;
-using SRCore.Config.Model;
 using ILogger = Serilog.ILogger;
 using ViewLocator = SRBot.Utils.ViewLocator;
 
@@ -23,37 +22,30 @@ namespace SRBot;
 public partial class App : Application
 {
     public static LoggingLevelSwitch LoggingLevelSwitch { get; } = new();
-
-    public static IServiceProvider ServiceProvider { get; private set; } = null!;
-    private Kernel? _kernel;
-    private static ConfigLoader ConfigLoader => ServiceProvider.GetRequiredService<ConfigLoader>();
-    private static ConfigService ConfigService => ServiceProvider.GetRequiredService<ConfigService>();
-    private static ProfileService ProfileService => ServiceProvider.GetRequiredService<ProfileService>();
-
-    // public static MainWindow? MainWindow;
-
+    public static MessageBoxManager MessageBoxManager => ServiceProvider.GetRequiredService<MessageBoxManager>();
+    
+    private static Kernel Kernel => ServiceProvider.GetRequiredService<Kernel>();
+    private static IServiceProvider ServiceProvider { get; set; } = null!;
+    
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
 
         ServiceProvider = ConfigureServices();
+
+        Kernel.KernelInitialized += KernelOnKernelInitialized;
+        Kernel.KernelShutdown += KernelOnKernelShutdown;
     }
 
     public override void OnFrameworkInitializationCompleted()
     {
-        ProfileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;
-
-        _kernel = ServiceProvider.GetRequiredService<Kernel>();
-        _kernel.InitializeAsync().ConfigureAwait(false);
-
-        _kernel.KernelInitialized += KernelOnKernelInitialized;
-        _kernel.KernelShutdown += KernelOnKernelShutdown;
+        Kernel.InitializeAsync().ConfigureAwait(false);
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             var viewLocator = ServiceProvider.GetRequiredService<IDataTemplate>();
-            var mainVm = ServiceProvider.GetRequiredService<MainWindowModel>();
 
+            var mainVm = ServiceProvider.GetRequiredService<MainWindowModel>();
             desktop.MainWindow = viewLocator.Build(mainVm) as MainWindow;
         }
 
@@ -71,25 +63,16 @@ public partial class App : Application
     private void KernelOnKernelInitialized(Kernel kernel)
     {
         //Load log level from config -> Set logging level application wide after the kernel is initialized and the active profile loaded.
-        var logConfig = ServiceProvider.GetRequiredService<ConfigService>().GetConfig<LogConfig>();
-        if (logConfig != null)
-            LoggingLevelSwitch.MinimumLevel = logConfig.LogLevel;
-
         var pluginLoader = ServiceProvider.GetRequiredService<AppPluginLoader>();
-        
+
         foreach (var plugin in pluginLoader.GetPlugins())
             plugin.Initialize(kernel);
-    }
-
-    private async void ProfileServiceOnActiveProfileChanged(Profile profile)
-    {
-        await ConfigLoader.LoadConfigAsync(ConfigService, profile);
     }
 
     private static ServiceProvider ConfigureServices()
     {
         var services = new ServiceCollection();
-
+        ;
         //Logger
         var memorySink = new MainThreadLogEventSink();
         services.AddSingleton(memorySink);
@@ -113,7 +96,9 @@ public partial class App : Application
         services.AddSingleton<ILogger>(logger);
         services.AddSRKernel();
         services.AddSingleton(pluginLoader);
-        services.AddSingleton<ConfigLoader>();
+        services.AddSingleton<AppConfigLoader>();
+        services.AddSingleton<MessageBoxManager>();
+        services.AddSingleton<ViewLocator>();
         // services.AddSingleton<PageNavigationService>();
 
         // View models
@@ -122,6 +107,8 @@ public partial class App : Application
         if (viewlocator is not null)
             services.AddSingleton(viewlocator);
         services.AddSingleton<MainWindowModel>();
+        services.AddSingleton<ServerListDialogModel>();
+        services.AddSingleton<ClientInfoDialogModel>();
 
         //Plugins
         var plugins = pluginLoader.LoadPlugins();
@@ -143,7 +130,7 @@ public partial class App : Application
 
     public static WindowBase? GetTopLevel()
     {
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
+        if (Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktopLifetime)
         {
             return desktopLifetime.MainWindow;
         }
