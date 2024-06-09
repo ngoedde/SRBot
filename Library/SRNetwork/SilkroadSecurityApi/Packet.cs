@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 
 namespace SRNetwork.SilkroadSecurityApi;
 
@@ -13,6 +14,11 @@ public class Packet
     private bool m_locked;
     private byte[] m_reader_bytes;
     private object m_lock;
+
+    public override string ToString()
+    {
+        return $"[{Opcode:X4}][Massive: {Massive}, Encrypted: {Encrypted}]";
+    }
 
     public ushort Opcode
     {
@@ -566,7 +572,7 @@ public class Packet
             m_writer.Write(value);
         }
     }
-    public void WriteUInt16(ushort value)
+    public void WriteUShort(ushort value)
     {
         lock (m_lock)
         {
@@ -588,7 +594,7 @@ public class Packet
             m_writer.Write(value);
         }
     }
-    public void WriteUInt32(uint value)
+    public void WriteUInt(uint value)
     {
         lock (m_lock)
         {
@@ -713,7 +719,7 @@ public class Packet
             m_writer.Write((sbyte)(Convert.ToInt64(value) & 0xFF));
         }
     }
-    public void WriteUInt16(object value)
+    public void WriteUShort(object value)
     {
         lock (m_lock)
         {
@@ -735,7 +741,7 @@ public class Packet
             m_writer.Write((ushort)(Convert.ToInt64(value) & 0xFFFF));
         }
     }
-    public void WriteUInt32(object value)
+    public void WriteUInt(object value)
     {
         lock (m_lock)
         {
@@ -1099,7 +1105,7 @@ public class Packet
             }
             for (int x = index; x < index + count; ++x)
             {
-                this.WriteUInt16(values[x]);
+                this.WriteUShort(values[x]);
             }
         }
     }
@@ -1135,7 +1141,7 @@ public class Packet
             }
             for (int x = index; x < index + count; ++x)
             {
-                this.WriteUInt32(values[x]);
+                this.WriteUInt(values[x]);
             }
         }
     }

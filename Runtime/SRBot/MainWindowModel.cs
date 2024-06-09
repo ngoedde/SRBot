@@ -70,7 +70,7 @@ public class MainWindowModel : ViewModel
     /// <summary>
     /// Gets a value indicating if the server list is available.
     /// </summary>
-    public bool IsServerListAvailable => _proxy.Context == ProxyContext.Gateway;
+    public bool IsServerListAvailable => (_proxy.Context & ProxyContext.Gateway) != 0;
 
     #endregion
 
@@ -163,8 +163,7 @@ public class MainWindowModel : ViewModel
         // Network has not been started yet?
         if (_proxy.Context == ProxyContext.None)
         {
-            var gatewayHost = _clientInfoManager.DivisionInfo.Divisions[0].GatewayServers[0];
-            EndPoint gatewayEndPoint = NetHelper.ToIPEndPoint(gatewayHost, _clientInfoManager.GatewayPort);
+            var gatewayEndPoint = _clientInfoManager.GetGatewayEndPoint();
 
             if (_profileService.ActiveProfile.Clientless)
             {

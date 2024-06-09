@@ -25,20 +25,6 @@ internal class SessionManager : IReadOnlyCollection<Session>
         var session = new Session(id, socket, security, _packetHandlerManager);
         return _sessions[id] = session;
     }
-
-    public TSession CreateSession<TSession>(Socket socket, Security security) where TSession : Session
-    {
-        var id = _generator.Next();
-        var session = (TSession)Activator.CreateInstance(typeof(TSession), id, socket, security, _packetHandlerManager);
-    
-        if (session == null)
-        {
-            throw new InvalidOperationException($"Could not create an instance of type {typeof(TSession).FullName}.");
-        }
-
-        _sessions[id] = session;
-        return session;
-    }
     
     public bool TryFindSessionById(int id, [MaybeNullWhen(false)] out Session session) => _sessions.TryGetValue(id, out session);
 

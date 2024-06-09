@@ -30,7 +30,7 @@ public class PatchInfo(IServiceProvider serviceProvider) : GameModel(serviceProv
 
         packet.WriteByte(_clientInfoManager.DivisionInfo.ContentId);
         packet.WriteString(NetIdentity.SilkroadClient);
-        packet.WriteUInt32(_clientInfoManager.Version);
+        packet.WriteUInt(_clientInfoManager.Version);
 
         _proxy.SendToServer(packet);
     }

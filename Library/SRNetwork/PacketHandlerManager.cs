@@ -4,14 +4,11 @@ namespace SRNetwork;
 
 public delegate ValueTask<bool> PacketHandler(Session session, Packet packet);
 
+public delegate ValueTask<Packet> PacketHook(Session session, Packet packet);
 public class PacketHandlerManager
 {
-    private readonly IDictionary<ushort, PacketHandler> _handlerMap;
-
-    public PacketHandlerManager()
-    {
-        _handlerMap = new Dictionary<ushort, PacketHandler>();
-    }
+    private readonly IDictionary<ushort, PacketHandler> _handlerMap = new Dictionary<ushort, PacketHandler>();
+    private readonly IDictionary<ushort, PacketHook> _hookMap = new Dictionary<ushort, PacketHook>();
 
     public PacketHandler this[ushort id]
     {
@@ -20,6 +17,7 @@ public class PacketHandlerManager
     }
 
     public void SetMsgHandler(ushort id, PacketHandler handler) => _handlerMap[id] = handler;
+    public void SetMsgHook(ushort id, PacketHook hook) => _hookMap[id] = hook;
 
     public ValueTask<bool> Handle(Session session, Packet packet)
     {
@@ -27,5 +25,13 @@ public class PacketHandlerManager
             return ValueTask.FromResult(false);
 
         return handler(session, packet);
+    }
+
+    public ValueTask<Packet> Hook(Session session, Packet packet)
+    {
+        if (!_hookMap.TryGetValue(packet.Opcode, out var hook))
+            return ValueTask.FromResult(packet);
+
+        return hook(session, packet);
     }
 }

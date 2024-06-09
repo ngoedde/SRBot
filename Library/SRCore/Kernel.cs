@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using SRCore.Bot;
 using SRCore.Config;
@@ -9,7 +8,8 @@ using SRGame.Client;
 
 namespace SRCore;
 
-public sealed class Kernel
+public sealed class Kernel(
+    IServiceProvider serviceProvider)
 {
     public static string ConfigDirectory { get; } = Path.Combine(Environment.CurrentDirectory, "user");
 
@@ -25,22 +25,12 @@ public sealed class Kernel
 
     #endregion
 
-    private readonly Proxy _proxy;
-    private readonly Game _game;
-    private readonly ClientlessManager _clientlessManager;
-    private readonly IEnumerable<SRNetwork.MessageHandler> _messageHandlers;
-    private readonly ProfileService _profileService;
-
-    public Kernel(
-        IServiceProvider serviceProvider,
-        IEnumerable<SRNetwork.MessageHandler> messageHandlers)
-    {
-        _proxy = serviceProvider.GetRequiredService<Proxy>();
-        _game = serviceProvider.GetRequiredService<Game>();
-        _clientlessManager = serviceProvider.GetRequiredService<ClientlessManager>();
-        _messageHandlers = serviceProvider.GetServices<SRNetwork.MessageHandler>();
-        _profileService = serviceProvider.GetRequiredService<ProfileService>();
-    }
+    private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
+    private readonly Game _game = serviceProvider.GetRequiredService<Game>();
+    private readonly IEnumerable<SRNetwork.MessageHandler> _messageHandlers = serviceProvider.GetServices<SRNetwork.MessageHandler>();
+    private readonly IEnumerable<SRNetwork.MessageHook> _messageHooks = serviceProvider.GetServices<SRNetwork.MessageHook>();
+    private readonly ProfileService _profileService = serviceProvider.GetRequiredService<ProfileService>();
+    private readonly ClientlessManager _clientlessManager = serviceProvider.GetRequiredService<ClientlessManager>();
 
     public bool IsInitialized { get; private set; }
 
@@ -59,7 +49,8 @@ public sealed class Kernel
         Directory.CreateDirectory(ConfigDirectory);
 
         await _profileService.LoadProfilesAsync().ConfigureAwait(false);
-        _proxy.Initialize(_messageHandlers);
+        _proxy.Initialize(_messageHandlers, _messageHooks);
+        _clientlessManager.Initialize();
         
         IsInitialized = true;
 
@@ -128,7 +119,14 @@ public static class KernelExtensions
             .Where(p => !p.IsAbstract && typeof(SRNetwork.MessageHandler).IsAssignableFrom(p));
         foreach (var type in packetHandler)
             services.AddSingleton(typeof(SRNetwork.MessageHandler), type);
-        
+
+        var packetHooks = AppDomain.CurrentDomain.GetAssemblies()
+            .SelectMany(s => s.GetTypes())
+            .Where(p => !p.IsAbstract && typeof(SRNetwork.MessageHook).IsAssignableFrom(p));
+        foreach (var type in packetHooks)
+            services.AddSingleton(typeof(SRNetwork.MessageHook), type);
+
+
         //Bot bases
         var botBases = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())

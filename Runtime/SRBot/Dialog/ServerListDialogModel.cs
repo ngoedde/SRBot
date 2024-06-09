@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using ReactiveUI;
 using SRCore.Models;
+using SukiUI.Controls;
 
 namespace SRBot.Dialog;
 
@@ -11,7 +11,10 @@ public class ServerListDialogModel(ShardList shardList) : ReactiveObject
     public void RefreshServerList()
     {
         ShardList.Request();
+    }
 
-        this.RaisePropertyChanged(nameof(ShardList.Shards));
+    public void CloseDialog()
+    {
+        SukiHost.CloseDialog();
     }
 }

@@ -417,8 +417,8 @@ public class Security
             this.SetupCountByte(m_seed_count);
             m_crc_seed = NextUInt8();
 
-            response.WriteUInt32(m_seed_count);
-            response.WriteUInt32(m_crc_seed);
+            response.WriteUInt(m_seed_count);
+            response.WriteUInt(m_crc_seed);
         }
         if (m_security_flags.handshake == 1)
         {
@@ -429,9 +429,9 @@ public class Security
             m_value_A = this.G_pow_X_mod_P(m_value_p, m_value_x, m_value_g);
 
             response.WriteUInt64(m_handshake_blowfish_key);
-            response.WriteUInt32(m_value_g);
-            response.WriteUInt32(m_value_p);
-            response.WriteUInt32(m_value_A);
+            response.WriteUInt(m_value_g);
+            response.WriteUInt(m_value_p);
+            response.WriteUInt(m_value_A);
         }
 
         m_outgoing_packets.Add(response);
@@ -627,7 +627,7 @@ public class Security
 
                 // Handshake challenge
                 Packet response = new Packet(0x5000);
-                response.WriteUInt32(m_value_B);
+                response.WriteUInt(m_value_B);
                 response.WriteUInt64(m_client_key);
                 m_outgoing_packets.Insert(0, response);
 

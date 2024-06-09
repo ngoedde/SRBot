@@ -99,6 +99,9 @@ public class Session
                     continue;
                 
                 await _handlerManager.Handle(this, packet);
+
+                var hookedPacket = await _handlerManager.Hook(this, packet);
+                OnMessageReceived(hookedPacket);
             }
         }
     }
@@ -148,7 +151,6 @@ public class Session
 
     private async ValueTask<bool> DisconnectAsync(DisconnectReason reason, CancellationToken cancellationToken = default)
     {
-        Console.WriteLine($"Disconnected: {reason}");
         _disconnect = true;
         await _socket.DisconnectAsync(false, cancellationToken);
         //using var msg = _allocator.NewLocalMsg(NetMsgID.LOCAL_NET_DISCONNECT);

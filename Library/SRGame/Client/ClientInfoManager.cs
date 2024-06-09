@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using SRPack.SRAdapter.Utils;
 
@@ -77,6 +79,23 @@ public class ClientInfoManager(ClientFileSystem fileSystem)
         return decodedVersionBuffer == null 
             ? 0 
             : uint.Parse(Encoding.ASCII.GetString(decodedVersionBuffer, 0, 4));
+    }
+
+    public IPEndPoint GetGatewayEndPoint()
+    {
+        var division = DivisionInfo.Divisions[0].GatewayServers[0];
+      
+        return ToIPEndPoint(division, GatewayPort);
+    }
+
+    private static IPEndPoint ToIPEndPoint(string? hostOrIP, ushort port)
+    {
+        ArgumentNullException.ThrowIfNull(hostOrIP);
+
+        if (!IPAddress.TryParse(hostOrIP, out IPAddress? address))
+            address = Array.Find(Dns.GetHostEntry(hostOrIP).AddressList, p => p.AddressFamily == AddressFamily.InterNetwork);
+
+        return new IPEndPoint(address!, port);
     }
 
     protected virtual void OnLoaded()

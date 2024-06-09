@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SRCore.Models.ShardInfo;
 using SRNetwork;
@@ -20,13 +19,11 @@ public class ShardList(IServiceProvider serviceProvider) : GameModel(serviceProv
 
     internal override bool TryParsePacket(Session session, Packet packet)
     {
+        Shards = new ObservableCollection<Shard>();
+        Farms = new ObservableCollection<Farm>();
 
-        //Problem: Observable is updated from a different thread!
         try
         {
-            Shards.Clear();
-            Farms.Clear();
-
             var hasNextFarmEntry = packet.ReadBool();
             while (hasNextFarmEntry)
             {
@@ -65,13 +62,10 @@ public class ShardList(IServiceProvider serviceProvider) : GameModel(serviceProv
                 hasNextShardEntry = packet.ReadBool();
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return false;
         }
-
-        this.RaisePropertyChanged(nameof(Shards));
-        this.RaisePropertyChanged(nameof(Farms));
 
         OnShardListUpdated(this);
 

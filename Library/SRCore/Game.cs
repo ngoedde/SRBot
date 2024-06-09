@@ -1,9 +1,7 @@
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using SRCore.Config;
-using SRGame;
 using SRGame.Client;
-using SRNetwork;
 
 namespace SRCore;
 

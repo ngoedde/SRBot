@@ -2,36 +2,66 @@ using Serilog;
 using SRCore.Config;
 using SRCore.Config.Model;
 using SRCore.Models;
+using SRGame.Client;
 using SRNetwork;
+using SRNetwork.Common;
+using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore;
 
 /// <summary>
 /// Automatically handles clientless/client mode.
 /// </summary>
-public class ClientlessManager
+internal class ClientlessManager(PatchInfo patchInfo, ShardList shardList, ProfileService profileService, Proxy proxy, ClientInfoManager clientInfoManager, AgentLogin agentLogin)
 {
-    private readonly PatchInfo _patchInfo;
-    private readonly ShardList _shardList;
-    private readonly ProfileService _profileService;
-    private readonly Proxy _proxy;
-    private Profile ActiveProfile => _profileService.ActiveProfile;
-    
-    public ClientlessManager(PatchInfo patchInfo, ShardList shardList, ProfileService profileService, Proxy proxy)
+    private Profile ActiveProfile => profileService.ActiveProfile;
+
+    public void Initialize()
     {
-        _patchInfo = patchInfo;
-        _shardList = shardList;
-        _profileService = profileService;
-        _proxy = proxy;
-        
-        _patchInfo.PatchInfoUpdated += OnPatchInfoUpdated;
-        _proxy.GatewayConnected += ProxyOnGatewayConnected;
+        patchInfo.PatchInfoUpdated += OnPatchInfoUpdated;
+
+        proxy.GatewayConnected += ProxyOnGatewayConnected;
+        proxy.ClientConnected += ProxyOnClientConnected;
+        //proxy.AgentConnected += ProxyOnAgentConnected;
+    }
+
+    private void ProxyOnAgentConnected(Session serverSession)
+    {
+        throw new NotImplementedException();
+    }
+
+    private async void ProxyOnClientConnected(Session clientSession)
+    {
+        if (ActiveProfile.Clientless)
+            return;
+
+        if ((proxy.Context & ProxyContext.Agent) != 0)
+        {
+            return;
+        }
+
+        var endpoint = clientInfoManager.GetGatewayEndPoint();
+        await proxy.ConnectToGateway(endpoint);
+    }
+
+    private async void ServerSessionOnMessageReceived(Packet packet)
+    {
+        if (packet.Opcode != GatewayMsgId.LoginAck)
+            return;
+
+        var result = (MessageResult)packet.ReadByte();
+        if (result != MessageResult.Success)
+            return;
+
+        await proxy.ConnectToAgent(NetHelper.ToIPEndPoint(agentLogin.AgentServerIp, agentLogin.AgentServerPort), agentLogin.Token);
     }
 
     private void ProxyOnGatewayConnected(Session serverSession)
     {
         if (ActiveProfile.Clientless)
-            _patchInfo.Request();
+            patchInfo.Request();
+
+        serverSession.MessageReceived += ServerSessionOnMessageReceived;
     }
     
     private async void OnPatchInfoUpdated(Session session, PatchInfo patchInfo)
@@ -46,6 +76,7 @@ public class ClientlessManager
         }
 
         if (ActiveProfile.Clientless)
-            _shardList.Request();
+            shardList.Request();
     }
+
 }

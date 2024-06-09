@@ -44,6 +44,7 @@ public class NetEngine
         this.Profiler = new NetTrafficProfiler();
     }
 
+
     public async Task StopAsync()
     {
         await _acceptor.StopAsync();
@@ -73,7 +74,7 @@ public class NetEngine
     private void OnConnected(Socket socket)
     {
         var security = new Security();
-        var session = _sessionManager.CreateSession<ServerSession>(socket, security);
+        var session = _sessionManager.CreateSession(socket, security);
         session.Profiler = this.Profiler.AddProfile(session.Id);
         session.Start();
         
@@ -83,6 +84,11 @@ public class NetEngine
     public void SetMsgHandler(ushort id, PacketHandler handler)
     {
         _packetHandlerManager.SetMsgHandler(id, handler);
+    }
+
+    public void SetMsgHook(ushort id, PacketHook hook)
+    {
+        _packetHandlerManager.SetMsgHook(id, hook);
     }
 
     public void Start(ushort port)
