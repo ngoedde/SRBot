@@ -34,6 +34,9 @@ public class Proxy
     [Reactive] public ushort LocalPort { get; private set; }
 
     private Task _agentKeepAliveTask = null!;
+
+    private IEnumerable<SRNetwork.MessageHandler> _handlers;
+    private IEnumerable<SRNetwork.MessageHook> _hooks;
     
     public Proxy()
     {
@@ -43,13 +46,16 @@ public class Proxy
 
     internal void Initialize(IEnumerable<SRNetwork.MessageHandler> packetHandlers, IEnumerable<SRNetwork.MessageHook>  packetHooks)
     {
-        foreach (var packetHandler in packetHandlers)
+        _handlers = packetHandlers;
+        _hooks = packetHooks;
+        
+        foreach (var packetHandler in _handlers)
         {
             Server.SetMsgHandler(packetHandler.Opcode, packetHandler.Handler);
             Client.SetMsgHandler(packetHandler.Opcode, packetHandler.Handler);
         }
 
-        foreach (var packetHandler in packetHooks)
+        foreach (var packetHandler in _hooks)
         {
             Server.SetMsgHook(packetHandler.Opcode, packetHandler.Hook);
             Client.SetMsgHook(packetHandler.Opcode, packetHandler.Hook);
@@ -204,6 +210,16 @@ public class Proxy
 
             await Task.Delay(2000);
         } 
+    }
+    
+    public SRNetwork.MessageHandler? GetHandler(ushort opcode)
+    {
+        return _handlers.FirstOrDefault(handler => handler.Opcode == opcode);
+    }
+    
+    public SRNetwork.MessageHook? GetHook(ushort opcode)
+    {
+        return _hooks.FirstOrDefault(hook => hook.Opcode == opcode);
     }
     
     protected virtual void OnClientConnected(Session clientSession)

@@ -12,17 +12,18 @@ namespace SRCore.Models;
 public class CharacterLobby(IServiceProvider serviceProvider) : GameModel(serviceProvider)
 {
     public delegate void CharacterListUpdatedEventHandler(CharacterLobby characterLobby);
+
     public event CharacterListUpdatedEventHandler? CharacterListUpdated;
-    
-    [Reactive] public ObservableCollection<Character> Characters { get; private set; } = new();
+
+    [Reactive] public ObservableCollection<CharacterSelection.Character> Characters { get; private set; } = new();
 
     private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
 
-    public void Join(Character character)
+    public void Join(CharacterSelection.Character character)
     {
         var packet = new Packet(AgentMsgId.CharacterListJoinReq);
         packet.WriteString(character.Name);
-        
+
         _proxy.SendToServer(packet);
     }
 
@@ -30,17 +31,17 @@ public class CharacterLobby(IServiceProvider serviceProvider) : GameModel(servic
     {
         var packet = new Packet(AgentMsgId.CharacterListActionReq);
         packet.WriteByte(CharacterSelectionAction.List);
-        
+
         _proxy.SendToServer(packet);
     }
-    
-    internal override bool TryParsePacket(Session session, Packet packet)
+
+    internal override void ParsePacket(Session session, Packet packet)
     {
         var action = (CharacterSelectionAction)packet.ReadByte();
         var result = (MessageResult)packet.ReadByte();
 
         if (result != MessageResult.Success)
-            return false;
+            return;
 
         if (action == CharacterSelectionAction.List)
         {
@@ -49,7 +50,7 @@ public class CharacterLobby(IServiceProvider serviceProvider) : GameModel(servic
             var characterCount = packet.ReadByte();
             for (var i = 0; i < characterCount; i++)
             {
-                var character = new Character
+                var character = new CharacterSelection.Character
                 {
                     RefObjId = packet.ReadUInt(),
                     Name = packet.ReadString(),
@@ -66,17 +67,17 @@ public class CharacterLobby(IServiceProvider serviceProvider) : GameModel(servic
 
                 if (character.IsDeleting)
                     character.DeleteTime = packet.ReadUInt();
-                
-                character.GuildMemberClass = (CharacterSelectionMemberClass) packet.ReadByte();
-                
+
+                character.GuildMemberClass = (CharacterSelectionMemberClass)packet.ReadByte();
+
                 //Is guild rename required?
                 if (packet.ReadBool())
                 {
                     //current guild name
                     packet.ReadString();
                 }
-                
-                character.AcademyMemberClass = (CharacterSelectionMemberClass) packet.ReadByte();
+
+                character.AcademyMemberClass = (CharacterSelectionMemberClass)packet.ReadByte();
                 var inventoryCount = packet.ReadByte();
                 for (var j = 0; j < inventoryCount; j++)
                 {
@@ -98,14 +99,12 @@ public class CharacterLobby(IServiceProvider serviceProvider) : GameModel(servic
                 }
 
                 Characters.Add(character);
-                
+
                 Log.Information($"Found character {character.Name} (lv. {character.Level})");
             }
         }
 
         OnCharacterListUpdated(this);
-        
-        return true;
     }
 
     protected virtual void OnCharacterListUpdated(CharacterLobby characterLobby)

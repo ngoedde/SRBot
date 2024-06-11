@@ -34,8 +34,6 @@ public class TrainingBot() : BotBase("SRCore.Bot.Training")
 
     public override Task<bool> Tick()
     {
-        Log.Debug("TrainingBot Tick");
-        
         return Task.FromResult(true);
     }
 }

@@ -10,8 +10,8 @@ public abstract class GameModel(IServiceProvider serviceProvider) : ReactiveObje
     protected IServiceProvider ServiceProvider { get; } = serviceProvider;
     protected Proxy Proxy => ServiceProvider.GetRequiredService<Proxy>();
 
-    internal virtual bool TryParsePacket(Session session, Packet packet)
+    internal virtual void ParsePacket(Session session, Packet packet)
     {
-        return true;
+        throw new NotImplementedException();
     }
 }

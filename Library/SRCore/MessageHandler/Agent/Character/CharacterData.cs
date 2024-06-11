@@ -2,19 +2,20 @@ using SRCore.Models;
 using SRNetwork;
 using SRNetwork.SilkroadSecurityApi;
 
-namespace SRCore.MessageHandler.Gateway;
+namespace SRCore.MessageHandler.Agent.Character;
 
-internal class ShardListMessageHandler(ShardList shardListModel) : SRNetwork.MessageHandler
+internal class CharacterData(Models.Character character) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
-    public override ushort Opcode => GatewayMsgId.ShardInfoAck;
+
+    public override ushort Opcode => AgentMsgId.CharacterData;
 
     public override ValueTask<bool> Handle(Session session, Packet packet)
     {
         try
         {
-            shardListModel.ParsePacket(session, packet);
-            
+            character.CharacterDataPacket.WriteByteArray(packet.GetBytes());
+        
             return ValueTask.FromResult(true);
         }
         catch (Exception)

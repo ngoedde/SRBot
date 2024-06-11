@@ -5,7 +5,7 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.MessageHandler.Agent.Auth;
 
-internal class IdentificationRequest(AgentLogin agentLogin, Proxy proxy, AccountService accountService) : SRNetwork.MessageHandler
+internal class Identification(AgentLogin agentLogin, Proxy proxy, AccountService accountService) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
@@ -21,13 +21,13 @@ internal class IdentificationRequest(AgentLogin agentLogin, Proxy proxy, Account
             
             var serviceName = packet.ReadString();
 
-            if (serviceName != NetIdentity.AgentServer)
-                return ValueTask.FromResult(true);
+            if (serviceName != NetIdentity.AgentServer) 
+                return OnHandled(session, packet);
 
             if ((proxy.Context & ProxyContext.Agent) != 0)
                 agentLogin.LoginToAgent();
-             
-            return ValueTask.FromResult(true);
+
+            return OnHandled(session, packet);
         }
         catch (Exception e)
         {

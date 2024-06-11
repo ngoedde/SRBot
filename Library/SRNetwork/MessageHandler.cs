@@ -4,11 +4,20 @@ namespace SRNetwork;
 
 public abstract class MessageHandler
 {
-    public virtual PacketHandler Handler { get; init; }
+    public delegate void HandledEventHandler(Session session, Packet packet);
+    public event HandledEventHandler? Handled;
+    
+    public virtual PacketHandler Handler { get; init; } = null!;
     public virtual ushort Opcode { get; init; }
 
-    public virtual ValueTask<bool> Handle(Session session, Packet packet)
+    public abstract ValueTask<bool> Handle(Session session, Packet packet);
+
+    protected ValueTask<bool> OnHandled(Session session, Packet packet)
     {
-        return Handler(session, packet);
+        packet.Reset();
+        
+        Handled?.Invoke(session, packet);
+        
+        return ValueTask.FromResult(true);
     }
 }

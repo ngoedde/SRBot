@@ -72,7 +72,7 @@ public class LoginService(IServiceProvider serviceProvider)
         var character = characterLobby.Characters.FirstOrDefault(c => string.Equals(c.Name, GameConfig.AutoLoginCharacter, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(GameConfig.AutoLoginCharacter));
         if (character == null)
         {
-            _ = Kernel.TriggerInterrupt("Auto login is enabled but no character is selected!", LogEventLevel.Warning);
+            _ = Kernel.Panic("Auto login is enabled but no character is selected!", LogEventLevel.Warning);
             
             return;
         }
@@ -92,7 +92,7 @@ public class LoginService(IServiceProvider serviceProvider)
         var selectedAccount = AccountService.GetAccount(GameConfig.AutoLoginId);
         if (selectedAccount == null)
         {
-            _ = Kernel.TriggerInterrupt("Auto login is enabled but no account is selected!", LogEventLevel.Warning);
+            _ = Kernel.Panic("Auto login is enabled but no account is selected!", LogEventLevel.Warning);
             
             return;
         }
@@ -100,7 +100,7 @@ public class LoginService(IServiceProvider serviceProvider)
         var shard = shardList.Shards.FirstOrDefault(s => string.Equals(s.Name, GameConfig.AutoLoginServer, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(GameConfig.AutoLoginServer) );
         if (shard == null)
         {
-            _ = Kernel.TriggerInterrupt("Auto login is enabled but no server is selected or the server could not be found!", LogEventLevel.Warning);
+            _ = Kernel.Panic("Auto login is enabled but no server is selected or the server could not be found!", LogEventLevel.Warning);
             
             return;
         }

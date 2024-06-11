@@ -48,6 +48,10 @@
                     <suki:BusyArea IsBusy="{Binding LoadingState.IsLoading}"
                                    BusyText="{ Binding LoadingState.Message }">
                     </suki:BusyArea>
+                    <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
+                        <TextBlock>TPS:</TextBlock>
+                        <TextBlock Grid.Column="1" IsVisible="{Binding IsBotRunning}" Text="{Binding Bot.TicksPerSecond}"></TextBlock>
+                    </Grid>
                 </StackPanel>
             </suki:SukiSideMenu.FooterContent>
         </suki:SukiSideMenu>
@@ -71,22 +75,22 @@
                 <StackPanel>
                     <Grid ColumnDefinitions="*, *">
                         <StackPanel>
-                            <Label>Level:</Label>
-                            <Label>STR:</Label>
-                            <Label>INT:</Label>
-                            <Label>Gold:</Label>
-                            <Label>Skill points:</Label>
+                            <TextBlock>Level:</TextBlock>
+                            <TextBlock>STR:</TextBlock>
+                            <TextBlock>INT:</TextBlock>
+                            <TextBlock>Gold:</TextBlock>
+                            <TextBlock>Skill points:</TextBlock>
                             <Label>Kills:</Label>
                             <Label>Weapon:</Label>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
-                            <Label>1</Label>
-                            <Label>20</Label>
-                            <Label>20</Label>
-                            <Label>0</Label>
-                            <Label>0</Label>
-                            <Label>0</Label>
-                            <Label>T-Staff</Label>
+                            <TextBlock Text="{Binding Character.Level}"/>
+                            <TextBlock>0</TextBlock>
+                            <TextBlock>0</TextBlock>
+                            <TextBlock Text="{Binding Character.Gold}"/>
+                            <TextBlock Text="{Binding Character.SkillPoints}"/>
+                            <TextBlock>0</TextBlock>
+                            <TextBlock>0</TextBlock>
                         </StackPanel>
                     </Grid>
                 </StackPanel>

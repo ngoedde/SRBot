@@ -14,13 +14,17 @@ internal class CharacterSelectionResponse(CharacterLobby characterLobby) : SRNet
     {
         try
         {
-            var result = characterLobby.TryParsePacket(session, packet);
+            characterLobby.ParsePacket(session, packet);
 
-            return ValueTask.FromResult(result);
+            return ValueTask.FromResult(true);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return ValueTask.FromResult(false);
+        }
+        finally
+        {
+            OnHandled(session, packet);
         }
     }
 }

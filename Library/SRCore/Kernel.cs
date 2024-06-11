@@ -77,7 +77,7 @@ public sealed class Kernel(
         OnInterrupt(this, "Active profile has changed.", LogEventLevel.Information);
     }
 
-    public async Task TriggerInterrupt(string message, LogEventLevel level = LogEventLevel.Fatal, bool shutdown = true)
+    public async Task Panic(string message, LogEventLevel level = LogEventLevel.Fatal, bool shutdown = true)
     {
         OnInterrupt(this, message, level);
 

@@ -154,7 +154,7 @@ public class Packet
         }
     }
 
-    public void Lock()
+    public Packet Lock()
     {
         lock (m_lock)
         {
@@ -167,6 +167,8 @@ public class Packet
                 m_locked = true;
             }
         }
+
+        return this;
     }
 
     public long SeekRead(long offset, SeekOrigin orgin)

@@ -25,16 +25,17 @@ namespace SRBot;
 
 public class MainWindowModel : ViewModel
 {
-    private readonly ProfileService _profileService;
-    private readonly ConfigService _configService;
-    private readonly Game _game;
-    private readonly AppConfigLoader _appConfigLoader;
-    private readonly ClientInfoManager _clientInfoManager;
-    private readonly EntityManager _entityManager;
-    private readonly Proxy _proxy;
-    private readonly Bot _bot;
-    private readonly PatchInfo _patchInfo;
-    private readonly ServerListDialogModel _serverListDialogModel;
+    private readonly IServiceProvider _serviceProvider;
+    public Bot Bot => _serviceProvider.GetRequiredService<Bot>();
+    public ProfileService ProfileService => _serviceProvider.GetRequiredService<ProfileService>();
+    public ConfigService ConfigService => _serviceProvider.GetRequiredService<ConfigService>();
+    public Game Game => _serviceProvider.GetRequiredService<Game>();
+    public AppConfigLoader AppConfigLoader => _serviceProvider.GetRequiredService<AppConfigLoader>();
+    public Proxy Proxy => _serviceProvider.GetRequiredService<Proxy>();
+    public PatchInfo PatchInfo => _serviceProvider.GetRequiredService<PatchInfo>();
+    public ServerListDialogModel ServerListDialogModel => _serviceProvider.GetRequiredService<ServerListDialogModel>();
+    public ClientInfoManager ClientInfoManager => _serviceProvider.GetRequiredService<ClientInfoManager>();
+    public EntityManager EntityManager => _serviceProvider.GetRequiredService<EntityManager>();
 
     #region Properties
 
@@ -52,7 +53,7 @@ public class MainWindowModel : ViewModel
     /// <summary>
     /// Gets the current profile that is being used.
     /// </summary>
-    public Profile ActiveProfile => _profileService.ActiveProfile;
+    public Profile ActiveProfile => ProfileService.ActiveProfile;
 
     /// <summary>
     /// Gets or sets the current loading state of the application.
@@ -63,16 +64,18 @@ public class MainWindowModel : ViewModel
     /// <summary>
     /// A value indicating if the game is initialized.
     /// </summary>
-    public bool IsGameInitialized => _game.IsLoaded;
+    public bool IsGameInitialized => Game.IsLoaded;
 
     /// <summary>
     /// Gets a value indicating if the server list is available.
     /// </summary>
-    public bool IsServerListAvailable => (_proxy.Context & ProxyContext.Gateway) != 0;
+    public bool IsServerListAvailable => (Proxy.Context & ProxyContext.Gateway) != 0;
 
-    public bool IsBotRunning => _bot.CurrentBot?.State is BotState.Started;
-    public bool IsBotIdle => _bot.CurrentBot?.State is BotState.Idle;
-    
+    public bool IsBotRunning => Bot.CurrentBot?.State is BotState.Started;
+    public bool IsBotIdle => Bot.CurrentBot?.State is BotState.Idle;
+
+    public Character Character => _serviceProvider.GetRequiredService<Character>();
+  
     #endregion
 
     public MainWindowModel(IServiceProvider serviceProvider)
@@ -81,23 +84,15 @@ public class MainWindowModel : ViewModel
         Pages = new ObservableCollection<PageModel>(pages.OrderBy(x => x.Position));
 
         // Get required services from the service provider, to not blow up the constructor.
-        _clientInfoManager = serviceProvider.GetRequiredService<ClientInfoManager>();
-        _entityManager = serviceProvider.GetRequiredService<EntityManager>();
-        _configService = serviceProvider.GetRequiredService<ConfigService>();
-        _appConfigLoader = serviceProvider.GetRequiredService<AppConfigLoader>();
-        _profileService = serviceProvider.GetRequiredService<ProfileService>();
-        _game = serviceProvider.GetRequiredService<Game>();
-        _proxy = serviceProvider.GetRequiredService<Proxy>();
-        _bot = serviceProvider.GetRequiredService<Bot>();
-        _patchInfo = serviceProvider.GetRequiredService<PatchInfo>();
-        _serverListDialogModel = serviceProvider.GetRequiredService<ServerListDialogModel>();
+        _serviceProvider = serviceProvider;
+       
 
-        _game.GameStopLoading += OnGameStopLoading;
-        _game.GameStartLoading += OnGameStartLoading;
-        _profileService.ActiveProfileChanged += OnActiveProfileChanged;
-        _patchInfo.PatchInfoUpdated += OnPatchInfoUpdated;
-        _bot.BotStarted += OnBotStarted;
-        _bot.BotStopped += OnBotStopped;
+        Game.GameStopLoading += OnGameStopLoading;
+        Game.GameStartLoading += OnGameStartLoading;
+        ProfileService.ActiveProfileChanged += OnActiveProfileChanged;
+        PatchInfo.PatchInfoUpdated += OnPatchInfoUpdated;
+        Bot.BotStarted += OnBotStarted;
+        Bot.BotStopped += OnBotStopped;
     }
 
     private void OnBotStopped(BotBase bot)
@@ -142,21 +137,21 @@ public class MainWindowModel : ViewModel
 
     private async void OnActiveProfileChanged(Profile profile)
     {
-        if (!Directory.Exists(_profileService.ActiveProfile.ClientDirectory))
+        if (!Directory.Exists(ProfileService.ActiveProfile.ClientDirectory))
         {
             ShowProfileDialog();
         }
 
         this.RaisePropertyChanged(nameof(ActiveProfile));
 
-        await _appConfigLoader.LoadConfigAsync(profile);
+        await AppConfigLoader.LoadConfigAsync(profile);
 
-        var logConfig = _configService.GetConfig<LogConfig>();
+        var logConfig = ConfigService.GetConfig<LogConfig>();
         if (logConfig != null)
             App.LoggingLevelSwitch.MinimumLevel = logConfig.LogLevel;
 
-        await _game.CloseAsync();
-        await _game.LoadGameDataAsync();
+        await Game.CloseAsync();
+        await Game.LoadGameDataAsync();
     }
 
     #endregion
@@ -167,7 +162,7 @@ public class MainWindowModel : ViewModel
 
     public async Task SwitchBotState()
     {
-        if (_bot.State is BotState.Idle)
+        if (Bot.State is BotState.Idle)
             await StartBot();
         else
             await StopBot();
@@ -176,25 +171,26 @@ public class MainWindowModel : ViewModel
     public async Task StartBot()
     {
         // Network has not been started yet?
-        if (_proxy.Context == ProxyContext.None)
+        if (Proxy.Context == ProxyContext.None)
         {
-            var gatewayEndPoint = _clientInfoManager.GetGatewayEndPoint();
+            var gatewayEndPoint = ClientInfoManager.GetGatewayEndPoint();
 
-            if (_profileService.ActiveProfile.Clientless)
+            if (ProfileService.ActiveProfile.Clientless)
             {
-                await _proxy.ConnectToGateway(gatewayEndPoint);
+                await Proxy.ConnectToGateway(gatewayEndPoint);
             }
             else
             {
-                await _proxy.StartClientProxy(_profileService.ActiveProfile.ClientListeningPort);
+                await Proxy.StartClientProxy(ProfileService.ActiveProfile.ClientListeningPort);
             }
         }
         
-        _bot.StartBot();
+        Bot.StartBot();
     }
 
     public async Task StopBot()
     {
+        Bot.StopBot();
     }
 
     public async Task SaveConfig()
@@ -205,21 +201,21 @@ public class MainWindowModel : ViewModel
 
     public void ShowProfileDialog()
     {
-        var dialogModel = new ProfileDialogModel(_profileService, _game);
+        var dialogModel = new ProfileDialogModel(ProfileService, Game);
 
         SukiHost.ShowDialog(dialogModel);
     }
 
     public void ShowClientInfoDialog()
     {
-        var dialog = new ClientInfoDialogModel(_clientInfoManager, _entityManager);
+        var dialog = new ClientInfoDialogModel(ClientInfoManager, EntityManager);
 
         SukiHost.ShowDialog(dialog, allowBackgroundClose: true);
     }
 
     public void ShowServerListDialog()
     {
-        SukiHost.ShowDialog(_serverListDialogModel, allowBackgroundClose: true);
+        SukiHost.ShowDialog(ServerListDialogModel, allowBackgroundClose: true);
     }
     
     #endregion

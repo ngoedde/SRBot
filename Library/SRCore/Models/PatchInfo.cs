@@ -35,7 +35,7 @@ public class PatchInfo(IServiceProvider serviceProvider) : GameModel(serviceProv
         _proxy.SendToServer(packet);
     }
 
-    internal override bool TryParsePacket(Session session, Packet packet)
+    internal override void ParsePacket(Session session, Packet packet)
     {
         var messageResult = (MessageResult)packet.ReadByte();
         if (messageResult == MessageResult.Error)
@@ -51,8 +51,6 @@ public class PatchInfo(IServiceProvider serviceProvider) : GameModel(serviceProv
         }
 
         OnPatchInfoUpdated(session, this);
-
-        return true;
     }
 
     protected virtual void OnPatchInfoUpdated(Session session, PatchInfo patchInfo)

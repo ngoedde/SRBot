@@ -2,7 +2,6 @@
 using SRNetwork.SilkroadSecurityApi;
 using SRNetwork;
 
-
 namespace SRCore.MessageHandler.Gateway
 {
     internal class LoginRequestHandler(AgentLogin agentLogin) : SRNetwork.MessageHandler
@@ -26,6 +25,10 @@ namespace SRCore.MessageHandler.Gateway
             catch (Exception)
             {
                 return ValueTask.FromResult(false);
+            }
+            finally
+            {
+                OnHandled(session, packet);
             }
         }
     }

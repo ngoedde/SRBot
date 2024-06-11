@@ -11,6 +11,19 @@ internal class PatchInfoMessageHandler(PatchInfo patchInfo) : SRNetwork.MessageH
     
     public override ValueTask<bool> Handle(Session session, Packet packet)
     {
-        return ValueTask.FromResult(patchInfo.TryParsePacket(session, packet));
+        try
+        {
+            patchInfo.ParsePacket(session, packet);
+            
+            return ValueTask.FromResult(true);
+        }
+        catch (Exception)
+        {
+            return ValueTask.FromResult(false);
+        }
+        finally
+        {
+            OnHandled(session, packet);
+        }
     }
 }
