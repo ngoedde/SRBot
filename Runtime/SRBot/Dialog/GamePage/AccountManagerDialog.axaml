@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:mi="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+             xmlns:gamePage="clr-namespace:SRBot.Dialog.GamePage"
+             xmlns:accountModels="clr-namespace:SRCore.Config.Model;assembly=SRCore"
+             mc:Ignorable="d" d:DesignWidth="700" d:DesignHeight="500"
+             x:DataType="gamePage:AccountManagerDialogModel"
+             x:Class="SRBot.Dialog.GamePage.AccountManagerDialog">
+    <StackPanel Spacing="10">
+        <mi:MaterialIcon Kind="Accounts" Width="48" Height="48" Margin="0 16 0 16"></mi:MaterialIcon>
+        <TextBlock Classes="h3" TextAlignment="Center" Margin="0 0 0 16">Account Manager</TextBlock>
+        
+        <Grid ColumnDefinitions="250,*">
+            <StackPanel Grid.Column="0">
+                <ListBox ItemsSource="{Binding AccountService.Config.Accounts}" SelectedItem="{Binding SelectedAccount}" Height="300" Width="200">
+                    <ListBox.DataTemplates>
+                        <DataTemplate DataType="accountModels:AccountInfo">
+                            <TextBlock Text="{Binding Username}"></TextBlock>
+                        </DataTemplate>
+                    </ListBox.DataTemplates>
+                </ListBox>
+                <!-- <Grid ColumnDefinitions="*,*"  HorizontalAlignment="Center"> -->
+                    <HyperlinkButton HorizontalAlignment="Center" Command="{Binding AddAccount}">Add account</HyperlinkButton>
+                    <HyperlinkButton HorizontalAlignment="Center" Grid.Column="1" Command="{Binding DeleteAccount}" CommandParameter="{Binding SelectedAccount}">Delete account</HyperlinkButton>
+                <!-- </Grid> -->
+            </StackPanel>
+            <StackPanel Grid.Column="1" Width="350">
+                <TextBlock Classes="h5" Text="Username:" Margin="0 16 0 0"></TextBlock>
+                <TextBox Text="{Binding SelectedAccount.Username}"></TextBox>
+                <TextBlock Classes="h5" Text="Password:" Margin="0 16 0 0"></TextBlock>
+                <TextBox PasswordChar="*" Text="{Binding SelectedAccount.Password}"></TextBox>
+                <TextBlock Classes="h5" Text="Secondary password:" Margin="0 16 0 0"></TextBlock>
+                <TextBox PasswordChar="*" Text="{Binding SelectedAccount.SecondaryPassword}"></TextBox>
+                <Button Command="{Binding SaveAccounts}" Width="150" Margin="0 16 0 0">Save accounts</Button>
+            </StackPanel>
+        </Grid>
+    </StackPanel>
+</UserControl>

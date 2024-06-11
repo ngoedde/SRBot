@@ -1,8 +1,11 @@
+using System;
 using Avalonia.Threading;
 using Serilog;
 using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
+using SukiUI.Controls;
+using SukiUI.Enums;
 
 namespace SRBot.Utils;
 
@@ -22,6 +25,12 @@ public class MainThreadLogEventSink : ILogEventSink
         Dispatcher.UIThread.InvokeAsync(() =>
         {
             LogEventReceived?.Invoke(logevent);
+
+            if (logevent.Level == LogEventLevel.Error || logevent.Level == LogEventLevel.Fatal)
+                SukiHost.ShowToast("Error", logevent.MessageTemplate.Text, SukiToastType.Error, TimeSpan.FromSeconds(5));
+            
+            if (logevent.Level == LogEventLevel.Warning)
+                SukiHost.ShowToast("Warning", logevent.MessageTemplate.Text, SukiToastType.Warning,TimeSpan.FromSeconds(5));
         });
     }
 }

@@ -33,8 +33,8 @@ public class Proxy
 
     [Reactive] public ushort LocalPort { get; private set; }
 
-    private uint _agentToken = 0;
-
+    private Task _agentKeepAliveTask = null!;
+    
     public Proxy()
     {
         Server.Connected += Proxy_OnServerConnected;
@@ -63,7 +63,9 @@ public class Proxy
 
     public void SendToServer(Packet packet)
     {
-        ServerSession?.Send(packet);
+       Log.Debug($"Sending to server: {packet}");
+        
+       ServerSession?.Send(packet);
     }
 
     public async Task StartClientProxy(ushort proxyPort)
@@ -78,29 +80,36 @@ public class Proxy
     {
         Log.Information($"Connecting to gateway server at {gatewayEndPoint}");
 
-        Context &= ~ProxyContext.Agent;
-        Context |= ProxyContext.Gateway;
-
         await InitializeServerConnection(gatewayEndPoint);
     }
 
-    public async Task ConnectToAgent(EndPoint agentEndPoint, uint token)
+    public async Task ConnectToAgent(EndPoint agentEndPoint)
     {
         Log.Information($"Connecting to agent server at {agentEndPoint}");
 
-        Context |= ProxyContext.Agent;
-        Context &= ~ProxyContext.Gateway;
-
-        _agentToken = token;
-
-        await InitializeServerConnection(agentEndPoint);
+        await InitializeServerConnection(agentEndPoint, true);
     }
 
-    private async Task InitializeServerConnection(EndPoint serverEndPoint)
+    private async Task InitializeServerConnection(EndPoint serverEndPoint, bool agent = false)
     {
         if (ServerSession != null)
             await ServerSession.DisconnectAsync();
 
+        if (agent)
+        {
+            Client.Identity = NetIdentity.AgentServer;
+            
+            Context |= ProxyContext.Agent;
+            Context &= ~ProxyContext.Gateway;
+        }
+        else
+        {
+            Client.Identity = NetIdentity.GatewayServer;
+
+            Context &= ~ProxyContext.Agent;
+            Context |= ProxyContext.Gateway;
+        }
+        
         //await Server.StopAsync();
         await Server.ConnectAsync(serverEndPoint);
     }
@@ -115,8 +124,12 @@ public class Proxy
 
         if ((Context & ProxyContext.Gateway) != 0)
             OnGatewayConnected(session);
-        else if ((Context & ProxyContext.Agent) != 0)
+        else if ((Context & ProxyContext.Agent) != 0) {
             OnAgentConnected(session);
+            
+            _agentKeepAliveTask = new Task(KeepAliveAgentSession);
+            _agentKeepAliveTask.Start(TaskScheduler.Current);
+        }
     }
 
     private void ServerSessionOnMessageReceived(Packet packet)
@@ -170,7 +183,7 @@ public class Proxy
     {
         Log.Debug($"Received from client: {packet}");
 
-        if (packet.Opcode == 0x5000 || packet.Opcode == 0x9000 || packet.Opcode == 0x2001)
+        if (packet.Opcode is 0x5000 or 0x9000)
             return;
 
         ServerSession?.Send(packet);
@@ -182,6 +195,17 @@ public class Proxy
         await Server.StopAsync();
     }
 
+    private async void KeepAliveAgentSession()
+    {
+        while ((Context & ProxyContext.Agent) != 0 && (Context & ProxyContext.Client) == 0)
+        {
+            var pingPacket = new Packet(0x2002);
+            SendToServer(pingPacket);
+
+            await Task.Delay(2000);
+        } 
+    }
+    
     protected virtual void OnClientConnected(Session clientSession)
     {
         ClientConnected?.Invoke(clientSession);

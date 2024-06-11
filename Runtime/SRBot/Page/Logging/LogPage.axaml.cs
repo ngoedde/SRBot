@@ -3,7 +3,7 @@ using Avalonia.Interactivity;
 using SukiUI.Controls;
 using SukiUI.Enums;
 
-namespace SRBot.Plugin.Logging.Page;
+namespace SRBot.Page.Logging;
 
 public partial class LogPage : UserControl
 {

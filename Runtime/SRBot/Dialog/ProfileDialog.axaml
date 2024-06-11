@@ -5,7 +5,7 @@
              xmlns:vm="using:SRBot.Dialog"
              xmlns:profile="using:SRCore.Config.Model"
              mc:Ignorable="d"
-             Width="400" d:DesignHeight="400"
+             Width="400" d:DesignHeight="700"
              xmlns:icons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              x:DataType="vm:ProfileDialogModel"
              Padding="10"
@@ -13,46 +13,45 @@
 
     <StackPanel Spacing="10">
         <icons:MaterialIcon Kind="User" Width="48" Height="48" Margin="0 0 0 0"></icons:MaterialIcon>
-        <TextBlock FontWeight="Bold" FontSize="18" TextAlignment="Center">Profile</TextBlock>
+        <TextBlock Classes="h3" TextAlignment="Center" Margin="0 0 0 16">Profile</TextBlock>
 
         <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding SelectedProfile}" Width="300">
             <ComboBox.ItemTemplate>
                 <DataTemplate DataType="profile:Profile">
                     <StackPanel>
-                    <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="SemiBold" />
-                    <TextBlock Text="{Binding ClientDirectory}" FontSize="12" FontWeight="SemiLight" />
+                        <TextBlock Text="{Binding Name}" FontSize="18" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding ClientDirectory}" FontSize="12" FontWeight="SemiLight" />
                     </StackPanel>
                 </DataTemplate>
             </ComboBox.ItemTemplate>
         </ComboBox>
         <StackPanel Spacing="10" Margin="16">
-            <TextBlock Text="Profile name"></TextBlock>
+            <TextBlock Text="Profile name" Margin="0 16 0 0"></TextBlock>
             <TextBox Text="{Binding SelectedProfile.Name}" Watermark="The name of the profile"></TextBox>
 
-            <TextBlock Text="Profile description"></TextBlock>
+            <TextBlock Text="Profile description" Margin="0 16 0 0"></TextBlock>
             <TextBox Text="{Binding SelectedProfile.Description}"></TextBox>
 
-            <TextBlock Text="Silkroad directory"></TextBlock>
+            <TextBlock Text="Silkroad directory" Margin="0 16 0 0"></TextBlock>
             <Grid ColumnDefinitions="*, 60">
-                <TextBox Text="{Binding SelectedProfile.ClientDirectory}"/>
-                <HyperlinkButton Grid.Column="1" Content="Browse" Command="{Binding BrowseClientFolder}" HorizontalAlignment="Right"></HyperlinkButton>
+                <TextBox Text="{Binding SelectedProfile.ClientDirectory}" />
+                <HyperlinkButton Grid.Column="1" Content="Browse" Command="{Binding BrowseClientFolder}"
+                                 HorizontalAlignment="Right">
+                </HyperlinkButton>
             </Grid>
-            <CheckBox Content="Clientless mode?" IsChecked="{Binding SelectedProfile.Clientless}" Classes="Flat Accent"></CheckBox>
+            <CheckBox Content="Clientless mode?" IsChecked="{Binding SelectedProfile.Clientless}" Margin="0 16 0 0" Classes="Flat Accent"></CheckBox>
         </StackPanel>
 
-        <Grid ColumnDefinitions="*,*">
-            <HyperlinkButton Grid.Column="0" Content="Delete profile" HorizontalAlignment="Center" Command="{Binding DeleteProfile}" CommandParameter="{Binding SelectedProfile}">
-            </HyperlinkButton>
-            
-            <HyperlinkButton Grid.Column="1" Content="New profile" HorizontalAlignment="Center"
-                             Command="{Binding AddProfile}">
-            </HyperlinkButton>
-        </Grid>
-        <Grid ColumnDefinitions="*,*">
-            <Button Margin="8 0 0 0" Content="Cancel" Classes="Flat Accent" Grid.Column="0" Command="{Binding CloseDialog}"></Button>
-            <Button Margin="8 0 0 0" Content="Load profile" Classes="Flat" Grid.Column="1"
-                    Command="{Binding LoadProfile}" CommandParameter="{Binding SelectedProfile}" IsEnabled="{Binding SelectedProfile.ClientDirectory}">
-            </Button>
-        </Grid>
+        <HyperlinkButton Grid.Column="0" Content="Delete profile" HorizontalAlignment="Center"
+                         Command="{Binding DeleteProfile}" CommandParameter="{Binding SelectedProfile}">
+        </HyperlinkButton>
+
+        <HyperlinkButton Grid.Column="1" Content="New profile" HorizontalAlignment="Center"
+                         Command="{Binding AddProfile}">
+        </HyperlinkButton>
+        <Button Margin="8 24 0 0" Content="Load profile" Classes="Flat" Grid.Column="1" HorizontalAlignment="Center"
+                Command="{Binding LoadProfile}" CommandParameter="{Binding SelectedProfile}"
+                IsEnabled="{Binding SelectedProfile.ClientDirectory}">
+        </Button>
     </StackPanel>
 </UserControl>

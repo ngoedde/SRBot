@@ -108,6 +108,24 @@ public class Packet
         m_reader = null;
         m_reader_bytes = null;
     }
+
+    public Packet Reset()
+    {
+        if (m_reader != null)
+        {
+            m_reader.BaseStream.Position = 0;
+        }
+
+        if (m_writer != null)
+        {
+            m_writer.BaseStream.Position = 0;
+        }
+        
+        m_lock = new object();
+        
+        return this;
+    }
+    
     public Packet(ushort opcode, bool encrypted, bool massive, byte[] bytes, int offset, int length)
     {
         if (encrypted && massive)
@@ -1073,11 +1091,11 @@ public class Packet
             }
         }
     }
-    public void WriteInt8Array(object[] values)
+    public void WriteByteArray(byte[] values)
     {
-        this.WriteInt8Array(values, 0, values.Length);
+        this.WriteByteArray(values, 0, values.Length);
     }
-    public void WriteInt8Array(object[] values, int index, int count)
+    public void WriteByteArray(byte[] values, int index, int count)
     {
         lock (m_lock)
         {

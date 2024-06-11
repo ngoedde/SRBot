@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using SRCore.Bot;
+using Serilog.Events;
+using SRCore.Botting;
+using SRCore.Components;
 using SRCore.Config;
 using SRCore.Config.Model;
 using SRCore.Models;
+using SRCore.Service;
 using SRGame.Client;
 
 namespace SRCore;
@@ -23,6 +26,9 @@ public sealed class Kernel(
 
     public event KernelShutdownEventHandler? KernelShutdown;
 
+    public delegate void InterruptEventHandler(Kernel kernel, string message, LogEventLevel level);
+    public event InterruptEventHandler? Interrupt;
+    
     #endregion
 
     private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
@@ -31,6 +37,9 @@ public sealed class Kernel(
     private readonly IEnumerable<SRNetwork.MessageHook> _messageHooks = serviceProvider.GetServices<SRNetwork.MessageHook>();
     private readonly ProfileService _profileService = serviceProvider.GetRequiredService<ProfileService>();
     private readonly ClientlessManager _clientlessManager = serviceProvider.GetRequiredService<ClientlessManager>();
+    private readonly AccountService _accountService = serviceProvider.GetRequiredService<AccountService>();
+    private readonly LoginService _loginService = serviceProvider.GetRequiredService<LoginService>();
+    private readonly Bot _bot = serviceProvider.GetRequiredService<Bot>();
 
     public bool IsInitialized { get; private set; }
 
@@ -47,10 +56,14 @@ public sealed class Kernel(
         
         //Folder structure
         Directory.CreateDirectory(ConfigDirectory);
-
+        
         await _profileService.LoadProfilesAsync().ConfigureAwait(false);
+        await _accountService.Initialize("").ConfigureAwait(false);
+        
         _proxy.Initialize(_messageHandlers, _messageHooks);
+        _loginService.Initialize();
         _clientlessManager.Initialize();
+        _profileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;
         
         IsInitialized = true;
 
@@ -59,6 +72,24 @@ public sealed class Kernel(
         Log.Debug("SRKernel initialized.");
     }
 
+    private void ProfileServiceOnActiveProfileChanged(Profile profile)
+    {
+        OnInterrupt(this, "Active profile has changed.", LogEventLevel.Information);
+    }
+
+    public async Task TriggerInterrupt(string message, LogEventLevel level = LogEventLevel.Fatal, bool shutdown = true)
+    {
+        OnInterrupt(this, message, level);
+
+        if (shutdown)
+        {
+            await _proxy.ShutdownAsync();
+            _bot.StopBot();
+        }
+        
+        Log.Write(level, message);
+    }
+    
     /// <summary>
     /// Shuts down the SRKernel and all services it depends on.
     /// </summary>
@@ -83,6 +114,13 @@ public sealed class Kernel(
     private void OnKernelShutdown(Kernel kernel)
     {
         KernelShutdown?.Invoke(kernel);
+    }
+
+    private void OnInterrupt(Kernel kernel, string message, LogEventLevel level)
+    {
+        Interrupt?.Invoke(kernel, message, level);
+        
+        Log.Debug($"[{level}] Kernel interrupt: {message}");
     }
 }
 
@@ -134,9 +172,11 @@ public static class KernelExtensions
         foreach (var type in botBases)
             services.AddSingleton(typeof(BotBase), type);
         
+        services.AddSingleton<Bot>();
         services.AddSingleton<Proxy>();
         services.AddSingleton<ClientlessManager>();
-        services.AddSingleton<BotManager>();
+        services.AddSingleton<AccountService>();
+        services.AddSingleton<LoginService>();
      
         return services;
     }

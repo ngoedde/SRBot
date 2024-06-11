@@ -15,6 +15,7 @@ namespace SRCore.MessageHandler.Gateway
         {
             try
             {
+                // Save the agent login information
                 agentLogin.ContentId = packet.ReadByte();
                 agentLogin.Username = packet.ReadString();
                 agentLogin.Password = packet.ReadString();
@@ -22,7 +23,7 @@ namespace SRCore.MessageHandler.Gateway
 
                 return ValueTask.FromResult(true);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return ValueTask.FromResult(false);
             }

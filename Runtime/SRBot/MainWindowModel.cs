@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using Avalonia.Media;
 using Material.Icons;
@@ -14,13 +13,12 @@ using SRBot.Config;
 using SRBot.Dialog;
 using SRBot.Page;
 using SRCore;
-using SRCore.Bot;
+using SRCore.Botting;
 using SRCore.Config;
 using SRCore.Config.Model;
 using SRCore.Models;
 using SRGame.Client;
 using SRNetwork;
-using SRNetwork.Common;
 using SukiUI.Controls;
 
 namespace SRBot;
@@ -34,7 +32,7 @@ public class MainWindowModel : ViewModel
     private readonly ClientInfoManager _clientInfoManager;
     private readonly EntityManager _entityManager;
     private readonly Proxy _proxy;
-    private readonly BotManager _botManager;
+    private readonly Bot _bot;
     private readonly PatchInfo _patchInfo;
     private readonly ServerListDialogModel _serverListDialogModel;
 
@@ -72,6 +70,9 @@ public class MainWindowModel : ViewModel
     /// </summary>
     public bool IsServerListAvailable => (_proxy.Context & ProxyContext.Gateway) != 0;
 
+    public bool IsBotRunning => _bot.CurrentBot?.State is BotState.Started;
+    public bool IsBotIdle => _bot.CurrentBot?.State is BotState.Idle;
+    
     #endregion
 
     public MainWindowModel(IServiceProvider serviceProvider)
@@ -87,7 +88,7 @@ public class MainWindowModel : ViewModel
         _profileService = serviceProvider.GetRequiredService<ProfileService>();
         _game = serviceProvider.GetRequiredService<Game>();
         _proxy = serviceProvider.GetRequiredService<Proxy>();
-        _botManager = serviceProvider.GetRequiredService<BotManager>();
+        _bot = serviceProvider.GetRequiredService<Bot>();
         _patchInfo = serviceProvider.GetRequiredService<PatchInfo>();
         _serverListDialogModel = serviceProvider.GetRequiredService<ServerListDialogModel>();
 
@@ -95,6 +96,20 @@ public class MainWindowModel : ViewModel
         _game.GameStartLoading += OnGameStartLoading;
         _profileService.ActiveProfileChanged += OnActiveProfileChanged;
         _patchInfo.PatchInfoUpdated += OnPatchInfoUpdated;
+        _bot.BotStarted += OnBotStarted;
+        _bot.BotStopped += OnBotStopped;
+    }
+
+    private void OnBotStopped(BotBase bot)
+    {
+        this.RaisePropertyChanged(nameof(IsBotRunning));
+        this.RaisePropertyChanged(nameof(IsBotIdle));
+    }
+
+    private void OnBotStarted(BotBase bot)
+    {
+        this.RaisePropertyChanged(nameof(IsBotRunning));
+        this.RaisePropertyChanged(nameof(IsBotIdle));
     }
 
     private async void OnPatchInfoUpdated(Session session, PatchInfo patchInfo)
@@ -152,7 +167,7 @@ public class MainWindowModel : ViewModel
 
     public async Task SwitchBotState()
     {
-        if (_botManager.CurrentBot.State is BotState.Idle or BotState.Stopped)
+        if (_bot.State is BotState.Idle)
             await StartBot();
         else
             await StopBot();
@@ -174,6 +189,8 @@ public class MainWindowModel : ViewModel
                 await _proxy.StartClientProxy(_profileService.ActiveProfile.ClientListeningPort);
             }
         }
+        
+        _bot.StartBot();
     }
 
     public async Task StopBot()
@@ -182,8 +199,8 @@ public class MainWindowModel : ViewModel
 
     public async Task SaveConfig()
     {
-        await _configService.SaveAllAsync();
-        await _profileService.SaveProfilesAsync();
+        // await _configService.SaveAllAsync();
+        // await _profileService.SaveProfilesAsync();
     }
 
     public void ShowProfileDialog()

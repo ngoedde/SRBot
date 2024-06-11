@@ -1,9 +1,10 @@
 using System.Text.Json;
+using ReactiveUI;
 using Serilog;
 
 namespace SRCore.Config;
 
-public class ConfigService(ILogger logger)
+public class ConfigService()
 {
     private readonly JsonSerializerOptions _options = new()
     {
@@ -31,11 +32,23 @@ public class ConfigService(ILogger logger)
         if (config == null)
             return defaultValue;
 
+        if (config is ReactiveObject obj)
+        {
+            obj.PropertyChanged += async (sender, args) =>
+            {
+                await SaveAsync(path);
+            };
+        }
+        else
+        {
+            Log.Error($"Configuration {config.GetType()} does not inherit from ReactiveObject. Changes will not be saved.");
+        }
+
         RemoveConfigOfType<T>();
         
         _configurations[path] = config;
         
-        logger.Information($"Loaded configuration from {path}");
+        Log.Debug($"Loaded configuration from {path}");
         return config;
     }
 
@@ -53,7 +66,7 @@ public class ConfigService(ILogger logger)
 
         await File.WriteAllTextAsync(path, jsonString);
         
-        logger.Information($"Saved configuration to {path}");
+        Log.Debug($"Saved configuration to {path}");
     }
     
     public async Task SaveAllAsync()

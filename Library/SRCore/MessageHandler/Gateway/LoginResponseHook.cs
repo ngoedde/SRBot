@@ -1,5 +1,4 @@
-﻿using System.Net;
-using SRCore.Models;
+﻿using SRCore.Models;
 using SRNetwork.SilkroadSecurityApi;
 using SRNetwork;
 
@@ -16,7 +15,7 @@ namespace SRCore.MessageHandler.Gateway
             var messageResult = (MessageResult)packet.ReadByte();
             if (messageResult != MessageResult.Success)
                 return ValueTask.FromResult(packet);
-
+            
             var token = packet.ReadUInt();
             var agentIp = packet.ReadString();
             var agentPort = packet.ReadUShort();
@@ -24,6 +23,10 @@ namespace SRCore.MessageHandler.Gateway
             agentLogin.Token = token;
             agentLogin.AgentServerIp = agentIp;
             agentLogin.AgentServerPort = agentPort;
+            
+            //Only hook client login responses
+            if ((agentLogin.Context & ProxyContext.Client) == 0)
+                return ValueTask.FromResult(packet.Reset());
 
             var newPacket = new Packet(Opcode, packet.Encrypted, packet.Massive);
             newPacket.WriteByte(messageResult);

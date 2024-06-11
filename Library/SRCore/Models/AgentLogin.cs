@@ -1,34 +1,41 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using ReactiveUI.Fody.Helpers;
+using SRNetwork;
+using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models
 {
     internal class AgentLogin(IServiceProvider serviceProvider) : GameModel(serviceProvider)
     {
-        [Reactive]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
-        [Reactive]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
 
-        [Reactive]
-        public string AgentServerIp { get; set; }
+        public string AgentServerIp { get; set; } = string.Empty;
 
-        [Reactive]
         public ushort AgentServerPort { get; set; }
 
-        [Reactive]
         public byte ContentId { get; set; }
 
-        [Reactive]
         public ushort ShardId { get; set; }
 
-        [Reactive]
         public uint Token { get; set; }
 
         public ushort LocalPort => _proxy.LocalPort;
+        
+        public ProxyContext Context => _proxy.Context;
 
         private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
-    }
 
+        public void LoginToAgent()
+        {
+            var agentHandshakePacket = new Packet(AgentMsgId.LoginActionReq, true);
+            agentHandshakePacket.WriteUInt(Token);
+            agentHandshakePacket.WriteString(Username);
+            agentHandshakePacket.WriteString(Password);
+            agentHandshakePacket.WriteByte(ContentId);
+            agentHandshakePacket.WriteByteArray(new byte[6]);
+            
+            _proxy.SendToServer(agentHandshakePacket);    
+        }
+    }
 }

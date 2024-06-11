@@ -3,8 +3,8 @@
 namespace SRNetwork;
 
 public delegate ValueTask<bool> PacketHandler(Session session, Packet packet);
-
 public delegate ValueTask<Packet> PacketHook(Session session, Packet packet);
+
 public class PacketHandlerManager
 {
     private readonly IDictionary<ushort, PacketHandler> _handlerMap = new Dictionary<ushort, PacketHandler>();

@@ -31,6 +31,8 @@ public class NetEngine
 
     public NetTrafficProfiler Profiler { get; }
 
+    public string Identity { get; set; } = NetIdentity.GatewayServer;
+    
     public NetEngine()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -49,11 +51,11 @@ public class NetEngine
     {
         await _acceptor.StopAsync();
         
-        // foreach (var session in _sessionManager)
-        // {
-        //     if (session.)
-        //     await session.DisconnectAsync();
-        // }
+        foreach (var session in _sessionManager)
+        {
+            // if (session.)
+            await session.DisconnectAsync();
+        }
     
         _sessionManager.Clear();
     }
@@ -62,7 +64,7 @@ public class NetEngine
     {
         var security = new Security();
         security.GenerateSecurity(true, true, true);
-        security.ChangeIdentity("GatewayServer", 0);
+        security.ChangeIdentity(Identity, 0);
         
         var session = _sessionManager.CreateSession(socket, security);
         session.Profiler = this.Profiler.AddProfile(session.Id);
@@ -80,7 +82,7 @@ public class NetEngine
         
         OnConnected(session);
     }
-    
+
     public void SetMsgHandler(ushort id, PacketHandler handler)
     {
         _packetHandlerManager.SetMsgHandler(id, handler);

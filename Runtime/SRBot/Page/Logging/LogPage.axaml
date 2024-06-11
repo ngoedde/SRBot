@@ -3,16 +3,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
-             xmlns:vm="clr-namespace:SRBot.Plugin.Logging.Page"
-             x:DataType="page1:LogPageModel"
+             xmlns:vm="clr-namespace:SRBot.Page.Logging"
+             x:DataType="vm:LogPageModel"
              VerticalAlignment="Stretch"
              HorizontalAlignment="Stretch"
              xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
-             xmlns:page="clr-namespace:SRBot.Plugin.Logging.Page"
-             xmlns:page1="clr-namespace:SRBot.Plugin.Logging.Page"
              MaxWidth="790"
              Margin="16"
-             x:Class="SRBot.Plugin.Logging.Page.LogPage">
+             x:Class="SRBot.Page.Logging.LogPage">
     <DockPanel>
         <suki:GlassCard>
             <DockPanel LastChildFill="True">
@@ -21,7 +19,7 @@
                     <Button HorizontalAlignment="Right" Click="ClearLog_OnClick">Clear</Button>
                 </Panel>
                 <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding Logs}" CanUserReorderColumns="True"
-                          CanUserSortColumns="True" CanUserResizeColumns="True">
+                          CanUserSortColumns="True" CanUserResizeColumns="True" Width="680">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Time" Binding="{Binding   Timestamp, StringFormat='hh:mm:ss'}" />
                         <DataGridTextColumn Header="Level" Binding="{Binding   Level}" />

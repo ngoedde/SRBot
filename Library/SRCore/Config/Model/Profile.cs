@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
-using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SRCore.Utils;
 using SRGame.Client;
 
 namespace SRCore.Config.Model;
 
-public class Profile(string configDirectory, string name) : ReactiveObject
+public class Profile(string configDirectory, string name) : ConfigElement
 {
     [Required, Reactive] public string Name { get; set; } = name;
 

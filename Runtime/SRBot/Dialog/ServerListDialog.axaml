@@ -9,8 +9,7 @@
              x:Class="SRBot.Dialog.ServerListDialog">
     <StackPanel Spacing="10">
         <icons:MaterialIcon Kind="Server" Width="48" Height="48" Margin="0 0 0 0"></icons:MaterialIcon>
-        <Button Content="X" Command="{Binding CloseDialog}" HorizontalAlignment="Right"></Button>
-        <TextBlock FontWeight="Bold" FontSize="18" TextAlignment="Center">Server list</TextBlock>
+        <TextBlock Classes="h3" TextAlignment="Center" Margin="0 0 0 16">Server List</TextBlock>
         <DataGrid ItemsSource="{Binding  ShardList.Shards}" AutoGenerateColumns="True" IsReadOnly="True">
         </DataGrid>
         <HyperlinkButton Content="Refresh" Command="{Binding RefreshServerList}" HorizontalAlignment="Center"></HyperlinkButton>

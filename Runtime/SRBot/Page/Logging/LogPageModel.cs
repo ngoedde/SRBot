@@ -3,21 +3,18 @@ using Material.Icons;
 using Serilog;
 using Serilog.Events;
 using SRBot.Config;
-using SRBot.Page;
 using SRBot.Utils;
 using SRCore.Config;
 
-namespace SRBot.Plugin.Logging.Page;
+namespace SRBot.Page.Logging;
 
 public class LogPageModel : PageModel
 {
     private readonly ConfigService _configService;
-    private readonly ILogger _logger;
 
-    public LogPageModel(MainThreadLogEventSink memoryLogEventSink, ConfigService configService, ILogger logger) : base("srbot_page_log", "Log", 99, MaterialIconKind.ConsoleLine)
+    public LogPageModel(MainThreadLogEventSink memoryLogEventSink, ConfigService configService) : base("srbot_page_log", "Log", 99, MaterialIconKind.ConsoleLine)
     {
         _configService = configService;
-        _logger = logger; 
         
         memoryLogEventSink.LogEventReceived += MemoryLogSinkOnLogEventReceived;
     }
@@ -38,6 +35,6 @@ public class LogPageModel : PageModel
     {
         Logs.Clear();
         
-        _logger.Information("Logs cleared");
+        Log.Information("Logs cleared");
     }
 }

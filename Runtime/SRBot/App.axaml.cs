@@ -32,7 +32,6 @@ public partial class App : Application
         AvaloniaXamlLoader.Load(this);
 
         ServiceProvider = ConfigureServices();
-
         Kernel.KernelInitialized += KernelOnKernelInitialized;
         Kernel.KernelShutdown += KernelOnKernelShutdown;
     }
