@@ -10,6 +10,5 @@ public abstract class Item(byte slot, RefObjItem item, ItemRentInfo? rentInfo = 
     [Reactive] public byte Slot { get; internal set; } = slot;
     [Reactive] public uint RentType { get; internal set; }
     [Reactive] public ItemRentInfo? RentInfo { get; internal set; }
-    [Reactive] public int RefObjId { get; internal set; }
-
+    [Reactive] public int RefObjId { get; internal set; } = item.Id;
 }

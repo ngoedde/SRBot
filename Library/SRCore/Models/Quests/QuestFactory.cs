@@ -6,7 +6,7 @@ internal class QuestFactory
 {
     public static Quest ParseFromPacket(Packet packet)
     {
-        var result = new Quest()
+        var result = new Quest
         {
             RefQuestId = packet.ReadUInt(),
             AchievementCount = packet.ReadByte(),
@@ -47,22 +47,6 @@ internal class QuestFactory
             result.NpcIds = new uint[npcCount];
             for (var i = 0; i < npcCount; i++)
                 result.NpcIds[i] = packet.ReadUInt();
-        }
-        
-        var markCount = packet.ReadByte();
-        for (var i = 0; i < markCount; i++)
-        {
-            var mark = new QuestMark
-            {
-                GameServerFrame = packet.ReadUInt(),
-                QuestType = (QuestType)packet.ReadByte(),
-                Type = (QuestMarkType)packet.ReadByte(),
-                RegionId = packet.ReadUShort(),
-                Position = Position.FromPacket(packet),
-                NpcUniqueId = packet.ReadUInt()
-            };
-            
-            result.Marks.Add(mark);
         }
         
         return result;

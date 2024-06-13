@@ -60,9 +60,9 @@
 
             <suki:GroupBox Header="Game" Margin="16" DockPanel.Dock="Top">
                 <StackPanel>
-                    <TextBlock Classes="h4" Text="Character name"></TextBlock>
-                    <ProgressBar Value="50" ShowProgressText="True"></ProgressBar>
-                    <ProgressBar Value="50" Classes="Accent" ShowProgressText="True"></ProgressBar>
+                    <TextBlock Classes="h4" Text="{Binding Player.Name}"/>
+                    <ProgressBar Value="{Binding Player.Health}" Maximum="{Binding Player.Attributes.MaxHealth}" ShowProgressText="False"></ProgressBar>
+                    <ProgressBar Value="{Binding Player.Mana}" Maximum="{Binding Player.Attributes.MaxMana}" Classes="Accent" ShowProgressText="False"></ProgressBar>
                 </StackPanel>
             </suki:GroupBox>
             <suki:GroupBox Header="Target" Margin="16" DockPanel.Dock="Top">
@@ -84,11 +84,11 @@
                             <Label>Weapon:</Label>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding Character.Level}"/>
-                            <TextBlock>0</TextBlock>
-                            <TextBlock>0</TextBlock>
-                            <TextBlock Text="{Binding Character.Gold}"/>
-                            <TextBlock Text="{Binding Character.SkillPoints}"/>
+                            <TextBlock Text="{Binding Player.Level}"/>
+                            <TextBlock Text="{Binding Player.Attributes.Strength}"/>
+                            <TextBlock Text="{Binding Player.Attributes.Intelligence}"/>
+                            <TextBlock Text="{Binding Player.Gold}"/>
+                            <TextBlock Text="{Binding Player.SkillPoints}"/>
                             <TextBlock>0</TextBlock>
                             <TextBlock>0</TextBlock>
                         </StackPanel>

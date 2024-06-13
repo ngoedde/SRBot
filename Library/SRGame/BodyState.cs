@@ -3,7 +3,7 @@
 /// <summary>
 ///     OBJ_BODYMODE_
 /// </summary>
-public enum BodyMode : byte
+public enum BodyState : byte
 {
     Normal = 0,
     Hwan = 1,

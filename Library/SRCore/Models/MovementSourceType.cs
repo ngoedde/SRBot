@@ -1,6 +1,6 @@
 namespace SRCore.Models;
 
-public enum MovementSource
+public enum MovementSourceType : byte
 {
     Spinning,
     SkyClick

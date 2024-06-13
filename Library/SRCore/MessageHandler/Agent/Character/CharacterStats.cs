@@ -1,21 +1,23 @@
-using SRCore.Models;
-using SRNetwork;
-using SRNetwork.SilkroadSecurityApi;
+using SRCore.Models.Character;
 
 namespace SRCore.MessageHandler.Agent.Character;
 
-internal class CharacterDataStart(Models.Player player) : SRNetwork.MessageHandler
+using Models;
+using SRNetwork;
+using SRNetwork.SilkroadSecurityApi;
+
+internal class CharacterStats(Player player) : MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
-    public override ushort Opcode => AgentMsgId.CharacterDataStart;
+    public override ushort Opcode => AgentMsgId.CharacterStatsUpdate;
 
     public override ValueTask<bool> Handle(Session session, Packet packet)
     {
         try
         {
-            player.CharacterDataPacket = new Packet(AgentMsgId.CharacterData);
-        
+            player.Attributes = Attributes.FromPacket(packet);
+            
             return ValueTask.FromResult(true);
         }
         catch (Exception)

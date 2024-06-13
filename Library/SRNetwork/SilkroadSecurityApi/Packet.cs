@@ -284,7 +284,7 @@ public class Packet
             return m_reader.ReadInt64();
         }
     }
-    public float ReadSingle()
+    public float ReadFloat()
     {
         lock (m_lock)
         {

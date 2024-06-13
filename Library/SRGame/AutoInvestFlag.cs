@@ -1,6 +1,5 @@
 ﻿namespace SRGame;
 
-[Flags]
 public enum AutoInvestFlag : byte
 {
     None = 0,

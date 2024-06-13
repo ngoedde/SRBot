@@ -23,7 +23,11 @@ public static class AgentMsgId
         CharacterDataStart = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4A5); // 0x34A5
     public static readonly MessageID
         CharacterDataEnd = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4A6); // 0x34A5
-
     public static readonly MessageID
         CharacterData = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x13);
+    public static readonly MessageID
+        ReadyToPlay = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x12); // 0x34A7
+    
+    public static readonly MessageID
+        CharacterStatsUpdate = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x3D);
 }

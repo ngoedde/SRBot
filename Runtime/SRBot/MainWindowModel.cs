@@ -74,7 +74,7 @@ public class MainWindowModel : ViewModel
     public bool IsBotRunning => Bot.CurrentBot?.State is BotState.Started;
     public bool IsBotIdle => Bot.CurrentBot?.State is BotState.Idle;
 
-    public Character Character => _serviceProvider.GetRequiredService<Character>();
+    public Player Player => _serviceProvider.GetRequiredService<Player>();
   
     #endregion
 

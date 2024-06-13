@@ -4,23 +4,31 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models;
 
-public class Movement(Position? destination = null) : ReactiveObject
+public class Movement(RegionPosition? destination = null) : ReactiveObject
 {
-    [Reactive] public Position? Destination { get; internal set; } = destination;
+    [Reactive] public RegionPosition? Destination { get; internal set; }
+    
     [Reactive] public byte Type { get; internal set; }
+    [Reactive] public MovementSourceType SourceType { get; internal set; }
     [Reactive] public ushort Angle { get; internal set; }
     
-    public static Movement FromPacket(Packet packet)
+    internal static Movement FromPacket(Packet packet)
     {
-        var result = new Movement(Position.FromPacket(packet));
-        
+        var result = new Movement();
+
+        var hasDestination = packet.ReadBool();
         result.Type = packet.ReadByte();
-        result.Angle = packet.ReadUShort();
         
-        if (packet.ReadBool())
+        if (hasDestination)
         {
-            result.Destination = Position.FromPacket(packet);
+            result.Destination = RegionPosition.FromPacket(packet);
         }
+        else
+        {
+            result.SourceType = (MovementSourceType)packet.ReadByte();
+            result.Angle = packet.ReadUShort();
+        }
+        
 
         return result;
     }

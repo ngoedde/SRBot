@@ -1,31 +1,27 @@
 using ReactiveUI.Fody.Helpers;
+using SRCore.Mathematics;
 using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models;
 
-public class EntityPosition : Position
+public class EntityPosition
 {
+    [Reactive] public RegionId RegionId { get; internal set; }
+    [Reactive] public float X { get; internal set; }
+    [Reactive] public float Y { get; internal set; }
+    [Reactive] public float Z { get; internal set; }
     [Reactive] public ushort Angle { get; internal set; }
     
     public new static EntityPosition FromPacket(Packet packet)
     {
-        var result = new EntityPosition();
-        
-        var regionId = packet.ReadUShort();
-        if (regionId < short.MaxValue)
+        var result = new EntityPosition
         {
-            result.XOffset = packet.ReadUShort();
-            result.YOffset = packet.ReadUShort();
-            result.ZOffset = packet.ReadUShort();
-        }
-        else
-        {
-            result.XOffset = packet.ReadUInt();
-            result.ZOffset = packet.ReadUInt();
-            result.YOffset = packet.ReadUInt();
-        }
-        
-        result.Angle = packet.ReadUShort();
+            RegionId = new RegionId(packet.ReadUShort()),
+            X = packet.ReadFloat(),
+            Y = packet.ReadFloat(),
+            Z = packet.ReadFloat(),
+            Angle = packet.ReadUShort()
+        };
 
         return result;
     }

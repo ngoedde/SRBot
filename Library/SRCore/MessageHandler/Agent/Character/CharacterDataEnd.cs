@@ -4,7 +4,7 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.MessageHandler.Agent.Character;
 
-internal class CharacterDataEnd(Models.Character character) : SRNetwork.MessageHandler
+internal class CharacterDataEnd(Models.Player player) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
@@ -15,7 +15,7 @@ internal class CharacterDataEnd(Models.Character character) : SRNetwork.MessageH
         try
         {
       
-            character.ParsePacket(session, character.CharacterDataPacket.Lock());
+            player.ParsePacket(session, player.CharacterDataPacket.Lock());
         
             return ValueTask.FromResult(true);
         }

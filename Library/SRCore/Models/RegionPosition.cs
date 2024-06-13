@@ -6,20 +6,22 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models;
 
-public class Position : ReactiveObject
+public class RegionPosition : ReactiveObject
 {
     [Reactive] public RegionId RegionId { get; internal set; }
     [Reactive] public uint XOffset { get; internal set; }
     [Reactive] public uint YOffset { get; internal set; }
     [Reactive] public uint ZOffset { get; internal set; }
     
-    public RegionPosition ToRegionPosition() => new(RegionId, new Vector3(XOffset, YOffset, ZOffset));
+    public Mathematics.RegionPosition ToRegionPosition() => new(RegionId, new Vector3(XOffset, YOffset, ZOffset));
 
-    public static Position FromPacket(Packet packet)
+    public static RegionPosition FromPacket(Packet packet)
     {
-        var result = new Position();
+        var result = new RegionPosition();
         
         var regionId = packet.ReadUShort();
+        
+        result.RegionId = new RegionId(regionId);
         if (regionId < short.MaxValue)
         {
             result.XOffset = packet.ReadUShort();
@@ -32,7 +34,7 @@ public class Position : ReactiveObject
             result.ZOffset = packet.ReadUInt();
             result.YOffset = packet.ReadUInt();
         }
-
+        
         return result;
     }
 }
