@@ -18,9 +18,8 @@ internal class Identification(AgentLogin agentLogin, Proxy proxy, AccountService
         {
             if ((proxy.Context & ProxyContext.Client) != 0)
                 return new ValueTask<bool>(true);
-            
-            var serviceName = packet.ReadString();
 
+            var serviceName = packet.ReadString();
             if (serviceName != NetIdentity.AgentServer) 
                 return OnHandled(session, packet);
 

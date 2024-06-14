@@ -60,7 +60,7 @@ public sealed class Kernel(
         await _profileService.LoadProfilesAsync().ConfigureAwait(false);
         await _accountService.Initialize("").ConfigureAwait(false);
         
-        _proxy.Initialize(_messageHandlers, _messageHooks);
+        _proxy.Initialize(serviceProvider);
         _loginService.Initialize();
         _clientlessManager.Initialize();
         _profileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;

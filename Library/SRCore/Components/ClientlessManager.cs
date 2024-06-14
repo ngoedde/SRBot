@@ -68,15 +68,6 @@ internal class ClientlessManager(
             
             characterLobby.Request();
         }
-
-        if (packet.Opcode == GatewayMsgId.LoginAck)
-        {
-            result = (MessageResult)packet.ReadByte();
-            if (result != MessageResult.Success)
-                return;
-
-            await proxy.ConnectToAgent(NetHelper.ToIPEndPoint(agentLogin.AgentServerIp, agentLogin.AgentServerPort));
-        }
     }
 
 

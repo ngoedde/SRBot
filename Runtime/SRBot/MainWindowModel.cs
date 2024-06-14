@@ -86,7 +86,6 @@ public class MainWindowModel : ViewModel
         // Get required services from the service provider, to not blow up the constructor.
         _serviceProvider = serviceProvider;
        
-
         Game.GameStopLoading += OnGameStopLoading;
         Game.GameStartLoading += OnGameStartLoading;
         ProfileService.ActiveProfileChanged += OnActiveProfileChanged;

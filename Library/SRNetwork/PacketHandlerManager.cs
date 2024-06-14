@@ -32,6 +32,9 @@ public class PacketHandlerManager
         if (!_hookMap.TryGetValue(packet.Opcode, out var hook))
             return ValueTask.FromResult(packet);
 
+        if (!packet.Locked)
+            packet.Lock();
+
         return hook(session, packet);
     }
 }

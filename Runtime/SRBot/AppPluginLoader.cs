@@ -15,12 +15,12 @@ public class AppPluginLoader(ILogger logger)
     
     public List<AppPlugin> LoadPlugins()
     {
-        foreach (var file in Directory.GetFiles(PluginDirectory, "*.Plugin.*.dll"))
-        {
-            if(TryGetExtensionsFromAssembly(file, out var assembly, out var plugins)) {
-                Plugins.Add(assembly, plugins);
-            }
-        }
+        //foreach (var file in Directory.GetFiles(PluginDirectory, "*.Plugin.*.dll"))
+        //{
+        //    if(TryGetExtensionsFromAssembly(file, out var assembly, out var plugins)) {
+        //        //Plugins.Add(assembly, plugins);
+        //    }
+        //}
 
         return Plugins.SelectMany(p => p.Value).ToList();
     }

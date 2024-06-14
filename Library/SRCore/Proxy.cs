@@ -1,6 +1,8 @@
 using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+using SRCore.Models;
 using SRNetwork;
 using SRNetwork.Common;
 using SRNetwork.SilkroadSecurityApi;
@@ -26,36 +28,36 @@ public class Proxy
     public event AgentDisconnectedEventHandler? AgentDisconnected;
 
     [Reactive] public ProxyContext Context { get; private set; } = ProxyContext.None;
-    public NetEngine Server { get; } = new();
-    public NetEngine Client { get; } = new();
-    [Reactive] public Session? ClientSession { get; private set; }
-    [Reactive] public Session? ServerSession { get; private set; }
-
     [Reactive] public ushort LocalPort { get; private set; }
 
-    private Task _agentKeepAliveTask = null!;
+    public NetEngine Server { get; } = new();
+    public NetEngine Client { get; } = new();
+    public Session? ClientSession { get; private set; }
+    public Session? ServerSession { get; private set; }
 
-    private IEnumerable<SRNetwork.MessageHandler> _handlers;
-    private IEnumerable<SRNetwork.MessageHook> _hooks;
-    
+    private Task? _agentKeepAliveTask = null!;
+    private IServiceProvider _serviceProvider;
+    private IEnumerable<SRNetwork.MessageHandler> Handlers => _serviceProvider.GetServices<SRNetwork.MessageHandler>();
+    private IEnumerable<MessageHook> Hooks => _serviceProvider.GetServices<SRNetwork.MessageHook>();
+    private AgentLogin AgentLogin => _serviceProvider.GetRequiredService<AgentLogin>();
+  
     public Proxy()
     {
         Server.Connected += Proxy_OnServerConnected;
         Client.ClientConnected += Proxy_OnClientConnected;
     }
 
-    internal void Initialize(IEnumerable<SRNetwork.MessageHandler> packetHandlers, IEnumerable<SRNetwork.MessageHook>  packetHooks)
+    internal void Initialize(IServiceProvider serviceProvider)
     {
-        _handlers = packetHandlers;
-        _hooks = packetHooks;
-        
-        foreach (var packetHandler in _handlers)
+        _serviceProvider = serviceProvider;
+
+        foreach (var packetHandler in Handlers)
         {
             Server.SetMsgHandler(packetHandler.Opcode, packetHandler.Handler);
             Client.SetMsgHandler(packetHandler.Opcode, packetHandler.Handler);
         }
 
-        foreach (var packetHandler in _hooks)
+        foreach (var packetHandler in Hooks)
         {
             Server.SetMsgHook(packetHandler.Opcode, packetHandler.Hook);
             Client.SetMsgHook(packetHandler.Opcode, packetHandler.Hook);
@@ -69,9 +71,9 @@ public class Proxy
 
     public void SendToServer(Packet packet)
     {
-       Log.Debug($"Sending to server: {packet}");
-        
-       ServerSession?.Send(packet);
+        Log.Debug($"Sending to server: {packet}");
+
+        ServerSession?.Send(packet);
     }
 
     public async Task StartClientProxy(ushort proxyPort)
@@ -104,7 +106,7 @@ public class Proxy
         if (agent)
         {
             Client.Identity = NetIdentity.AgentServer;
-            
+
             Context |= ProxyContext.Agent;
             Context &= ~ProxyContext.Gateway;
         }
@@ -115,7 +117,7 @@ public class Proxy
             Context &= ~ProxyContext.Agent;
             Context |= ProxyContext.Gateway;
         }
-        
+
         //await Server.StopAsync();
         await Server.ConnectAsync(serverEndPoint);
     }
@@ -130,17 +132,31 @@ public class Proxy
 
         if ((Context & ProxyContext.Gateway) != 0)
             OnGatewayConnected(session);
-        else if ((Context & ProxyContext.Agent) != 0) {
+        else if ((Context & ProxyContext.Agent) != 0)
             OnAgentConnected(session);
-            
-            _agentKeepAliveTask = new Task(KeepAliveAgentSession);
-            _agentKeepAliveTask.Start(TaskScheduler.Current);
-        }
     }
 
-    private void ServerSessionOnMessageReceived(Packet packet)
+    private async void ServerSessionOnMessageReceived(Packet packet)
     {
         Log.Debug($"Received from server: {packet}");
+
+        if (packet.Opcode == GatewayMsgId.LoginAck)
+        {
+            var messageResult = (MessageResult)packet.ReadByte();
+            if (messageResult != MessageResult.Success)
+                return;
+
+            await ConnectToAgent(NetHelper.ToIPEndPoint(AgentLogin.AgentServerIp, AgentLogin.AgentServerPort));
+        }
+
+        if (packet.Opcode == AgentMsgId.LoginActionAck)
+        {
+            var messageResult = (MessageResult)packet.ReadByte();
+            if (messageResult != MessageResult.Success)
+                return;
+
+            _agentKeepAliveTask = Task.Run(KeepAliveAgentSession);
+        }
 
         ClientSession?.Send(packet);
     }
@@ -188,6 +204,8 @@ public class Proxy
     private void Proxy_OnClientMessageReceived(Packet packet)
     {
         Log.Debug($"Received from client: {packet}");
+        if ((Context & ProxyContext.Agent) != 0 && packet.Opcode == 0x6100)
+            return;
 
         if (packet.Opcode is 0x5000 or 0x9000)
             return;
@@ -209,19 +227,19 @@ public class Proxy
             SendToServer(pingPacket);
 
             await Task.Delay(2000);
-        } 
+        }
     }
-    
+
     public SRNetwork.MessageHandler? GetHandler(ushort opcode)
     {
-        return _handlers.FirstOrDefault(handler => handler.Opcode == opcode);
+        return Handlers.FirstOrDefault(handler => handler.Opcode == opcode);
     }
-    
+
     public SRNetwork.MessageHook? GetHook(ushort opcode)
     {
-        return _hooks.FirstOrDefault(hook => hook.Opcode == opcode);
+        return Hooks.FirstOrDefault(hook => hook.Opcode == opcode);
     }
-    
+
     protected virtual void OnClientConnected(Session clientSession)
     {
         ClientConnected?.Invoke(clientSession);

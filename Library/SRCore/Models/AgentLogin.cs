@@ -21,8 +21,6 @@ namespace SRCore.Models
         public uint Token { get; set; }
 
         public ushort LocalPort => _proxy.LocalPort;
-        
-        public ProxyContext Context => _proxy.Context;
 
         private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
 

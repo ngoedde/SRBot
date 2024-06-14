@@ -35,14 +35,15 @@ namespace SRCore.MessageHandler.Gateway
             AgentLogin.AgentServerPort = agentPort;
             
             //Only hook client login responses
-            if ((AgentLogin.Context & ProxyContext.Client) == 0)
-                return ValueTask.FromResult(packet.Reset());
+            if ((Proxy.Context & ProxyContext.Client) == 0)
+                return ValueTask.FromResult(packet);
 
             var newPacket = new Packet(Opcode, packet.Encrypted, packet.Massive);
             newPacket.WriteByte(messageResult);
             newPacket.WriteUInt(token);
             newPacket.WriteString("127.0.0.1");
             newPacket.WriteUShort(AgentLogin.LocalPort);
+            newPacket.Lock();
 
             return ValueTask.FromResult(newPacket);
         }

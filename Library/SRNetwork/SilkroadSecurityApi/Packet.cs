@@ -14,6 +14,7 @@ public class Packet
     private bool m_locked;
     private byte[] m_reader_bytes;
     private object m_lock;
+    public bool Locked => m_locked;
 
     public override string ToString()
     {
@@ -109,7 +110,7 @@ public class Packet
         m_reader_bytes = null;
     }
 
-    public Packet Reset()
+    public void Reset()
     {
         if (m_reader != null)
         {
@@ -122,8 +123,6 @@ public class Packet
         }
         
         m_lock = new object();
-        
-        return this;
     }
     
     public Packet(ushort opcode, bool encrypted, bool massive, byte[] bytes, int offset, int length)
