@@ -1,3 +1,5 @@
+using SRGame.Client.Repository;
+
 namespace SRGame.Client.Entity;
 
 public abstract class Entity<TPrimaryKey>

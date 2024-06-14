@@ -24,7 +24,7 @@ public interface IAsyncFileAdapter
     /// <param name="filePath">The absolute path to the file.</param>
     /// <returns></returns>
     public Task<byte[]> ReadAllBytesAsync(string filePath);
-
+    
     /// <summary>
     ///     Read all text from a file asynchronously.
     /// </summary>

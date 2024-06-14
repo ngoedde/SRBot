@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
+using System.Reactive.Concurrency;
 using SRNetwork.Common;
 using SRNetwork.SilkroadSecurityApi;
 
@@ -19,7 +20,7 @@ internal class SessionManager : IReadOnlyCollection<Session>
         _generator = generator;
     }
 
-    public Session CreateSession(Socket socket, Security security)
+    public Session CreateSession(IScheduler scheduler, Socket socket, Security security)
     {
         var id = _generator.Next();
         var session = new Session(id, socket, security, _packetHandlerManager);

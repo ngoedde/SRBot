@@ -1,4 +1,4 @@
-namespace SRCore.Models.Inventory.ItemType;
+namespace SRGame;
 
 public enum SummonerState : byte
 {

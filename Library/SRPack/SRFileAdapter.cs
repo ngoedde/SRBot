@@ -83,6 +83,8 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
 
     public async Task<MemoryStream> ReadAllAsync(string filePath)
     {
+        filePath = PathUtils.Normalize(filePath);
+        
         if (!_pack.Initialized)
         {
             throw new IOException("SRPack is not initialized.");
@@ -94,7 +96,7 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
             throw new IOException($"File {filePath} not found.");
         }
 
-        var buffer = await _pack.ReadFileEntryAsync(entry);
+        var buffer = await _pack.ReadFileEntryAsync(entry).ConfigureAwait(false);
 
         return new MemoryStream(buffer, false);
     }
@@ -118,7 +120,7 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
             throw new IOException("SRPack is not initialized.");
         }
 
-        var stream = await ReadAllAsync(filePath);
+        var stream = await ReadAllAsync(filePath).ConfigureAwait(false);
 
         return stream.GetBuffer();
     }

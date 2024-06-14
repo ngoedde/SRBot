@@ -7,19 +7,22 @@
              x:DataType="vm:LogPageModel"
              VerticalAlignment="Stretch"
              HorizontalAlignment="Stretch"
-             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             Loaded="Control_OnLoaded"
              MaxWidth="790"
              Margin="16"
              x:Class="SRBot.Page.Logging.LogPage">
     <DockPanel>
-        <suki:GlassCard>
+
             <DockPanel LastChildFill="True">
                 <Panel VerticalAlignment="Bottom" DockPanel.Dock="Bottom">
-                    <CheckBox IsChecked="{Binding Config.RefreshLogView}">Refresh logs</CheckBox>
-                    <Button HorizontalAlignment="Right" Click="ClearLog_OnClick">Clear</Button>
+                    <Grid ColumnDefinitions="*,*,*">
+                        <CheckBox Grid.Column="0" IsChecked="{Binding Config.RefreshLogView}">Refresh logs</CheckBox>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding ScrollToEnd}">Scroll to end</CheckBox>
+                        <Button Grid.Column="2" HorizontalAlignment="Right" Click="ClearLog_OnClick">Clear</Button>
+                    </Grid>
                 </Panel>
-                <DataGrid DockPanel.Dock="Top" ItemsSource="{Binding Logs}" CanUserReorderColumns="True"
-                          CanUserSortColumns="True" CanUserResizeColumns="True" Width="680">
+                <DataGrid Name="LogGrid" DockPanel.Dock="Top" ItemsSource="{Binding Logs}" CanUserReorderColumns="True"
+                          CanUserSortColumns="True" CanUserResizeColumns="True" Width="768" Height="768" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible" >
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="Time" Binding="{Binding   Timestamp, StringFormat='hh:mm:ss'}" />
                         <DataGridTextColumn Header="Level" Binding="{Binding   Level}" />
@@ -27,7 +30,7 @@
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>
-        </suki:GlassCard>
+  
     </DockPanel>
 
 </UserControl>

@@ -62,7 +62,7 @@ public class LoginService(IServiceProvider serviceProvider)
     /// Auto login: Join game after the character list has been received.
     /// </summary>
     /// <param name="characterLobby"></param>
-    private void CharacterLobbyOnCharacterListUpdated(CharacterLobby characterLobby)
+    private async void CharacterLobbyOnCharacterListUpdated(CharacterLobby characterLobby)
     {
         if (!GameConfig.EnableAutoLogin)
             return;
@@ -77,6 +77,7 @@ public class LoginService(IServiceProvider serviceProvider)
             return;
         }
 
+        await Task.Delay(GameConfig.GetAutoLoginDelayTime());
         characterLobby.Join(character);
     }
 
@@ -84,7 +85,7 @@ public class LoginService(IServiceProvider serviceProvider)
     /// Auto login: Send login request to the server after the shard list has been received.
     /// </summary>
     /// <param name="shardList"></param>
-    private void ShardListOnShardListUpdated(ShardList shardList)
+    private async void ShardListOnShardListUpdated(ShardList shardList)
     {
         if (!GameConfig.EnableAutoLogin)
             return;
@@ -110,6 +111,8 @@ public class LoginService(IServiceProvider serviceProvider)
 
         // Bot start -> auto login fail -> shutdown?
         Log.Information("Auto login enabled. Logging in...");
+        
+        await Task.Delay(GameConfig.GetAutoLoginDelayTime());
         Login(selectedAccount.Username, selectedAccount.Password, shard);
     }
 }

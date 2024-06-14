@@ -4,11 +4,13 @@ using System.Text;
 using SRNetwork.Common;
 using SRNetwork.Common.Profiling;
 using SRNetwork.SilkroadSecurityApi;
-
+using System.Reactive.Concurrency;
 namespace SRNetwork;
 
 public class NetEngine
 {
+    private readonly IScheduler _scheduler;
+
     public delegate void ClientConnectedEventHandler(Session session);
 
     public delegate void ClientDisconnectedEventHandler(Session session);
@@ -35,14 +37,16 @@ public class NetEngine
 
     public string Identity { get; set; } = NetIdentity.GatewayServer;
 
-    public NetEngine()
+    public NetEngine(IScheduler scheduler)
     {
+        _scheduler = scheduler;
+        
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
         _generator = new IDGenerator32();
         _acceptor = new NetAcceptor(this.OnAccepted);
         _connector = new NetConnector(this.OnConnected);
-        _packetHandlerManager = new PacketHandlerManager();
+        _packetHandlerManager = new PacketHandlerManager(scheduler);
         _sessionManager = new SessionManager(_generator, _packetHandlerManager);
 
         this.Profiler = new NetTrafficProfiler();
@@ -68,7 +72,7 @@ public class NetEngine
         security.GenerateSecurity(true, true, true);
         security.ChangeIdentity(Identity, 0);
 
-        var session = _sessionManager.CreateSession(socket, security);
+        var session = _sessionManager.CreateSession(_scheduler, socket, security);
         session.Profiler = this.Profiler.AddProfile(session.Id);
         session.Start();
 
@@ -78,7 +82,7 @@ public class NetEngine
     private void OnConnected(Socket socket)
     {
         var security = new Security();
-        var session = _sessionManager.CreateSession(socket, security);
+        var session = _sessionManager.CreateSession(_scheduler, socket, security);
         session.Profiler = this.Profiler.AddProfile(session.Id);
         session.Start();
 

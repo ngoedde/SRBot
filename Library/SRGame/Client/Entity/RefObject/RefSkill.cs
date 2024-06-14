@@ -1,4 +1,6 @@
-﻿namespace SRGame.Client.Entity.RefObject;
+﻿using SRGame.Client.Repository;
+
+namespace SRGame.Client.Entity.RefObject;
 
 public class RefSkill : Entity<int>
 {
@@ -10,102 +12,509 @@ public class RefSkill : Entity<int>
     #region Fields
 
     private int _id;
+    private byte _service;
+    private int _groupID;
+    private string _basicCode;
+    private string _basicName;
+    private string _codeName;
+    private string _basicGroup;
+    private int _basicOriginal;
+    private byte _basicLevel;
+    private byte _basicActivity;
+    private uint _chainCode;
+    private int _basicRecycleCost;
+    private int _actionPreparingTime;
+    private int _actionCastingTime;
+    private int _actionDuration;
+    private int _actionReuseDelay;
+    private int _actionCoolTime;
+    private int _actionFlyingSpeed;
+    private byte _actionInterruptable;
+    private int _actionOverlap;
+    private int _actionAutoAttackType;
+    private int _actionInTown;
+    private short _actionRange;
+    private bool _targetRequired;
+    private bool _targetTypeAnimal;
+    private bool _targetTypeLand;
+    private bool _targetTypeBuilding;
+    private bool _targetGroupSelf;
+    private bool _targetGroupAlly;
+    private bool _targetGroupParty;
+    private bool _targetGroupEnemyMonster;
+    private bool _targetGroupEnemyPlayer;
+    private bool _targetGroupNeutral;
+    private bool _targetGroupDontCare;
+    private bool _targetEtcSelectDeadBody;
+    private int _requiredMastery1;
+    private int _requiredMastery2;
+    private byte _requiredMasteryLevel1;
+    private byte _requiredMasteryLevel2;
+    private short _requiredStrength;
+    private short _requiredIntelligence;
+    private int _requiredLearnSkill1;
+    private int _requiredLearnSkill2;
+    private int _requiredLearnSkill3;
+    private byte _requiredLearnSkillLevel1;
+    private byte _requiredLearnSkillLevel2;
+    private byte _requiredLearnSkillLevel3;
+    private int _requiredLearnSkillPoint;
+    private byte _requiredRace;
+    private byte _requiredRestriction1;
+    private byte _requiredRestriction2;
+    private WeaponType _requiredWeapon1;
+    private WeaponType _requiredWeapon2;
+    private short _consumeHealth;
+    private short _consumeMana;
+    private short _consumeHealthRatio;
+    private short _consumeManaRatio;
+    private byte _consumeHwan;
+    private byte _uiSkillTab;
+    private byte _uiSkillPage;
+    private byte _uiSkillColumn;
+    private byte _uiSkillRow;
+    private string _uiIconFile;
+    private string _uiSkillName;
+    private string _uiSkillToolTip;
+    private string _uiSkillToolTipDesc;
+    private string _uiSkillStudyDesc;
+    private short _aiAttackChance;
+    private byte _aiSkillType;
+    private List<int> _params = new(PARAM_COUNT);
+
     public override int Id => _id;
 
-    public byte Service;
-    public int GroupID;
-    public string Basic_Code;
-    public string CodeName;
-    public string Basic_Group;
-    public int Basic_Original;
-    public byte Basic_Level;
-    public byte Basic_Activity;
+    [Translation(nameof(UISkillName))]
+    public string Name { get; internal set; }
+    
+    [Translation(nameof(UISkillStudyDesc))]
+    public string Description { get; internal set; }
+    
+    [Translation(nameof(UISkillToolTip))]
+    public string TooltipTitle { get; internal set; }
+    
+    [Translation(nameof(UISkillToolTipDesc))]
+    public string TooltipDescription { get; internal set; }
+    
+    public byte Service
+    {
+        get => _service;
+        set => _service = value;
+    }
 
-    public uint Basic_ChainCode;
+    public int GroupID
+    {
+        get => _groupID;
+        set => _groupID = value;
+    }
 
-    //public int Basic_RecycleCost;
-    public int Action_PreparingTime;
-    public int Action_CastingTime;
+    public string BasicCode
+    {
+        get => _basicCode;
+        set => _basicCode = value;
+    }
 
-    public int Action_ActionDuration;
-    public int Action_ReuseDelay;
+    public string BasicName
+    {
+        get => _basicName;
+        set => _basicName = value;
+    }
 
-    //public int Action_CoolTime;
-    //public int Action_FlyingSpeed;
-    //public byte Action_Interruptable;
-    public int Action_Overlap;
+    public string CodeName
+    {
+        get => _codeName;
+        set => _codeName = value;
+    }
 
-    public int Action_AutoAttackType;
+    public string BasicGroup
+    {
+        get => _basicGroup;
+        set => _basicGroup = value;
+    }
 
-    //public int Action_InTown;
-    public short Action_Range;
-    public bool Target_Required;
+    public int BasicOriginal
+    {
+        get => _basicOriginal;
+        set => _basicOriginal = value;
+    }
 
-    public bool TargetType_Animal;
+    public byte BasicLevel
+    {
+        get => _basicLevel;
+        set => _basicLevel = value;
+    }
 
-    //public bool TargetType_Land;
-    //public bool TargetType_Building;
-    public bool TargetGroup_Self;
-    public bool TargetGroup_Ally;
-    public bool TargetGroup_Party;
-    public bool TargetGroup_Enemy_M;
+    public byte BasicActivity
+    {
+        get => _basicActivity;
+        set => _basicActivity = value;
+    }
 
-    public bool TargetGroup_Enemy_P;
+    public uint ChainCode
+    {
+        get => _chainCode;
+        set => _chainCode = value;
+    }
 
-    //public bool TargetGroup_Neutral;
-    //public bool TargetGroup_DontCare;
-    public bool TargetEtc_SelectDeadBody;
-    public int ReqCommon_Mastery1;
-    public int ReqCommon_Mastery2;
-    public byte ReqCommon_MasteryLevel1;
+    public int BasicRecycleCost
+    {
+        get => _basicRecycleCost;
+        set => _basicRecycleCost = value;
+    }
 
-    public byte ReqCommon_MasteryLevel2;
-    //public short ReqCommon_Str;
-    //public short ReqCommon_Int;
+    public int ActionPreparingTime
+    {
+        get => _actionPreparingTime;
+        set => _actionPreparingTime = value;
+    }
 
-    //public int ReqLearn_Skill1;
-    //public int ReqLearn_Skill2;
-    //public int ReqLearn_Skill3;
-    //public byte ReqLearn_SkillLevel1;
-    //public byte ReqLearn_SkillLevel2;
-    //public byte ReqLearn_SkillLevel3;
-    //public int ReqLearn_SP;
+    public int ActionCastingTime
+    {
+        get => _actionCastingTime;
+        set => _actionCastingTime = value;
+    }
 
-    //public byte ReqLearn_Race;
-    //public byte Req_Restriction1;
-    //public byte Req_Restriction2;
-    public WeaponType ReqCast_Weapon1;
-    public WeaponType ReqCast_Weapon2;
+    public int ActionDuration
+    {
+        get => _actionDuration;
+        set => _actionDuration = value;
+    }
 
-    //public short Consume_HP;
-    public short Consume_MP;
+    public int ActionReuseDelay
+    {
+        get => _actionReuseDelay;
+        set => _actionReuseDelay = value;
+    }
 
-    //public short Consume_HPRatio;
-    //public short Consume_MPRatio;
-    //public byte Consume_HWAN;
-    //public byte UI_SkillTab;
-    //public byte UI_SkillPage;
-    //public byte UI_SkillColumn;
-    //public byte UI_SkillRow;
-    public string UI_IconFile;
+    public int ActionCoolTime
+    {
+        get => _actionCoolTime;
+        set => _actionCoolTime = value;
+    }
 
-    public string UI_SkillName;
+    public int ActionFlyingSpeed
+    {
+        get => _actionFlyingSpeed;
+        set => _actionFlyingSpeed = value;
+    }
 
-    //public string UI_SkillToolTip;
-    //public string UI_SkillToolTip_Desc;
-    //public string UI_SkillStudy_Desc;
-    //public short AI_AttackChance;
-    //public byte AI_SkillType;
-    public List<int> Params = new(50);
+    public byte ActionInterruptable
+    {
+        get => _actionInterruptable;
+        set => _actionInterruptable = value;
+    }
 
+    public int ActionOverlap
+    {
+        get => _actionOverlap;
+        set => _actionOverlap = value;
+    }
+
+    public int ActionAutoAttackType
+    {
+        get => _actionAutoAttackType;
+        set => _actionAutoAttackType = value;
+    }
+
+    public int ActionInTown
+    {
+        get => _actionInTown;
+        set => _actionInTown = value;
+    }
+
+    public short ActionRange
+    {
+        get => _actionRange;
+        set => _actionRange = value;
+    }
+
+    public bool TargetRequired
+    {
+        get => _targetRequired;
+        set => _targetRequired = value;
+    }
+
+    public bool TargetTypeAnimal
+    {
+        get => _targetTypeAnimal;
+        set => _targetTypeAnimal = value;
+    }
+
+    public bool TargetTypeLand
+    {
+        get => _targetTypeLand;
+        set => _targetTypeLand = value;
+    }
+
+    public bool TargetTypeBuilding
+    {
+        get => _targetTypeBuilding;
+        set => _targetTypeBuilding = value;
+    }
+
+    public bool TargetGroupSelf
+    {
+        get => _targetGroupSelf;
+        set => _targetGroupSelf = value;
+    }
+
+    public bool TargetGroupAlly
+    {
+        get => _targetGroupAlly;
+        set => _targetGroupAlly = value;
+    }
+
+    public bool TargetGroupParty
+    {
+        get => _targetGroupParty;
+        set => _targetGroupParty = value;
+    }
+
+    public bool TargetGroupEnemyMonster
+    {
+        get => _targetGroupEnemyMonster;
+        set => _targetGroupEnemyMonster = value;
+    }
+
+    public bool TargetGroupEnemyPlayer
+    {
+        get => _targetGroupEnemyPlayer;
+        set => _targetGroupEnemyPlayer = value;
+    }
+
+    public bool TargetGroupNeutral
+    {
+        get => _targetGroupNeutral;
+        set => _targetGroupNeutral = value;
+    }
+
+    public bool TargetGroupDontCare
+    {
+        get => _targetGroupDontCare;
+        set => _targetGroupDontCare = value;
+    }
+
+    public bool TargetEtcSelectDeadBody
+    {
+        get => _targetEtcSelectDeadBody;
+        set => _targetEtcSelectDeadBody = value;
+    }
+
+    public int RequiredMastery1
+    {
+        get => _requiredMastery1;
+        set => _requiredMastery1 = value;
+    }
+
+    public int RequiredMastery2
+    {
+        get => _requiredMastery2;
+        set => _requiredMastery2 = value;
+    }
+
+    public byte RequiredMasteryLevel1
+    {
+        get => _requiredMasteryLevel1;
+        set => _requiredMasteryLevel1 = value;
+    }
+
+    public byte RequiredMasteryLevel2
+    {
+        get => _requiredMasteryLevel2;
+        set => _requiredMasteryLevel2 = value;
+    }
+
+    public short RequiredStrength
+    {
+        get => _requiredStrength;
+        set => _requiredStrength = value;
+    }
+
+    public short RequiredIntelligence
+    {
+        get => _requiredIntelligence;
+        set => _requiredIntelligence = value;
+    }
+
+    public int RequiredLearnSkill1
+    {
+        get => _requiredLearnSkill1;
+        set => _requiredLearnSkill1 = value;
+    }
+
+    public int RequiredLearnSkill2
+    {
+        get => _requiredLearnSkill2;
+        set => _requiredLearnSkill2 = value;
+    }
+
+    public int RequiredLearnSkill3
+    {
+        get => _requiredLearnSkill3;
+        set => _requiredLearnSkill3 = value;
+    }
+
+    public byte RequiredLearnSkillLevel1
+    {
+        get => _requiredLearnSkillLevel1;
+        set => _requiredLearnSkillLevel1 = value;
+    }
+
+    public byte RequiredLearnSkillLevel2
+    {
+        get => _requiredLearnSkillLevel2;
+        set => _requiredLearnSkillLevel2 = value;
+    }
+
+    public byte RequiredLearnSkillLevel3
+    {
+        get => _requiredLearnSkillLevel3;
+        set => _requiredLearnSkillLevel3 = value;
+    }
+
+    public int RequiredLearnSkillPoint
+    {
+        get => _requiredLearnSkillPoint;
+        set => _requiredLearnSkillPoint = value;
+    }
+
+    public byte RequiredRace
+    {
+        get => _requiredRace;
+        set => _requiredRace = value;
+    }
+
+    public byte RequiredRestriction1
+    {
+        get => _requiredRestriction1;
+        set => _requiredRestriction1 = value;
+    }
+
+    public byte RequiredRestriction2
+    {
+        get => _requiredRestriction2;
+        set => _requiredRestriction2 = value;
+    }
+
+    public WeaponType RequiredWeapon1
+    {
+        get => _requiredWeapon1;
+        set => _requiredWeapon1 = value;
+    }
+
+    public WeaponType RequiredWeapon2
+    {
+        get => _requiredWeapon2;
+        set => _requiredWeapon2 = value;
+    }
+
+    public short ConsumeHealth
+    {
+        get => _consumeHealth;
+        set => _consumeHealth = value;
+    }
+
+    public short ConsumeMana
+    {
+        get => _consumeMana;
+        set => _consumeMana = value;
+    }
+
+    public short ConsumeHealthRatio
+    {
+        get => _consumeHealthRatio;
+        set => _consumeHealthRatio = value;
+    }
+
+    public short ConsumeManaRatio
+    {
+        get => _consumeManaRatio;
+        set => _consumeManaRatio = value;
+    }
+
+    public byte ConsumeHwan
+    {
+        get => _consumeHwan;
+        set => _consumeHwan = value;
+    }
+
+    public byte UISkillTab
+    {
+        get => _uiSkillTab;
+        set => _uiSkillTab = value;
+    }
+
+    public byte UISkillPage
+    {
+        get => _uiSkillPage;
+        set => _uiSkillPage = value;
+    }
+
+    public byte UISkillColumn
+    {
+        get => _uiSkillColumn;
+        set => _uiSkillColumn = value;
+    }
+
+    public byte UISkillRow
+    {
+        get => _uiSkillRow;
+        set => _uiSkillRow = value;
+    }
+
+    public string UIIconFile
+    {
+        get => _uiIconFile;
+        set => _uiIconFile = value;
+    }
+
+    public string UISkillName
+    {
+        get => _uiSkillName;
+        set => _uiSkillName = value;
+    }
+
+    public string UISkillToolTip
+    {
+        get => _uiSkillToolTip;
+        set => _uiSkillToolTip = value;
+    }
+
+    public string UISkillToolTipDesc
+    {
+        get => _uiSkillToolTipDesc;
+        set => _uiSkillToolTipDesc = value;
+    }
+
+    public string UISkillStudyDesc
+    {
+        get => _uiSkillStudyDesc;
+        set => _uiSkillStudyDesc = value;
+    }
+
+    public short AIAttackChance
+    {
+        get => _aiAttackChance;
+        set => _aiAttackChance = value;
+    }
+
+    public byte AISkillType
+    {
+        get => _aiSkillType;
+        set => _aiSkillType = value;
+    }
+
+    public List<int> Params
+    {
+        get => _params;
+        set => _params = value;
+    }
     #endregion Fields
-
-    #region IReferenceObj
 
     public override bool Parse(EntityParser parser)
     {
         //Skip disabled
-        if (!parser.TryParse(0, out Service) || Service == 0)
+        if (!parser.TryParse(0, out _service) || Service == 0)
             return false;
 
         //Skip invalid ID (PK)
@@ -113,91 +522,81 @@ public class RefSkill : Entity<int>
             return false;
 
         //Skip invalid group (MSKILL, HSKILL, TSKILL, GSKILL, PSKILL, P2SKILL) to save memory
-        if (!parser.TryParse(2, out GroupID) /*|| GroupID == 0*/)
+        if (!parser.TryParse(2, out _groupID) /*|| GroupID == 0*/)
             return false;
 
-        parser.TryParse(3, out Basic_Code);
-        //parser.TryParseString(4, out Basic_Name);
-        //parser.TryParseString(5, out Basic_Group);
-        //parser.TryParseInt(6, out Basic_Original);
-        parser.TryParse(7, out Basic_Level);
-        parser.TryParse(8, out Basic_Activity);
-        parser.TryParse(9, out Basic_ChainCode);
-        //Basic_RecycleCost = int.Parse(data[10]);
-
-        parser.TryParse(11, out Action_PreparingTime);
-        parser.TryParse(12, out Action_CastingTime);
-        parser.TryParse(13, out Action_ActionDuration);
-        parser.TryParse(14, out Action_ReuseDelay);
-        //Action_CoolTime = int.Parse(data[15]);
-        //Action_FlyingSpeed = int.Parse(data[16]);
-        //Action_Interruptable = byte.Parse(data[17]);
-        parser.TryParse(18, out Action_Overlap);
-        parser.TryParse(19, out Action_AutoAttackType);
-        //Action_InTown = int.Parse(data[20]);
-        parser.TryParse(21, out Action_Range);
-        parser.TryParse(22, out Target_Required);
-        parser.TryParse(23, out TargetType_Animal);
-        //parser.TryParseBool(24, out TargetType_Land);
-        //parser.TryParseBool(25, out TargetType_Building);
-        parser.TryParse(26, out TargetGroup_Self);
-        parser.TryParse(27, out TargetGroup_Ally);
-        parser.TryParse(28, out TargetGroup_Party);
-        parser.TryParse(29, out TargetGroup_Enemy_M);
-        parser.TryParse(30, out TargetGroup_Enemy_P);
-        //parser.TryParseBool(31, out TargetGroup_Neutral);
-        //parser.TryParseBool(32, out TargetGroup_DontCare);
-        parser.TryParse(33, out TargetEtc_SelectDeadBody);
-
-        parser.TryParse(34, out ReqCommon_Mastery1);
-        parser.TryParse(35, out ReqCommon_Mastery2);
-
-        parser.TryParse(36, out ReqCommon_MasteryLevel1);
-        parser.TryParse(37, out ReqCommon_MasteryLevel2);
-
-        //parser.TryParseShort(38, out ReqCommon_Str);
-        //parser.TryParseShort(39, out ReqCommon_Int);
-        //ReqLearn_Skill1 = int.Parse(data[40]);
-        //ReqLearn_Skill2 = int.Parse(data[41]);
-        //ReqLearn_Skill3 = int.Parse(data[42]);
-        //ReqLearn_SkillLevel1 = byte.Parse(data[43]);
-        //ReqLearn_SkillLevel2 = byte.Parse(data[44]);
-        //ReqLearn_SkillLevel3 = byte.Parse(data[45]);
-        //parser.TryParseInt(46, out ReqLearn_SP);
-        //ReqLearn_Race = byte.Parse(data[47]);
-        //Req_Restriction1 = byte.Parse(data[48]);
-        //Req_Restriction2 = byte.Parse(data[49]);
-        parser.TryParse(50, out ReqCast_Weapon1);
-        parser.TryParse(51, out ReqCast_Weapon2);
-
-        //Consume_HP = short.Parse(data[52]);
-        parser.TryParse(53, out Consume_MP);
-        //Consume_HPRatio = short.Parse(data[54]);
-        //Consume_MPRatio = short.Parse(data[55]);
-        //Consume_HWAN = byte.Parse(data[56]);
-
-        //UI_SkillTab = byte.Parse(data[57]);
-        //UI_SkillPage = byte.Parse(data[58]);
-        //UI_SkillColumn = byte.Parse(data[59]);
-        //UI_SkillRow = byte.Parse(data[60]);
-
-        parser.TryParse(61, out UI_IconFile);
-        parser.TryParse(62, out UI_SkillName);
-        //UI_SkillToolTip = data[63];
-        //UI_SkillToolTip_Desc = data[64];
-        //UI_SkillStudy_Desc = data[65];
-
-        //AI_AttackChance = short.Parse(data[66]);
-        //AI_SkillType = byte.Parse(data[67]);
+        parser.TryParse(3, out _basicCode);
+        parser.TryParse(4, out _basicName);
+        parser.TryParse(5, out _basicGroup);
+        parser.TryParse(6, out _basicOriginal);
+        parser.TryParse(7, out _basicLevel);
+        parser.TryParse(8, out _basicActivity);
+        parser.TryParse(9, out _chainCode);
+        parser.TryParse(10, out _basicRecycleCost);
+        parser.TryParse(11, out _actionPreparingTime);
+        parser.TryParse(12, out _actionCastingTime);
+        parser.TryParse(13, out _actionDuration);
+        parser.TryParse(14, out _actionReuseDelay);
+        parser.TryParse(15, out _actionCoolTime);
+        parser.TryParse(16, out _actionFlyingSpeed);
+        parser.TryParse(17, out _actionInterruptable);
+        parser.TryParse(18, out _actionOverlap);
+        parser.TryParse(19, out _actionAutoAttackType);
+        parser.TryParse(20, out _actionInTown);
+        parser.TryParse(21, out _actionRange);
+        parser.TryParse(22, out _targetRequired);
+        parser.TryParse(23, out _targetTypeAnimal);
+        parser.TryParse(24, out _targetTypeLand);
+        parser.TryParse(25, out _targetTypeBuilding);
+        parser.TryParse(26, out _targetGroupSelf);
+        parser.TryParse(27, out _targetGroupAlly);
+        parser.TryParse(28, out _targetGroupParty);
+        parser.TryParse(29, out _targetGroupEnemyMonster);
+        parser.TryParse(30, out _targetGroupEnemyPlayer);
+        parser.TryParse(31, out _targetGroupNeutral);
+        parser.TryParse(32, out _targetGroupDontCare);
+        parser.TryParse(33, out _targetEtcSelectDeadBody);
+        parser.TryParse(34, out _requiredMastery1);
+        parser.TryParse(35, out _requiredMastery2);
+        parser.TryParse(36, out _requiredMasteryLevel1);
+        parser.TryParse(37, out _requiredMasteryLevel2);
+        parser.TryParse(38, out _requiredStrength);
+        parser.TryParse(39, out _requiredIntelligence);
+        parser.TryParse(40, out _requiredLearnSkill1);
+        parser.TryParse(41, out _requiredLearnSkill2);
+        parser.TryParse(42, out _requiredLearnSkill3);
+        parser.TryParse(43, out _requiredLearnSkillLevel1);
+        parser.TryParse(44, out _requiredLearnSkillLevel2);
+        parser.TryParse(45, out _requiredLearnSkillLevel3);
+        parser.TryParse(46, out _requiredLearnSkillPoint);
+        parser.TryParse(47, out _requiredRace);
+        parser.TryParse(48, out _requiredRestriction1);
+        parser.TryParse(49, out _requiredRestriction2);
+        parser.TryParse(50, out _requiredWeapon1);
+        parser.TryParse(51, out _requiredWeapon2);
+        parser.TryParse(52, out _consumeHealth);
+        parser.TryParse(53, out _consumeMana);
+        parser.TryParse(54, out _consumeHealthRatio);
+        parser.TryParse(55, out _consumeManaRatio);
+        parser.TryParse(56, out _consumeHwan);
+        parser.TryParse(57, out _uiSkillTab);
+        parser.TryParse(58, out _uiSkillPage);
+        parser.TryParse(59, out _uiSkillColumn);
+        parser.TryParse(60, out _uiSkillRow);
+        parser.TryParse(61, out _uiIconFile);
+        parser.TryParse(62, out _uiSkillName);
+        parser.TryParse(63, out _uiSkillToolTip);
+        parser.TryParse(64, out _uiSkillToolTipDesc);
+        parser.TryParse(65, out _uiSkillStudyDesc);
+        parser.TryParse(66, out _aiAttackChance);
+        parser.TryParse(67, out _aiSkillType);
 
         for (var i = 0; i < PARAM_COUNT; i++)
             if (parser.TryParse(68 + i, out int paramValue))
-                Params.Add(paramValue);
+                _params.Add(paramValue);
 
         return true;
     }
-
-    #endregion IReferenceObj
 }
 
 //Params:

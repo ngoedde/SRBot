@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using Material.Icons;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Serilog.Events;
 using SRBot.Config;
@@ -11,6 +12,8 @@ namespace SRBot.Page.Logging;
 public class LogPageModel : PageModel
 {
     private readonly ConfigService _configService;
+
+    [Reactive] public bool ScrollToEnd { get; set; } = true;
 
     public LogPageModel(MainThreadLogEventSink memoryLogEventSink, ConfigService configService) : base("srbot_page_log",
         "Log", 99, MaterialIconKind.ConsoleLine)
@@ -24,12 +27,15 @@ public class LogPageModel : PageModel
     {
         if (_configService.GetConfig<LogConfig>() is { RefreshLogView: false })
             return;
-
+        
+        if (Logs.Count > 1000)
+            Logs.RemoveAt(0);
+        
         Logs.Add(logEvent);
     }
 
     public ObservableCollection<LogEvent> Logs { get; } = new();
-
+    
     public LogConfig Config => _configService.GetConfig<LogConfig>() ?? new LogConfig();
 
     public void ClearLogs()

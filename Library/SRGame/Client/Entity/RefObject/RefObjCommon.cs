@@ -1,99 +1,197 @@
 ﻿using System.Diagnostics;
+using SRGame.Client.Repository;
 
 namespace SRGame.Client.Entity.RefObject;
 
 [DebuggerDisplay("ID = {Id}; Code = {CodeName}; Name = {ObjName}")]
 public abstract class RefObjCommon : Entity<int>
 {
+    public int Tid => CashItem | Bionic | (TypeID1 << 2) | (TypeID2 << 5) | (TypeID3 << 7) | (TypeID4 << 11);
+
     #region Fields
 
     private int _id = 0;
-
     public override int Id => _id;
-    public byte Service; //bool -> Indicates whether object is used or not.
-    public string CodeName;
-    public string ObjName; //Korean -> Localize by NameStrID
 
-    //public string OrgObjCodeName; //reference codeName to original object used by clones
-    public string NameStrID; //reference for ObjName localization (SN_CODENAME)
+    private bool _active;
+    private string _codeName;
+    private string _objName;
+    private string _orgObjCodeName;
+    private string _nameStrID;
+    private string _descStrID;
+    private byte _cashItem;
+    private byte _bionic;
+    private byte _typeID1;
+    private byte _typeID2;
+    private byte _typeID3;
+    private byte _typeID4;
+    private int _decayTime;
+    private Country _country;
+    private Rarity _rarity;
+    private bool _canTrade;
+    private bool _canSell;
+    private bool _canBuy;
+    private BorrowType _canBorrow;
+    private DropType _canDrop;
+    private bool _canPick;
+    private bool _canRepair;
+    private bool _canRevive;
+    private UseType _canUse;
+    private bool _canThrow;
+    private int _price;
+    private int _costRepair;
+    private int _costRevive;
+    private int _costBorrow;
+    private int _keepingFee;
+    private int _sellPrice;
+    private ReqLevelType _reqLevelType1;
+    private byte _reqLevel1;
+    private ReqLevelType _reqLevelType2;
+    private byte _reqLevel2;
+    private ReqLevelType _reqLevelType3;
+    private byte _reqLevel3;
+    private ReqLevelType _reqLevelType4;
+    private byte _reqLevel4;
+    private int _maxContain;
+    private short _regionID;
+    private short _angle;
+    private short _offsetZ;
+    private short _offsetX;
+    private short _offsetY;
+    private short _speed1;
+    private short _speed2;
+    private int _scale;
+    private short _bcHeight;
+    private short _bcRadius;
+    private int _eventID;
+    private string _assocFileObj;
+    private string _assocFileDrop;
+    private string _assocFileIcon;
+    private string _assocFile1;
+    private string _assocFile2;
 
-    //public string DescStrID; //references for Description localization (CODENAME_TT_DESC)
-    public byte CashItem; //bool -> Indicates whether object belongs to Item Mall or not
+    [Translation(nameof(NameStrID))] public string Name { get; set; }
 
-    public byte Bionic; //bool
-    public byte TypeID1;
-    public byte TypeID2;
-    public byte TypeID3;
-    public byte TypeID4;
+    [Translation(nameof(DescStrID))] public string Description { get; set; }
 
-    /// <summary>
-    ///     Gets the item Tid.
-    /// </summary>
-    public int Tid => CashItem | Bionic | (TypeID1 << 2) | (TypeID2 << 5) | (TypeID3 << 7) | (TypeID4 << 11);
+    public bool Active
+    {
+        get => _active;
+        private set => _active = value;
+    }
 
-    //public int DecayTime; //time in milliseconds until object despawns
-    public Country Country; //Indicates where object is from
+    public string CodeName
+    {
+        get => _codeName;
+        private set => _codeName = value;
+    }
 
-    public Rarity Rarity;
+    public string ObjName
+    {
+        get => _objName;
+        private set => _objName = value;
+    }
 
-    //public byte CanTrade; //bool
-    //public byte CanSell; //bool
-    //public byte CanBuy; //bool
-    //public BorrowType CanBorrow; //link to BorrowType
-    public DropType CanDrop;
+    public string OrgObjCodeName => _orgObjCodeName;
 
-    // public byte CanPick; //bool
-    // public byte CanRepair; //bool
-    // public byte CanRevive; //bool
-    public UseType CanUse; //link to UseType
-    //public byte CanThrow; //bool -> only ITEM_FORT_SHOCK_BOMB
+    public string NameStrID => _nameStrID;
 
-    //public int Price;
-    //public int CostRepair;
-    //public int CostRevive;
-    //public int CostBorrow;
-    //public int KeepingFee; //Storage cost
-    //public int SellPrice;
+    public string DescStrID => _descStrID;
 
-    public ReqLevelType ReqLevelType1;
-    public byte ReqLevel1;
-    public ReqLevelType ReqLevelType2;
-    public byte ReqLevel2;
-    public ReqLevelType ReqLevelType3;
-    public byte ReqLevel3;
-    public ReqLevelType ReqLevelType4;
-    public byte ReqLevel4;
+    public byte CashItem => _cashItem;
 
-    //public int MaxContain;
-    //public short RegionID; //for "STORE_" objects
-    //public short Dir; //unused
-    //public short OffsetZ; //for "STORE_" objects
-    //public short OffsetX; //for "STORE_" objects
-    //public short OffsetY; //for "STORE_" objects
+    public byte Bionic => _bionic;
 
-    public short Speed1; //WalkSpeed
-    public short Speed2; //RunSpeed
+    public byte TypeID1 => _typeID1;
 
-    //public int Scale;
+    public byte TypeID2 => _typeID2;
 
-    //public short BCHeight; //for object selection
-    //public short BCRadius; //for object selection
+    public byte TypeID3 => _typeID3;
 
-    //public int EventID;
+    public byte TypeID4 => _typeID4;
 
-    //public string AssocFileObj;  //
-    //public string AssocFileDrop; //DropModel
-    public string AssocFileIcon; //Icon
+    public int DecayTime => _decayTime;
 
-    //public string AssocFile1; //
-    //public string AssocFile2;
+    public Country Country => _country;
+
+    public Rarity Rarity => _rarity;
+
+    public bool CanTrade => _canTrade;
+
+    public bool CanSell => _canSell;
+
+    public bool CanBuy => _canBuy;
+
+    public BorrowType CanBorrow => _canBorrow;
+
+    public DropType CanDrop => _canDrop;
+
+    public bool CanPick => _canPick;
+
+    public bool CanRepair => _canRepair;
+
+    public bool CanRevive => _canRevive;
+
+    public UseType CanUse => _canUse;
+
+    public bool CanThrow => _canThrow;
+
+    public int Price => _price;
+
+    public int CostRepair => _costRepair;
+
+    public int CostRevive => _costRevive;
+
+    public int CostBorrow => _costBorrow;
+
+    public int KeepingFee => _keepingFee;
+
+    public int SellPrice => _sellPrice;
+
+    public ReqLevelType ReqLevelType1 => _reqLevelType1;
+
+    public byte ReqLevel1 => _reqLevel1;
+
+    public ReqLevelType ReqLevelType2 => _reqLevelType2;
+
+    public byte ReqLevel2 => _reqLevel2;
+
+    public ReqLevelType ReqLevelType3 => _reqLevelType3;
+
+    public byte ReqLevel3 => _reqLevel3;
+
+    public ReqLevelType ReqLevelType4 => _reqLevelType4;
+
+    public byte ReqLevel4 => _reqLevel4;
+
+    public int MaxContain => _maxContain;
+
+    public short RegionID => _regionID;
+
+    public short Angle => _angle;
+
+    public short OffsetZ => _offsetZ;
+
+    public short OffsetX => _offsetX;
+    public short OffsetY => _offsetY;
+    public short Speed1 => _speed1;
+    public short Speed2 => _speed2;
+    public int Scale => _scale;
+    public short BCHeight => _bcHeight;
+    public short BCRadius => _bcRadius;
+    public int EventId => _eventID;
+    public string AssocFileObj => _assocFileObj;
+    public string AssocFileDrop => _assocFileDrop;
+    public string AssocFileIcon => _assocFileIcon;
+    public string AssocFile1 => _assocFile1;
+    public string AssocFile2 => _assocFile2;
 
     #endregion Fields
 
     public override bool Parse(EntityParser parser)
     {
         //Skip disabled
-        if (!parser.TryParse(0, out Service) || Service == 0)
+        if (!parser.TryParse(0, out _active) || _active == false)
             return false;
 
         //Skip invalid ID (PK)
@@ -101,78 +199,63 @@ public abstract class RefObjCommon : Entity<int>
             return false;
 
         //Skip invalid CodeName
-        if (!parser.TryParse(2, out CodeName))
+        if (!parser.TryParse(2, out _codeName))
             return false;
 
-        parser.TryParse(3, out ObjName);
-
-        //OrgObjCodeName = data[4];
-        parser.TryParse(5, out NameStrID);
-        //DescStrID = data[6];
-
-        parser.TryParse(7, out CashItem);
-        parser.TryParse(8, out Bionic);
-        parser.TryParse(9, out TypeID1);
-        parser.TryParse(10, out TypeID2);
-        parser.TryParse(11, out TypeID3);
-        parser.TryParse(12, out TypeID4);
-
-        //DecayTime = int.Parse(data[13]);
-        parser.TryParse(14, out Country);
-        parser.TryParse(15, out Rarity);
-
-        //CanTrade = byte.Parse(data[16]);
-        //CanSell = byte.Parse(data[17]);
-        //CanBuy = byte.Parse(data[18]);
-        //CanBorrow = (BorrowType)byte.Parse(data[19]);
-
-        parser.TryParse(20, out CanDrop);
-
-        //CanPick = byte.Parse(data[21]);
-        //CanRepair = byte.Parse(data[22]);
-        //CanRevive = byte.Parse(data[23]);
-        parser.TryParse(24, out CanUse);
-        //CanThrow = byte.Parse(data[25]);
-
-        //Pricing
-        //Price = int.Parse(data[26]);
-        //CostRepair = int.Parse(data[27]);
-        //CostRevive = int.Parse(data[28]);
-        //CostBorrow = int.Parse(data[29]);
-        //KeepingFee = int.Parse(data[30]);
-        //SellPrice = int.Parse(data[31]);
-
-        //Requirements
-        parser.TryParse(32, out ReqLevelType1);
-        parser.TryParse(33, out ReqLevel1);
-        parser.TryParse(34, out ReqLevelType2);
-        parser.TryParse(35, out ReqLevel2);
-        parser.TryParse(36, out ReqLevelType3);
-        parser.TryParse(37, out ReqLevel3);
-        parser.TryParse(38, out ReqLevelType4);
-        parser.TryParse(39, out ReqLevel4);
-
-        //MaxContain = int.Parse(data[40]);
-
-        //RegionID = short.Parse(data[41]);
-        //Dir = short.Parse(data[42]);
-        //OffsetZ = short.Parse(data[43]);
-        //OffsetX = short.Parse(data[44]);
-        //OffsetY = short.Parse(data[45]);
-
-        parser.TryParse(46, out Speed1);
-        parser.TryParse(47, out Speed2);
-
-        //Scale = int.Parse(data[48]);
-
-        //BCHeight = short.Parse(data[49]);
-        //BCRadius = short.Parse(data[50]);
-        //EventID = int.Parse(data[51]);
-        //AssocFileObj = data[52];
-        //AssocFileDrop = data[53];
-        parser.TryParse(54, out AssocFileIcon);
-        //AssocFile1 = data[55];
-        //AssocFile2 = data[56];
+        parser.TryParse(3, out _objName);
+        parser.TryParse(4, out _orgObjCodeName);
+        parser.TryParse(5, out _nameStrID);
+        parser.TryParse(6, out _descStrID);
+        parser.TryParse(7, out _cashItem);
+        parser.TryParse(8, out _bionic);
+        parser.TryParse(9, out _typeID1);
+        parser.TryParse(10, out _typeID2);
+        parser.TryParse(11, out _typeID3);
+        parser.TryParse(12, out _typeID4);
+        parser.TryParse(13, out _decayTime);
+        parser.TryParse(14, out _country);
+        parser.TryParse(15, out _rarity);
+        parser.TryParse(16, out _canTrade);
+        parser.TryParse(17, out _canSell);
+        parser.TryParse(18, out _canBuy);
+        parser.TryParse(19, out _canBorrow);
+        parser.TryParse(20, out _canDrop);
+        parser.TryParse(21, out _canPick);
+        parser.TryParse(22, out _canRepair);
+        parser.TryParse(23, out _canRevive);
+        parser.TryParse(24, out _canUse);
+        parser.TryParse(25, out _canThrow);
+        parser.TryParse(26, out _price);
+        parser.TryParse(27, out _costRepair);
+        parser.TryParse(28, out _costRevive);
+        parser.TryParse(29, out _costBorrow);
+        parser.TryParse(30, out _keepingFee);
+        parser.TryParse(31, out _sellPrice);
+        parser.TryParse(32, out _reqLevelType1);
+        parser.TryParse(33, out _reqLevel1);
+        parser.TryParse(34, out _reqLevelType2);
+        parser.TryParse(35, out _reqLevel2);
+        parser.TryParse(36, out _reqLevelType3);
+        parser.TryParse(37, out _reqLevel3);
+        parser.TryParse(38, out _reqLevelType4);
+        parser.TryParse(39, out _reqLevel4);
+        parser.TryParse(40, out _maxContain);
+        parser.TryParse(41, out _regionID);
+        parser.TryParse(42, out _angle);
+        parser.TryParse(43, out _offsetX);
+        parser.TryParse(44, out _offsetY);
+        parser.TryParse(45, out _offsetZ);
+        parser.TryParse(46, out _speed1);
+        parser.TryParse(47, out _speed2);
+        parser.TryParse(48, out _scale);
+        parser.TryParse(49, out _bcHeight);
+        parser.TryParse(50, out _bcRadius);
+        parser.TryParse(51, out _eventID);
+        parser.TryParse(52, out _assocFileObj);
+        parser.TryParse(53, out _assocFileDrop);
+        parser.TryParse(54, out _assocFileIcon);
+        parser.TryParse(55, out _assocFile1);
+        parser.TryParse(56, out _assocFile2);
 
         return true;
     }

@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using SRCore.Models.Inventory.ItemType;
+using SRGame;
 using SRGame.Client;
 using SRGame.Client.Entity.RefObject;
 using SRNetwork.SilkroadSecurityApi;

@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System.Reactive.Concurrency;
+using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using Serilog;
 using Serilog.Events;
 using SRCore.Botting;
@@ -11,8 +13,7 @@ using SRGame.Client;
 
 namespace SRCore;
 
-public sealed class Kernel(
-    IServiceProvider serviceProvider)
+public sealed class Kernel(IServiceProvider serviceProvider, IScheduler scheduler)
 {
     public static string ConfigDirectory { get; } = Path.Combine(Environment.CurrentDirectory, "user");
 
@@ -55,6 +56,8 @@ public sealed class Kernel(
     /// <exception cref="Exception"></exception>
     public async Task InitializeAsync()
     {
+        RxApp.MainThreadScheduler = scheduler;
+        
         Log.Debug("SRKernel initializing...");
 
         if (IsInitialized)
@@ -66,7 +69,7 @@ public sealed class Kernel(
         await _profileService.LoadProfilesAsync().ConfigureAwait(false);
         await _accountService.Initialize("").ConfigureAwait(false);
 
-        _proxy.Initialize(serviceProvider);
+        _proxy.Initialize(serviceProvider, scheduler);
         _loginService.Initialize();
         _clientlessManager.Initialize();
         _profileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;

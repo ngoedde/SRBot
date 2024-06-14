@@ -1,12 +1,16 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Reactive.Concurrency;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Templates;
 using Avalonia.Markup.Xaml;
+using Avalonia.ReactiveUI;
+using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 using Serilog;
 using Serilog.Core;
 using SRBot.Config;
@@ -30,7 +34,7 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
-
+        
         ServiceProvider = ConfigureServices();
         Kernel.KernelInitialized += KernelOnKernelInitialized;
         Kernel.KernelShutdown += KernelOnKernelShutdown;
@@ -124,6 +128,9 @@ public partial class App : Application
         foreach (var type in pageExtensionTypes)
             services.AddSingleton(typeof(PageModel), type);
 
+        //UI Thread dispatcher
+        services.AddSingleton<IScheduler>(AvaloniaScheduler.Instance);
+        
         return services.BuildServiceProvider();
     }
 

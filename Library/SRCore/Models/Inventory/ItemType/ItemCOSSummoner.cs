@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using ReactiveUI.Fody.Helpers;
+using SRGame;
 using SRGame.Client.Entity.RefObject;
 
 namespace SRCore.Models.Inventory.ItemType;

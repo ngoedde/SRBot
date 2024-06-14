@@ -12,6 +12,11 @@ public class LocalFileAdapter(string basePath) : IAsyncFileAdapter
         return await File.ReadAllBytesAsync(filePath);
     }
 
+    public byte[] ReadAllBytes(string fileName)
+    {
+        return File.ReadAllBytes(fileName);
+    }
+
     public async Task<string> ReadAllTextAsync(string filePath)
     {
         filePath = GetAbsolutePath(filePath);

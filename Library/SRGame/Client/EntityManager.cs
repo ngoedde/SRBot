@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 using Serilog;
 using SRGame.Client.Entity.RefObject;
@@ -6,9 +7,7 @@ using SRGame.Client.Repository;
 
 namespace SRGame.Client;
 
-public sealed class EntityManager(
-    ClientFileSystem fileSystem,
-    ILogger logger)
+public sealed class EntityManager(ClientFileSystem fileSystem)
 {
     public delegate void OnStartLoadingEventHandler();
 
@@ -39,21 +38,23 @@ public sealed class EntityManager(
 
         try
         {
-            await ItemRepository.LoadAsync(clientType);
-            await SkillRepository.LoadAsync(clientType);
-            await CharacterRepository.LoadAsync(clientType);
             await TranslationRepository.LoadAsync(clientType);
-            await SkillMasteryRepository.LoadAsync(clientType);
+            (await ItemRepository.LoadAsync(clientType)).Translate(TranslationRepository);
+            (await SkillRepository.LoadAsync(clientType)).Translate(TranslationRepository);
+            (await CharacterRepository.LoadAsync(clientType)).Translate(TranslationRepository);
+            (await SkillMasteryRepository.LoadAsync(clientType)).Translate(TranslationRepository);
         }
         catch (Exception e)
         {
-            logger.Fatal(e, $"Game initialization error: {e.Message}");
+#if DEBUG
+            throw;
+#endif
+            Log.Fatal(e, $"Game initialization error: {e.Message}");
         }
 
         IsLoading = false;
-        logger.Information("Game loaded in {ElapsedMilliseconds}ms", sw.ElapsedMilliseconds);
-        logger.Information(PrintStats());
-
+        Log.Information(PrintStats());
+        Log.Information($"Game loaded in {sw.ElapsedMilliseconds}ms");
         OnFinishLoading();
     }
 
@@ -63,15 +64,13 @@ public sealed class EntityManager(
 
     public RefText? GetTranslation(string name) => TranslationRepository.GetEntity(name);
 
-    public RefObjItem? GetItem(string codeName) =>
-        ItemRepository.Entities.FirstOrDefault(i => i.Value.CodeName == codeName).Value;
+    public RefObjItem? GetItem(string codeName) => ItemRepository.Entities.FirstOrDefault(i => i.Value.CodeName == codeName).Value;
 
-    public RefObjItem? GetItem(int id) => ItemRepository.GetEntity(id);
+    public RefObjItem? GetItem(int id) => ItemRepository.Entities.GetValueOrDefault(id);
+    
+    public RefSkill? GetSkill(string codeName) => SkillRepository.Entities.FirstOrDefault(s => s.Value.CodeName == codeName).Value;
 
-    public RefSkill? GetSkill(string codeName) =>
-        SkillRepository.Entities.FirstOrDefault(s => s.Value.CodeName == codeName).Value;
-
-    public RefSkill? GetSkill(int id) => SkillRepository.GetEntity(id);
+    public RefSkill? GetSkill(int id) => SkillRepository.Entities.GetValueOrDefault(id);
 
     public RefObjChar? GetCharacter(string codeName) =>
         CharacterRepository.Entities.FirstOrDefault(s => s.Value.CodeName == codeName).Value;

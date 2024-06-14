@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Material.Icons;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
@@ -20,6 +21,7 @@ using SRCore.Models;
 using SRGame.Client;
 using SRNetwork;
 using SukiUI.Controls;
+using SukiUI.Enums;
 
 namespace SRBot;
 
@@ -85,7 +87,7 @@ public class MainWindowModel : ViewModel
 
         // Get required services from the service provider, to not blow up the constructor.
         _serviceProvider = serviceProvider;
-
+        
         Game.GameStopLoading += OnGameStopLoading;
         Game.GameStartLoading += OnGameStartLoading;
         ProfileService.ActiveProfileChanged += OnActiveProfileChanged;
@@ -169,12 +171,19 @@ public class MainWindowModel : ViewModel
 
     public async Task StartBot()
     {
+        var gameConfig = ConfigService.GetConfig<GameConfig>();
+        if (gameConfig.Clientless && !gameConfig.EnableAutoLogin)
+        {
+           await SukiHost.ShowToast("Error", "Clientless mode requires auto-login to be enabled (Game -> Auto login -> Enable auto login).", SukiToastType.Error);
+           return;
+        }
+        
         // Network has not been started yet?
         if (Proxy.Context == ProxyContext.None)
         {
             var gatewayEndPoint = ClientInfoManager.GetGatewayEndPoint();
 
-            if (ProfileService.ActiveProfile.Clientless)
+            if (gameConfig.Clientless)
             {
                 await Proxy.ConnectToGateway(gatewayEndPoint);
             }

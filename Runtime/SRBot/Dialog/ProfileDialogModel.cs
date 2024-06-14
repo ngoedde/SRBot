@@ -78,7 +78,7 @@ public class ProfileDialogModel : ViewModel
 
     public async Task LoadProfile(Profile profile)
     {
-        if (_game.IsLoaded)
+        if (_game.IsLoaded && _profileService.ActiveProfile != profile)
         {
             var result = await App.MessageBoxManager.ShowMessageBoxAsync("The game is already initialized.",
                 "The game is already initialized. If you choose a different profile, the bot will reload all data. Do you want to continue?",
@@ -89,8 +89,11 @@ public class ProfileDialogModel : ViewModel
         }
 
         SukiHost.CloseDialog();
-
-        await SetActiveProfile(profile);
+        
+        if (_profileService.ActiveProfile != profile){
+            await SetActiveProfile(profile);
+        }
+        
         await SaveProfiles();
     }
 

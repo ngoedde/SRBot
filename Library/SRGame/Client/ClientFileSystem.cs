@@ -40,8 +40,8 @@ public class ClientFileSystem
 
         return assetPack switch
         {
-            AssetPack.Media => await Media!.ReadAllAsync(path),
-            AssetPack.Data => await Data!.ReadAllAsync(path),
+            AssetPack.Media => await Media!.ReadAllAsync(path).ConfigureAwait(false),
+            AssetPack.Data => await Data!.ReadAllAsync(path).ConfigureAwait(false),
             _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
         };
     }

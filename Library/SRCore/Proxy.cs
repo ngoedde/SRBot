@@ -1,4 +1,5 @@
 using System.Net;
+using System.Reactive.Concurrency;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
@@ -34,8 +35,8 @@ public class Proxy
     [Reactive] public ProxyContext Context { get; private set; } = ProxyContext.None;
     [Reactive] public ushort LocalPort { get; private set; }
 
-    public NetEngine Server { get; } = new();
-    public NetEngine Client { get; } = new();
+    public NetEngine Server { get; private set; } = null!;
+    public NetEngine Client { get; private set; } = null!;
     public Session? ClientSession { get; private set; }
     public Session? ServerSession { get; private set; }
 
@@ -44,14 +45,13 @@ public class Proxy
     private IEnumerable<MessageHook> Hooks => _serviceProvider.GetServices<MessageHook>();
     private AgentLogin AgentLogin => _serviceProvider.GetRequiredService<AgentLogin>();
 
-    public Proxy()
+    internal void Initialize(IServiceProvider serviceProvider, IScheduler scheduler)
     {
+        Server = new NetEngine(scheduler);
+        Client = new NetEngine(scheduler);
         Server.Connected += Proxy_OnServerConnected;
         Client.ClientConnected += Proxy_OnClientConnected;
-    }
-
-    internal void Initialize(IServiceProvider serviceProvider)
-    {
+        
         _serviceProvider = serviceProvider;
 
         foreach (var packetHandler in Handlers)

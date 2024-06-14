@@ -1,0 +1,35 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             xmlns:vm="clr-namespace:SRBot.Page.Inventory"
+             x:DataType="vm:InventoryPageModel"
+             VerticalAlignment="Stretch"
+             HorizontalAlignment="Stretch"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             MaxWidth="800"
+             Margin="16"
+             x:Class="SRBot.Page.Inventory.InventoryPage">
+    <TabControl>
+        <TabItem Header="Player">
+            <DataGrid ItemsSource="{Binding PlayerInventory}" AutoGenerateColumns="False" IsReadOnly="True">
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Header="Icon">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Image Source="{Binding  Icon}" Width="32" Height="32"></Image>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Header="Quantity" Binding="{Binding Item.Quantity}"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Item.RefObjItem.Name}"></DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </TabItem>
+        <TabItem Header="Ability pet"></TabItem>
+        <TabItem Header="Storage"></TabItem>
+        <TabItem Header="Guild storage"></TabItem>
+        <TabItem Header="Transport"></TabItem>
+    </TabControl>
+</UserControl>

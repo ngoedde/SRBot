@@ -17,6 +17,13 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 {
     #region Properties
 
+    [Reactive] public ObservableCollection<Item> Inventory { get; internal set; } = new();
+    [Reactive] public ObservableCollection<Item> AvatarInventory { get; internal set; } = new();
+    [Reactive] public ObservableCollection<Mastery> Masteries { get; internal set; } = new();
+    [Reactive] public ObservableCollection<Skill> Skills { get; internal set; } = new();
+    [Reactive] public ObservableCollection<Quest> Quests { get; internal set; } = new();
+    [Reactive] public ObservableCollection<Theme> CollectionBook { get; internal set; } = new();
+    [Reactive] public ObservableCollection<QuestMark> QuestMarks { get; internal set; } = new();
     [Reactive] public uint RefObjId { get; internal set; }
     [Reactive] public byte Scale { get; internal set; }
     [Reactive] public byte Level { get; internal set; }
@@ -41,16 +48,9 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
     [Reactive] public Movement Movement { get; internal set; } = new();
     [Reactive] public EntityPosition Position { get; internal set; } = new();
     [Reactive] public State State { get; internal set; } = new();
-    [Reactive] public ObservableCollection<Item> Inventory { get; internal set; } = new();
-    [Reactive] public ObservableCollection<Item> AvatarInventory { get; internal set; } = new();
-    [Reactive] public ObservableCollection<Mastery> Masteries { get; internal set; } = new();
-    [Reactive] public ObservableCollection<Skill> Skills { get; internal set; } = new();
-    [Reactive] public ObservableCollection<Quest> Quests { get; internal set; } = new();
-    [Reactive] public ObservableCollection<Theme> CollectionBook { get; internal set; } = new();
     [Reactive] public uint[] CompletedQuests { get; internal set; } = [];
-    [Reactive] public ObservableCollection<QuestMark> QuestMarks { get; internal set; } = new();
     [Reactive] public uint UniqueId { get; internal set; }
-    [Reactive] public string Name { get; internal set; }
+    [Reactive] public string Name { get; internal set; } = "Not in game";
     [Reactive] public Job Job { get; internal set; } = new();
     [Reactive] public PvPState PvPState { get; internal set; }
     [Reactive] public bool IsRiding { get; internal set; }
@@ -76,13 +76,21 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 
     internal override void ParsePacket(Session session, Packet packet)
     {
-        Inventory = new ObservableCollection<Item>();
-        AvatarInventory = new ObservableCollection<Item>();
-        Masteries = new ObservableCollection<Mastery>();
-        Skills = new ObservableCollection<Skill>();
-        Quests = new ObservableCollection<Quest>();
-        CollectionBook = new ObservableCollection<Theme>();
-        QuestMarks = new ObservableCollection<QuestMark>();
+        Inventory.Clear();
+        AvatarInventory.Clear();
+        Masteries.Clear();
+        Skills.Clear();
+        Quests.Clear();
+        CollectionBook.Clear();
+        QuestMarks.Clear();
+        
+        // Inventory = new ObservableCollection<Item>();
+        // AvatarInventory = new ObservableCollection<Item>();
+        // Masteries = new ObservableCollection<Mastery>();
+        // Skills = new ObservableCollection<Skill>();
+        // Quests = new ObservableCollection<Quest>();
+        // CollectionBook = new ObservableCollection<Theme>();
+        // QuestMarks = new ObservableCollection<QuestMark>();
 
         //Server time for some reason. Don't need this.
         packet.ReadUInt();

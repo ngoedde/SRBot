@@ -1,27 +1,98 @@
-﻿namespace SRGame.Client.Entity.RefObject;
+﻿using SRGame.Client.Repository;
+
+namespace SRGame.Client.Entity.RefObject;
 
 public class RefSkillMastery : Entity<int>
 {
     #region Fields
 
     private int _id;
+    private string _name;
+    private string _nameCode;
+    private byte _groupNum;
+    private string _description;
+    private string _tabNameCode;
+    private byte _tabID;
+    private byte _skillToolTipType;
+    private WeaponType _weaponType1;
+    private WeaponType _weaponType2;
+    private WeaponType _weaponType3;
+    private string _icon;
+    private string _focusIcon;
+
     public override int Id => _id;
 
-    public string Name;
-    public string NameCode;
+    public string Name
+    {
+        get => _name;
+        set => _name = value;
+    }
 
-    public byte GroupNum;
-    public string Description;
-    public string TabNameCode;
-    public byte TabID;
+    public string NameCode
+    {
+        get => _nameCode;
+        set => _nameCode = value;
+    }
 
-    public byte SkillToolTipType;
+    public byte GroupNum
+    {
+        get => _groupNum;
+        set => _groupNum = value;
+    }
 
-    public WeaponType WeaponType1;
-    public WeaponType WeaponType2;
-    public WeaponType WeaponType3;
-    public string Icon;
-    public string FocusIcon;
+    public string Description
+    {
+        get => _description;
+        set => _description = value;
+    }
+
+    public string TabNameCode
+    {
+        get => _tabNameCode;
+        set => _tabNameCode = value;
+    }
+
+    public byte TabID
+    {
+        get => _tabID;
+        set => _tabID = value;
+    }
+
+    public byte SkillToolTipType
+    {
+        get => _skillToolTipType;
+        set => _skillToolTipType = value;
+    }
+
+    public WeaponType WeaponType1
+    {
+        get => _weaponType1;
+        set => _weaponType1 = value;
+    }
+
+    public WeaponType WeaponType2
+    {
+        get => _weaponType2;
+        set => _weaponType2 = value;
+    }
+
+    public WeaponType WeaponType3
+    {
+        get => _weaponType3;
+        set => _weaponType3 = value;
+    }
+
+    public string Icon
+    {
+        get => _icon;
+        set => _icon = value;
+    }
+
+    public string FocusIcon
+    {
+        get => _focusIcon;
+        set => _focusIcon = value;
+    }
 
     #endregion Fields
 
@@ -30,21 +101,18 @@ public class RefSkillMastery : Entity<int>
     public override bool Parse(EntityParser parser)
     {
         parser.TryParse(0, out _id);
-        parser.TryParse(1, out Name);
-        // if(Game.ClientType >= GameClientType.Chinese)
-        //     parser.TryParse(3, out NameCode);
-        parser.TryParse(2, out NameCode);
-
-        parser.TryParse(3, out GroupNum);
-        parser.TryParse(4, out Description);
-        parser.TryParse(5, out TabNameCode);
-        parser.TryParse(6, out TabID);
-        parser.TryParse(7, out SkillToolTipType);
-        parser.TryParse(8, out WeaponType1);
-        parser.TryParse(9, out WeaponType2);
-        parser.TryParse(10, out WeaponType3);
-        parser.TryParse(11, out Icon);
-        parser.TryParse(12, out FocusIcon);
+        parser.TryParse(1, out _name);
+        parser.TryParse(2, out _nameCode);
+        parser.TryParse(3, out _groupNum);
+        parser.TryParse(4, out _description);
+        parser.TryParse(5, out _tabNameCode);
+        parser.TryParse(6, out _tabID);
+        parser.TryParse(7, out _skillToolTipType);
+        parser.TryParse(8, out _weaponType1);
+        parser.TryParse(9, out _weaponType2);
+        parser.TryParse(10, out _weaponType3);
+        parser.TryParse(11, out _icon);
+        parser.TryParse(12, out _focusIcon);
 
         return true;
     }

@@ -10,10 +10,10 @@
              x:DataType="vm:GamePageModel"
              x:Class="SRBot.Page.Game.GamePage">
 
-    <ScrollViewer Width="700" Margin="24" Height="700">
+    <ScrollViewer Width="768" Margin="24" Height="900">
         <StackPanel>
             <TextBlock Classes="h4" Margin="0 16 0 16" HorizontalAlignment="Center">Auto Login</TextBlock>
-            <suki:GlassCard Width="450" HorizontalAlignment="Center" Padding="24" Height="450" VerticalAlignment="Top">
+            <suki:GlassCard Width="450" HorizontalAlignment="Center" Padding="24" VerticalAlignment="Top">
                 <StackPanel>
                     <Label Margin="0 16 0 0">Account:</Label>
                     <ComboBox ItemsSource="{Binding AutoLoginConfig.Accounts}"
@@ -33,21 +33,24 @@
                         <Label Margin="0 16 0 0">Server:</Label>
                         <TextBox Text="{Binding  GameConfig.AutoLoginServer}" Watermark="First server in the list"></TextBox>
 
-                        <Label Margin="0 16 0 0">Static Captcha:</Label>
-                        <TextBox Text="{Binding  GameConfig.StaticCaptcha}" Watermark="Send empty captcha if asked"></TextBox>
-
-                        <Grid ColumnDefinitions="*,*">
-                            <CheckBox Margin="0 16 0 0" IsChecked="{Binding GameConfig.EnableAutoLogin}">Enable auto login?</CheckBox>
-                            <Button Grid.Column="1" Margin="0 16 0 0" Width="200"
-                                    Command="{Binding OpenAccountManagerDialog}">
-                                Account manager
-                            </Button>
-                        </Grid>
-
+                        <Expander Header="Advanced" Margin="0 16 0 0">
+                            <StackPanel>
+                                <Label Margin="0 16 0 0">Static Captcha:</Label>
+                                <TextBox Text="{Binding  GameConfig.StaticCaptcha}" Watermark="Send empty captcha if asked"></TextBox>
+                                <Label Margin="0 16 0 0">Artificial delay:</Label>
+                                <NumericUpDown Value="{Binding GameConfig.AutoLoginDelay}" Watermark="Wait between 1-3 seconds" Maximum="10" Minimum="0" Increment="1">
+                                </NumericUpDown>
+                            </StackPanel>
+                        </Expander>
+                        <CheckBox Margin="0 16 0 0" IsChecked="{Binding GameConfig.EnableAutoLogin}">Auto login</CheckBox>
+                        <CheckBox Margin="0 8 0 0" IsChecked="{Binding GameConfig.Clientless}" IsVisible="{Binding GameConfig.EnableAutoLogin}">Clientless mode</CheckBox>
+                        <Button Grid.Column="1" Margin="0 24 0 0" Width="200" HorizontalAlignment="Center"
+                                Command="{Binding OpenAccountManagerDialog}">
+                            Account manager
+                        </Button>
                     </StackPanel>
                 </StackPanel>
             </suki:GlassCard>
         </StackPanel>
-
     </ScrollViewer>
 </UserControl>

@@ -5,7 +5,7 @@ namespace SRGame.Client.Repository;
 public class TranslationRepository(ClientFileSystem clientFileSystem)
     : EntityRepository<RefText, string>(clientFileSystem)
 {
-    public override async Task LoadAsync(ClientType clientType)
+    public override async Task<EntityRepository<RefText, string>> LoadAsync(ClientType clientType)
     {
         await base.LoadAsync(clientType);
 
@@ -55,5 +55,12 @@ public class TranslationRepository(ClientFileSystem clientFileSystem)
         }
 
         OnLoaded();
+        
+        return this;
+    }
+
+    public string GetTranslation(string name, string? @default = null)
+    {
+        return Entities.GetValueOrDefault(name)?.Text ?? @default ?? name;
     }
 }

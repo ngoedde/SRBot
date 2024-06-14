@@ -28,10 +28,12 @@
                 <StackPanel>
                     <Image Width="80"
                            Height="80"
-                           Margin="30,10,30,30"
                            Source="Assets/logo.png" />
-                    <HyperlinkButton Command="{Binding ShowProfileDialog }" Classes="h4"
-                                     Content="{Binding ActiveProfile.Name}" HorizontalAlignment="Center" />
+                    <HyperlinkButton Margin="0 16 0 8" 
+                                     FontSize="14"
+                                     Command="{Binding ShowProfileDialog }" 
+                                     Content="{Binding ActiveProfile.Name}" 
+                                     HorizontalAlignment="Center" FontFeatures=""/>
                 </StackPanel>
             </suki:SukiSideMenu.HeaderContent>
             <suki:SukiSideMenu.ItemTemplate>

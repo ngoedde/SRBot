@@ -39,9 +39,6 @@
                                  HorizontalAlignment="Right">
                 </HyperlinkButton>
             </Grid>
-            <CheckBox Content="Clientless mode?" IsChecked="{Binding SelectedProfile.Clientless}" Margin="0 16 0 0"
-                      Classes="Flat Accent">
-            </CheckBox>
         </StackPanel>
 
         <HyperlinkButton Grid.Column="0" Content="Delete profile" HorizontalAlignment="Center"

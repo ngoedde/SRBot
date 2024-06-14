@@ -1,25 +1,45 @@
-﻿namespace SRGame.Client.Entity.RefObject;
+﻿using SRGame.Client.Repository;
+
+namespace SRGame.Client.Entity.RefObject;
 
 public class RefObjItem : RefObjCommon
 {
-    public string Desc1;
-    public string Desc2;
-    public string Desc3;
-    public string Desc4;
-    public byte ItemClass;
-    public int MaxStack;
-    public int Param1;
-    public int Param2;
-    public int Param3;
-    public int Param4;
-    public byte Quivered; //Consumes ammo
-    public short Range;
-    public byte ReqGender;
-    public int ReqInt;
-    public int ReqStr;
-    public byte SpeedClass;
-    public byte TwoHanded;
-
+    private string _desc1;
+    private string _desc2;
+    private string _desc3;
+    private string _desc4;
+    private byte _itemClass;
+    private int _maxStack;
+    private int _param1;
+    private int _param2;
+    private int _param3;
+    private int _param4;
+    private bool _quivered; //Consumes ammo
+    private short _range;
+    private byte _reqGender;
+    private int _reqInt;
+    private int _reqStr;
+    private byte _speedClass;
+    private bool _twoHanded;
+    
+    public string Desc1 => _desc1;
+    public string Desc2 => _desc2;
+    public string Desc3 => _desc3;
+    public string Desc4 => _desc4;
+    public byte ItemClass { get => _itemClass; }
+    public int MaxStack { get => _maxStack; }
+    public int Param1 { get => _param1; }
+    public int Param2 { get => _param2; }
+    public int Param3 { get => _param3; }
+    public int Param4 { get => _param4; }
+    public bool Quivered { get => _quivered; }
+    public short Range { get => _range; }
+    public byte ReqGender { get => _reqGender; }
+    public int ReqInt { get => _reqInt; }
+    public int ReqStr { get => _reqStr; }
+    public byte SpeedClass { get => _speedClass; }
+    public bool TwoHanded { get => _twoHanded; }
+    
     //public float Dur_L;
     //public float Dur_U;
 
@@ -139,23 +159,23 @@ public class RefObjItem : RefObjCommon
         //parser.TryParse(116, out CHR_L); //critical hit rate
         //parser.TryParse(117, out CHR_U);
 
-        parser.TryParse(57, out MaxStack);
-        parser.TryParse(58, out ReqGender);
-        parser.TryParse(59, out ReqStr);
-        parser.TryParse(60, out ReqInt);
-        parser.TryParse(61, out ItemClass);
-        parser.TryParse(86, out Quivered);
-        parser.TryParse(92, out SpeedClass);
-        parser.TryParse(93, out TwoHanded);
-        parser.TryParse(94, out Range);
-        parser.TryParse(118, out Param1);
-        parser.TryParse(119, out Desc1);
-        parser.TryParse(120, out Param2);
-        parser.TryParse(121, out Desc2);
-        parser.TryParse(122, out Param3);
-        parser.TryParse(123, out Desc3);
-        parser.TryParse(124, out Param4);
-        parser.TryParse(125, out Desc4);
+        parser.TryParse(57, out _maxStack);
+        parser.TryParse(58, out _reqGender);
+        parser.TryParse(59, out _reqStr);
+        parser.TryParse(60, out _reqInt);
+        parser.TryParse(61, out _itemClass);
+        parser.TryParse(86, out _quivered);
+        parser.TryParse(92, out _speedClass);
+        parser.TryParse(93, out _twoHanded);
+        parser.TryParse(94, out _range);
+        parser.TryParse(118, out _param1);
+        parser.TryParse(119, out _desc1);
+        parser.TryParse(120, out _param2);
+        parser.TryParse(121, out _desc2);
+        parser.TryParse(122, out _param3);
+        parser.TryParse(123, out _desc3);
+        parser.TryParse(124, out _param4);
+        parser.TryParse(125, out _desc4);
 
         return true;
     }

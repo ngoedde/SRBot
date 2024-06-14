@@ -5,7 +5,7 @@ namespace SRGame.Client.Repository;
 public class SkillMasteryRepository(ClientFileSystem clientFileSystem)
     : EntityRepository<RefSkillMastery, int>(clientFileSystem)
 {
-    public override async Task LoadAsync(ClientType clientType)
+    public override async Task<EntityRepository<RefSkillMastery, int>> LoadAsync(ClientType clientType)
     {
         await base.LoadAsync(clientType);
 
@@ -13,5 +13,7 @@ public class SkillMasteryRepository(ClientFileSystem clientFileSystem)
         ParseLinesToEntities(data);
 
         OnLoaded();
+
+        return this;
     }
 }
