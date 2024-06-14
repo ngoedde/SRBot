@@ -20,7 +20,15 @@ public abstract class MessageHandler
             throw exception;
 #endif
 
-        packet.Reset();
+        if (!packet.Locked)
+        {
+            packet.Lock();
+        }
+        else
+        {
+            packet.Reset();
+        }
+  
 
         Handled?.Invoke(this, session, packet);
 

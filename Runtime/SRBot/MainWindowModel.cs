@@ -192,12 +192,6 @@ public class MainWindowModel : ViewModel
         Bot.StopBot();
     }
 
-    public async Task SaveConfig()
-    {
-        // await _configService.SaveAllAsync();
-        // await _profileService.SaveProfilesAsync();
-    }
-
     public void ShowProfileDialog()
     {
         var dialogModel = new ProfileDialogModel(ProfileService, Game);

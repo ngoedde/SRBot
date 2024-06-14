@@ -216,9 +216,5 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 
         WorldId = packet.ReadUShort();
         LayerId = packet.ReadUShort();
-
-        //Ready to play
-        var characterAckPacket = new Packet(AgentMsgId.ReadyToPlay);
-        Proxy.SendToServer(characterAckPacket);
     }
 }

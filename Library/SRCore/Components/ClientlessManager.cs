@@ -31,11 +31,12 @@ internal class ClientlessManager(
 
     private void OnAuthenticationHandled(SRNetwork.MessageHandler handler, Session session, Packet packet)
     {
+        if ((proxy.Context & ProxyContext.Client) != 0)
+            return;
+        
         var result = (MessageResult)packet.ReadByte();
         if (result != MessageResult.Success)
-        {
             return;
-        }
 
         packet.Reset();
 
@@ -44,13 +45,9 @@ internal class ClientlessManager(
 
     private async void ProxyOnClientConnected(Session clientSession)
     {
-        if ((proxy.Context & ProxyContext.Client) == 0)
-            return;
-
         if ((proxy.Context & ProxyContext.Agent) != 0)
             return;
 
-        //For clientless operation -> Connect to gateway
         var endpoint = clientInfoManager.GetGatewayEndPoint();
         await proxy.ConnectToGateway(endpoint);
     }

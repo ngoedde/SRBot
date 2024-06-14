@@ -41,7 +41,7 @@ public class Proxy
 
     private IServiceProvider _serviceProvider;
     private IEnumerable<SRNetwork.MessageHandler> Handlers => _serviceProvider.GetServices<SRNetwork.MessageHandler>();
-    private IEnumerable<MessageHook> Hooks => _serviceProvider.GetServices<SRNetwork.MessageHook>();
+    private IEnumerable<MessageHook> Hooks => _serviceProvider.GetServices<MessageHook>();
     private AgentLogin AgentLogin => _serviceProvider.GetRequiredService<AgentLogin>();
 
     public Proxy()
@@ -160,7 +160,7 @@ public class Proxy
 
             packet.Reset();
 
-            Task.Run(KeepAliveAgentSession);
+            _ = Task.Run(KeepAliveAgentSession);
         }
 
         if ((Context & ProxyContext.Client) != 0)
@@ -212,10 +212,9 @@ public class Proxy
     private void Proxy_OnClientMessageReceived(Packet packet)
     {
         Log.Debug($"Received from client: {packet}");
-        if ((Context & ProxyContext.Agent) != 0)
-            return;
-
-        if (packet.Opcode is 0x5000 or 0x9000)
+        // if ((Context & ProxyContext.Agent) != 0)
+        //     return;
+        if (packet.Opcode is 0x5000 or 0x9000 or 0x2001 or 0x6103)
             return;
 
         ServerSession?.Send(packet);
