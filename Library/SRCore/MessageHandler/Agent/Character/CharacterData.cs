@@ -16,15 +16,11 @@ internal class CharacterData(Models.Player player) : SRNetwork.MessageHandler
         {
             player.CharacterDataPacket.WriteByteArray(packet.GetBytes());
         
-            return ValueTask.FromResult(true);
+            return OnHandled(session, packet);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return ValueTask.FromResult(false);
-        }
-        finally
-        {
-            OnHandled(session, packet);
+            return OnHandled(session, packet, e);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
+using SRCore.MessageHandler.Gateway;
 using SRCore.Models;
 using SRNetwork;
 using SRNetwork.Common;
@@ -118,7 +119,6 @@ public class Proxy
             Context |= ProxyContext.Gateway;
         }
 
-        //await Server.StopAsync();
         await Server.ConnectAsync(serverEndPoint);
     }
 
@@ -146,6 +146,7 @@ public class Proxy
             if (messageResult != MessageResult.Success)
                 return;
 
+            packet.Reset();
             await ConnectToAgent(NetHelper.ToIPEndPoint(AgentLogin.AgentServerIp, AgentLogin.AgentServerPort));
         }
 
@@ -155,10 +156,14 @@ public class Proxy
             if (messageResult != MessageResult.Success)
                 return;
 
+            packet.Reset();
+            
             _agentKeepAliveTask = Task.Run(KeepAliveAgentSession);
         }
 
-        ClientSession?.Send(packet);
+        if ((Context & ProxyContext.Client) != 0) {
+            ClientSession?.Send(packet);
+        }
     }
 
     private void ServerSessionOnDisconnected(DisconnectReason reason)
@@ -204,7 +209,7 @@ public class Proxy
     private void Proxy_OnClientMessageReceived(Packet packet)
     {
         Log.Debug($"Received from client: {packet}");
-        if ((Context & ProxyContext.Agent) != 0 && packet.Opcode == 0x6100)
+        if ((Context & ProxyContext.Agent) != 0)
             return;
 
         if (packet.Opcode is 0x5000 or 0x9000)
@@ -234,12 +239,22 @@ public class Proxy
     {
         return Handlers.FirstOrDefault(handler => handler.Opcode == opcode);
     }
+    
+    public TMessageHandler? GetHandler<TMessageHandler>() where TMessageHandler : SRNetwork.MessageHandler
+    {
+        return (TMessageHandler?)Handlers.FirstOrDefault(handler => handler is TMessageHandler);
+    }
 
-    public SRNetwork.MessageHook? GetHook(ushort opcode)
+    public MessageHook? GetHook(ushort opcode)
     {
         return Hooks.FirstOrDefault(hook => hook.Opcode == opcode);
     }
 
+    public TMessageHook? GetHook<TMessageHook>() where TMessageHook : MessageHook
+    {
+        return (TMessageHook?)Hooks.FirstOrDefault(hook => hook is TMessageHook);
+    }
+    
     protected virtual void OnClientConnected(Session clientSession)
     {
         ClientConnected?.Invoke(clientSession);

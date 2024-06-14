@@ -100,9 +100,6 @@ public class Session
                 
                 await _handlerManager.Handle(this, packet);
                 
-                //Resets the reader&writer position to 0 so the hooks will get a clean verion of the packet.
-                packet.Reset();
-                
                 var hookedPacket = await _handlerManager.Hook(this, packet);
                 OnMessageReceived(hookedPacket);
             }

@@ -26,7 +26,7 @@ internal class Authentication(IServiceProvider serviceProvider) : SRNetwork.Mess
         }
         catch (Exception e)
         {
-            return ValueTask.FromResult(false);
+            return OnHandled(session, packet, e);
         }
     }
 }

@@ -14,18 +14,13 @@ internal class CharacterDataEnd(Models.Player player) : SRNetwork.MessageHandler
     {
         try
         {
-      
             player.ParsePacket(session, player.CharacterDataPacket.Lock());
-        
-            return ValueTask.FromResult(true);
+            
+            return OnHandled(session, packet);
         }
         catch (Exception e)
         {
-            return ValueTask.FromResult(false);
-        }
-        finally
-        {
-            OnHandled(session, packet);
+            return OnHandled(session, packet, e);
         }
     }
 }

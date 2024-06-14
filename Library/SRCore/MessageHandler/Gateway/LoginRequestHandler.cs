@@ -20,15 +20,11 @@ namespace SRCore.MessageHandler.Gateway
                 agentLogin.Password = packet.ReadString();
                 agentLogin.ShardId = packet.ReadUShort();
 
-                return ValueTask.FromResult(true);
+                return OnHandled(session, packet);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return ValueTask.FromResult(false);
-            }
-            finally
-            {
-                OnHandled(session, packet);
+                return OnHandled(session, packet, e);
             }
         }
     }

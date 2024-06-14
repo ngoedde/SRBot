@@ -4,7 +4,7 @@ namespace SRNetwork;
 
 public abstract class MessageHandler
 {
-    public delegate void HandledEventHandler(Session session, Packet packet);
+    public delegate void HandledEventHandler(MessageHandler handler, Session session, Packet packet);
     public event HandledEventHandler? Handled;
     
     public virtual PacketHandler Handler { get; init; } = null!;
@@ -12,12 +12,17 @@ public abstract class MessageHandler
 
     public abstract ValueTask<bool> Handle(Session session, Packet packet);
 
-    protected ValueTask<bool> OnHandled(Session session, Packet packet)
+    protected ValueTask<bool> OnHandled(Session session, Packet packet, Exception? exception = null)
     {
+        #if DEBUG
+        if (exception != null)
+            throw exception;
+        #endif
+        
         packet.Reset();
         
-        Handled?.Invoke(session, packet);
+        Handled?.Invoke(this, session, packet);
         
-        return ValueTask.FromResult(true);
+        return ValueTask.FromResult(exception == null);
     }
 }

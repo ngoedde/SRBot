@@ -112,17 +112,12 @@ public class Packet
 
     public void Reset()
     {
-        if (m_reader != null)
+        if (!m_locked || m_reader == null)
         {
-            m_reader.BaseStream.Position = 0;
-        }
-
-        if (m_writer != null)
-        {
-            m_writer.BaseStream.Position = 0;
+            throw new Exception("Cannot Reset an unlocked Packet.");
         }
         
-        m_lock = new object();
+        m_reader.BaseStream.Seek(0, System.IO.SeekOrigin.Begin);
     }
     
     public Packet(ushort opcode, bool encrypted, bool massive, byte[] bytes, int offset, int length)

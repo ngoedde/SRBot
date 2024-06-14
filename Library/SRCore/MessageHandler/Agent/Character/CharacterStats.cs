@@ -18,15 +18,11 @@ internal class CharacterStats(Player player) : MessageHandler
         {
             player.Attributes = Attributes.FromPacket(packet);
             
-            return ValueTask.FromResult(true);
+            return OnHandled(session, packet);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return ValueTask.FromResult(false);
-        }
-        finally
-        {
-            OnHandled(session, packet);
+            return OnHandled(session, packet, e);
         }
     }
 }

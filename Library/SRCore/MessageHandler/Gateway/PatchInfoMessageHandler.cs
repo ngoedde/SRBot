@@ -14,16 +14,12 @@ internal class PatchInfoMessageHandler(PatchInfo patchInfo) : SRNetwork.MessageH
         try
         {
             patchInfo.ParsePacket(session, packet);
-            
-            return ValueTask.FromResult(true);
+
+            return OnHandled(session, packet);
         }
-        catch (Exception)
+        catch (Exception e)
         {
-            return ValueTask.FromResult(false);
-        }
-        finally
-        {
-            OnHandled(session, packet);
+            return OnHandled(session, packet, e);
         }
     }
 }

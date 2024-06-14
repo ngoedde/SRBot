@@ -30,7 +30,8 @@ internal class Identification(AgentLogin agentLogin, Proxy proxy, AccountService
         }
         catch (Exception e)
         {
-            return ValueTask.FromResult(false);
+            
+            return OnHandled(session, packet, e);
         }
     }
 }

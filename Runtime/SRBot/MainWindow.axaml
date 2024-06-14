@@ -49,7 +49,7 @@
                                    BusyText="{ Binding LoadingState.Message }">
                     </suki:BusyArea>
                     <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
-                        <TextBlock>TPS:</TextBlock>
+                        <TextBlock IsVisible="{Binding IsBotRunning}">TPS:</TextBlock>
                         <TextBlock Grid.Column="1" IsVisible="{Binding IsBotRunning}" Text="{Binding Bot.TicksPerSecond}"></TextBlock>
                     </Grid>
                 </StackPanel>
@@ -129,4 +129,4 @@
         </DockPanel>
     </Grid>
 
-</suki:SukiWindow>
+</suki:SukiWindow> 

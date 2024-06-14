@@ -1,8 +1,8 @@
 using Serilog;
+using SRCore.MessageHandler.Agent.Auth;
 using SRCore.Models;
 using SRGame.Client;
 using SRNetwork;
-using SRNetwork.Common;
 using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Components;
@@ -23,14 +23,24 @@ internal class ClientlessManager(
     {
         proxy.GatewayConnected += ProxyOnGatewayConnected;
         proxy.ClientConnected += ProxyOnClientConnected;
-        proxy.AgentConnected += ProxyOnAgentConnected;
+        
+        proxy.GetHandler<Authentication>()!.Handled += OnAuthenticationHandled;
+        
         patchInfo.PatchInfoUpdated += OnPatchInfoUpdated;
     }
 
-    private void ProxyOnAgentConnected(Session serverSession)
+    private void OnAuthenticationHandled(SRNetwork.MessageHandler handler, Session session, Packet packet)
     {
-        serverSession.MessageReceived += ServerSessionOnMessageReceived;
+        var result = (MessageResult)packet.ReadByte();
+        if (result != MessageResult.Success) {
+            return;
+        }
+        
+        packet.Reset();
+            
+        characterLobby.Request();
     }
+    
 
     private async void ProxyOnClientConnected(Session clientSession)
     {
@@ -38,9 +48,7 @@ internal class ClientlessManager(
             return;
 
         if ((proxy.Context & ProxyContext.Agent) != 0)
-        {
             return;
-        }
         
         //For clientless operation -> Connect to gateway
         var endpoint = clientInfoManager.GetGatewayEndPoint();
@@ -51,25 +59,7 @@ internal class ClientlessManager(
     {
         if ((proxy.Context & ProxyContext.Client) == 0)
             patchInfo.Request();
-
-        serverSession.MessageReceived += ServerSessionOnMessageReceived;
     }
-
-    private async void ServerSessionOnMessageReceived(Packet packet)
-    {
-        MessageResult result;
-        
-        //For clientless operation -> Request character list after login
-        if (packet.Opcode == AgentMsgId.LoginActionAck && (proxy.Context & ProxyContext.Client) == 0)
-        {
-            result = (MessageResult)packet.ReadByte();
-            if (result != MessageResult.Success)
-                return;
-            
-            characterLobby.Request();
-        }
-    }
-
 
     private async void OnPatchInfoUpdated(Session session, PatchInfo patchInfo)
     {
