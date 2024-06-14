@@ -13,7 +13,7 @@ internal class ItemFactory
         var slot = packet.ReadByte();
         var itemRentInfo = ParseRentInfoFromPacket(packet);
         var itemId = packet.ReadInt();
-        
+
         var item = entityManager.GetItem(itemId);
         if (item == null)
             throw new Exception($"Item with id {itemId} not found in entity manager!");
@@ -26,7 +26,7 @@ internal class ItemFactory
         {
             if (item.TypeID3 == 1)
                 return ParseItemCosSummoner(packet, item, slot, itemRentInfo);
-            
+
             if (item.TypeID3 == 2)
                 return ParseItemMonsterCapsule(packet, item, slot, itemRentInfo);
 
@@ -36,14 +36,14 @@ internal class ItemFactory
 
         if (item.TypeID2 == 3)
             return ParseItemExpendable(packet, item, slot, itemRentInfo);
-        
+
         throw new Exception("Can not parse inventory! Unknown item type!");
     }
 
     private static ItemEquip ParseItemEquip(Packet packet, RefObjItem item, byte slot, ItemRentInfo? rentInfo)
     {
         var result = new ItemEquip(slot, item, rentInfo);
-        
+
         result.OptLevel = packet.ReadByte();
         result.Variance = packet.ReadULong();
         result.Durability = packet.ReadUInt();
@@ -56,11 +56,12 @@ internal class ItemFactory
         return result;
     }
 
-    private static ItemCosSummoner ParseItemCosSummoner(Packet packet, RefObjItem item, byte slot, ItemRentInfo? rentInfo)
+    private static ItemCosSummoner ParseItemCosSummoner(Packet packet, RefObjItem item, byte slot,
+        ItemRentInfo? rentInfo)
     {
         var result = new ItemCosSummoner(slot, item, rentInfo);
 
-        result.State = (SummonerState) packet.ReadByte();
+        result.State = (SummonerState)packet.ReadByte();
         if (result.State != SummonerState.Inactive)
         {
             result.ContainedRefObjId = packet.ReadUInt();
@@ -94,7 +95,7 @@ internal class ItemFactory
 
         return result;
     }
-    
+
     private static ItemExpendable ParseItemExpendable(Packet packet, RefObjItem item, byte slot, ItemRentInfo? rentInfo)
     {
         var result = new ItemExpendable(slot, item, rentInfo)
@@ -105,9 +106,10 @@ internal class ItemFactory
         if (item.TypeID3 == 11)
         {
             //MAGICSTONE, ATTRSTONE
-            if (item.TypeID4 == 1 || item.TypeID4 == 2)         
-               result.AttributeAssimilationProbability = packet.ReadByte(); //AttributeAssimilationProbability
-        } else if (item.TypeID3 == 14 && item.TypeID4 == 2)
+            if (item.TypeID4 == 1 || item.TypeID4 == 2)
+                result.AttributeAssimilationProbability = packet.ReadByte(); //AttributeAssimilationProbability
+        }
+        else if (item.TypeID3 == 14 && item.TypeID4 == 2)
         {
             //ITEM_MALL_GACHA_CARD_WIN
             //ITEM_MALL_GACHA_CARD_LOSE
@@ -116,35 +118,36 @@ internal class ItemFactory
             {
                 var key = packet.ReadUInt();
                 var value = packet.ReadUInt();
-                
+
                 result.MagicParams[key] = value;
             }
         }
-        
+
         return result;
     }
-    
-    private static ItemMonsterCapsule ParseItemMonsterCapsule(Packet packet, RefObjItem item, byte slot, ItemRentInfo? rentInfo)
+
+    private static ItemMonsterCapsule ParseItemMonsterCapsule(Packet packet, RefObjItem item, byte slot,
+        ItemRentInfo? rentInfo)
     {
         var result = new ItemMonsterCapsule(slot, item, rentInfo)
         {
             ContainedRefObjId = packet.ReadUInt()
         };
-        
+
         return result;
     }
-    
+
     private static ItemStorage ParseItemStorage(Packet packet, RefObjItem item, byte slot, ItemRentInfo? rentInfo)
     {
         var result = new ItemStorage(slot, item, rentInfo)
         {
             Quantity = packet.ReadUInt()
         };
-        
+
         return result;
     }
-    
-    
+
+
     private static ObservableCollection<BindingOption> ParseBindingOptions(Packet packet)
     {
         var count = packet.ReadByte();
@@ -158,14 +161,14 @@ internal class ItemFactory
                 Id = packet.ReadUInt(),
                 Value = packet.ReadUInt()
             };
-            
+
             bindingOptions.Add(option);
         }
 
         return bindingOptions;
     }
 
-    private static Dictionary<uint,uint> ParseMagicParams(Packet packet)
+    private static Dictionary<uint, uint> ParseMagicParams(Packet packet)
     {
         var count = packet.ReadByte();
         var magicParams = new Dictionary<uint, uint>();
@@ -174,7 +177,7 @@ internal class ItemFactory
         {
             var key = packet.ReadUInt();
             var value = packet.ReadUInt();
-            
+
             magicParams[key] = value;
         }
 

@@ -1,5 +1,4 @@
 ﻿#if UNITY_STANDALONE || UNITY_EDITOR
-
 using MathF = UnityEngine.Mathf;
 
 #else
@@ -57,7 +56,8 @@ public static class MathHelper
     public static float Dot2D(Vector3 left, Vector3 right) => (left.X * right.X) + (left.Z * right.Z);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Distance2DSqrt(Vector2 left, Vector2 right) => ((left.X - right.X) * (left.X - right.X)) + ((left.Y - right.Y) * (left.Y - right.Y));
+    public static float Distance2DSqrt(Vector2 left, Vector2 right) =>
+        ((left.X - right.X) * (left.X - right.X)) + ((left.Y - right.Y) * (left.Y - right.Y));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Distance2DSqrt(Vector2 left, Vector3 right)
@@ -99,7 +99,8 @@ public static class MathHelper
     public static float Distance2D(Vector3 left, Vector3 right) => MathF.Sqrt(Distance2DSqrt(left, right));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Distance2D(RegionPosition left, RegionPosition right) => MathF.Sqrt(Distance2DSqrt(left, right));
+    public static float Distance2D(RegionPosition left, RegionPosition right) =>
+        MathF.Sqrt(Distance2DSqrt(left, right));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Lerp(float min, float max, float t) => ((1.0f - t) * min) + (t * max);
@@ -134,7 +135,8 @@ public static class MathHelper
     public static float Clamp01(float value) => Clamp(value, 0.0f, 1.0f);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsApproximately(this float a, float b, float threshold = Epsilon) => MathF.Abs(a - b) < threshold;
+    public static bool IsApproximately(this float a, float b, float threshold = Epsilon) =>
+        MathF.Abs(a - b) < threshold;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsApproximatelyZero(this float value, float threshold = Epsilon) => MathF.Abs(value) < threshold;

@@ -14,7 +14,7 @@
         </materialIcons:MaterialIcon>
         <TextBlock FontWeight="Bold" FontSize="18" TextAlignment="Center" Text="{Binding Title}">
         </TextBlock>
-        <TextBlock Text="{Binding Message}" HorizontalAlignment="Center" Margin="0 16 0 0"/>
+        <TextBlock Text="{Binding Message}" HorizontalAlignment="Center" Margin="0 16 0 0" />
         <WrapPanel HorizontalAlignment="Center" Margin="0 24 0 8 ">
             <Button Content="Cancel" Click="CancelButton_OnClick" Classes="Accent"
                     Margin="10"

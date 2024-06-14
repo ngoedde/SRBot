@@ -36,7 +36,7 @@ public class ProfileDialogModel : ViewModel
     }
 
     #region Methods
-    
+
     public async Task SetActiveProfile(Profile profile)
     {
         await _profileService.SetActiveProfileAsync(profile);
@@ -122,6 +122,6 @@ public class ProfileDialogModel : ViewModel
     {
         SukiHost.CloseDialog();
     }
-    
+
     #endregion
 }

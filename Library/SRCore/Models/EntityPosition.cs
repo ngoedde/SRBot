@@ -11,7 +11,7 @@ public class EntityPosition
     [Reactive] public float Y { get; internal set; }
     [Reactive] public float Z { get; internal set; }
     [Reactive] public ushort Angle { get; internal set; }
-    
+
     public new static EntityPosition FromPacket(Packet packet)
     {
         var result = new EntityPosition

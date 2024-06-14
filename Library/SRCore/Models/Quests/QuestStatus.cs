@@ -1,6 +1,6 @@
 namespace SRCore.Models.Quests;
 
-public enum QuestStatus: byte
+public enum QuestStatus : byte
 {
     //1 = Initialized
     //2 = Complete, but not supplied

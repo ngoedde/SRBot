@@ -10,7 +10,7 @@
         <AssemblyVersion>1.0.0.0</AssemblyVersion>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <OutputPath>../Build/Debug</OutputPath>
+        <OutputPath>../Build/Debug</OutputPath>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <OutputPath>../Build/Release</OutputPath>
@@ -19,45 +19,45 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.1.0-beta2" />
-        <PackageReference Include="Avalonia.Desktop" Version="11.1.0-beta2" />
-        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.0-beta2" />
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.0-beta2" />
+        <PackageReference Include="Avalonia" Version="11.1.0-beta2"/>
+        <PackageReference Include="Avalonia.Desktop" Version="11.1.0-beta2"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.0-beta2"/>
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.1.0-beta2"/>
         <!--Condition below is needed to remove Avalonia.Diagnostics package from build output in Release configuration.-->
-        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.0-beta2" />
-        <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9" />
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.4.24266.19" />
-        <PackageReference Include="ReactiveUI.Fody" Version="19.5.41" />
-        <PackageReference Include="SukiUI" Version="6.0.0-beta6" />
+        <PackageReference Condition="'$(Configuration)' == 'Debug'" Include="Avalonia.Diagnostics" Version="11.1.0-beta2"/>
+        <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.4.24266.19"/>
+        <PackageReference Include="ReactiveUI.Fody" Version="19.5.41"/>
+        <PackageReference Include="SukiUI" Version="6.0.0-beta6"/>
     </ItemGroup>
 
     <ItemGroup>
-        <None Remove="Assets\logo.png" />
-        <AvaloniaResource Include="Assets\logo.png" />
+        <None Remove="Assets\logo.png"/>
+        <AvaloniaResource Include="Assets\logo.png"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Library\SRCore\SRCore.csproj" />
+        <ProjectReference Include="..\..\Library\SRCore\SRCore.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <UpToDateCheckInput Remove="Page\Game\GamePage.axaml" />
-      <UpToDateCheckInput Remove="Page\Dashboard\DashboardPage.axaml" />
+        <UpToDateCheckInput Remove="Page\Game\GamePage.axaml"/>
+        <UpToDateCheckInput Remove="Page\Dashboard\DashboardPage.axaml"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Page\Logging\LogPage.axaml.cs">
-        <DependentUpon>LogPage.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Dialog\Game\AccountManagerDialog.axaml.cs">
-        <DependentUpon>AccountManagerDialog.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
-      <Compile Update="Page\Game\GamePage.axaml.cs">
-        <DependentUpon>GamePage.axaml</DependentUpon>
-        <SubType>Code</SubType>
-      </Compile>
+        <Compile Update="Page\Logging\LogPage.axaml.cs">
+            <DependentUpon>LogPage.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Dialog\Game\AccountManagerDialog.axaml.cs">
+            <DependentUpon>AccountManagerDialog.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Page\Game\GamePage.axaml.cs">
+            <DependentUpon>GamePage.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
-    
+
 </Project>

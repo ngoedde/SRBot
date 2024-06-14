@@ -17,7 +17,7 @@ internal class CharacterStats(Player player) : MessageHandler
         try
         {
             player.Attributes = Attributes.FromPacket(packet);
-            
+
             return OnHandled(session, packet);
         }
         catch (Exception e)

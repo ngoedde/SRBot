@@ -20,8 +20,9 @@ internal class Authentication(IServiceProvider serviceProvider) : SRNetwork.Mess
         {
             var messageResult = (MessageResult)packet.ReadByte();
             if (messageResult != MessageResult.Success)
-                _ = Kernel.Panic("Login to agent server failed", LogEventLevel.Error, (Proxy.Context & ProxyContext.Client) == 0);
-            
+                _ = Kernel.Panic("Login to agent server failed", LogEventLevel.Error,
+                    (Proxy.Context & ProxyContext.Client) == 0);
+
             return OnHandled(session, packet);
         }
         catch (Exception e)

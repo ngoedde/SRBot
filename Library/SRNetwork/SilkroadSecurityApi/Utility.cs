@@ -19,6 +19,7 @@ public class Utility
         {
             length += bytesPerLine - length % bytesPerLine;
         }
+
         for (int x = 0; x <= length; ++x)
         {
             if (x % bytesPerLine == 0)
@@ -28,11 +29,13 @@ public class Utility
                     output.Append($"  {ascii_output.ToString()}{Environment.NewLine}");
                     ascii_output.Clear();
                 }
+
                 if (x != length)
                 {
                     output.Append($"{x:d10}   ");
                 }
             }
+
             if (x < count)
             {
                 output.Append($"{buffer[offset + x]:X2} ");
@@ -52,6 +55,7 @@ public class Utility
                 ascii_output.Append(".");
             }
         }
+
         return output.ToString();
     }
 }

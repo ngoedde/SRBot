@@ -23,10 +23,10 @@ public partial class App : Application
 {
     public static LoggingLevelSwitch LoggingLevelSwitch { get; } = new();
     public static MessageBoxManager MessageBoxManager => ServiceProvider.GetRequiredService<MessageBoxManager>();
-    
+
     private static Kernel Kernel => ServiceProvider.GetRequiredService<Kernel>();
     private static IServiceProvider ServiceProvider { get; set; } = null!;
-    
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);

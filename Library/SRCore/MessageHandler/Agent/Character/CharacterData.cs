@@ -15,7 +15,7 @@ internal class CharacterData(Models.Player player) : SRNetwork.MessageHandler
         try
         {
             player.CharacterDataPacket.WriteByteArray(packet.GetBytes());
-        
+
             return OnHandled(session, packet);
         }
         catch (Exception e)

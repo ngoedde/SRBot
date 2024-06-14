@@ -62,9 +62,9 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
     [Reactive] public bool IsGameMaster { get; internal set; }
     [Reactive] public ushort WorldId { get; internal set; }
     [Reactive] public ushort LayerId { get; internal set; }
-    
-    [Reactive] public Attributes Attributes { get;internal set; } = new();
-    
+
+    [Reactive] public Attributes Attributes { get; internal set; } = new();
+
     [Obsolete("Use property Attributes instead")]
     public Attributes Stats => Attributes;
 

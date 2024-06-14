@@ -15,7 +15,7 @@ public class RefObjChar : RefObjCommon
     public byte CanControl;
     public byte DamagePortion;
     public short MaxPassenger;
-    
+
     public override bool Parse(EntityParser parser)
     {
         if (!base.Parse(parser))

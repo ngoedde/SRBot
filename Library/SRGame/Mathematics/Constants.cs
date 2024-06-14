@@ -1,5 +1,4 @@
-﻿
-namespace SRGame.Mathematics;
+﻿namespace SRGame.Mathematics;
 
 public class Constants
 {

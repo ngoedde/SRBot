@@ -9,39 +9,45 @@
              Margin="8"
              x:DataType="vm:GamePageModel"
              x:Class="SRBot.Page.Game.GamePage">
-    
-        <ScrollViewer Width="700" Margin="24" Height="700">
-            <StackPanel>
-                <TextBlock Classes="h4" Margin="0 16 0 16" HorizontalAlignment="Center">Auto Login</TextBlock>
-                <suki:GlassCard Width="450" HorizontalAlignment="Center" Padding="24"  Height="450" VerticalAlignment="Top">
-                        <StackPanel>
-                            <Label Margin="0 16 0 0">Account:</Label>
-                            <ComboBox ItemsSource="{Binding AutoLoginConfig.Accounts}" SelectedItem="{Binding SelectedAutoLoginAccount}">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate DataType="accountModels:AccountInfo">
-                                        <TextBlock Text="{Binding Username}"></TextBlock>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
-                            </ComboBox>
-                            <StackPanel>
-                                <Label Margin="0 16 0 0">Character name:</Label>
-                                <TextBox Text="{Binding  GameConfig.AutoLoginCharacter}" Watermark="First character in the list"></TextBox>
 
-                                <Label Margin="0 16 0 0">Server:</Label>
-                                <TextBox Text="{Binding  GameConfig.AutoLoginServer}" Watermark="First server in the list"></TextBox>
-                                
-                                <Label Margin="0 16 0 0">Static Captcha:</Label>
-                                <TextBox Text="{Binding  GameConfig.StaticCaptcha}" Watermark="Send empty captcha if asked"></TextBox>
-                                
-                                <Grid ColumnDefinitions="*,*">
-                                    <CheckBox  Margin="0 16 0 0" IsChecked="{Binding GameConfig.EnableAutoLogin}">Enable auto login?</CheckBox>
-                                    <Button Grid.Column="1" Margin="0 16 0 0" Width="200" Command="{Binding OpenAccountManagerDialog}">Account manager</Button>
-                                </Grid>
-                       
-                            </StackPanel>
-                        </StackPanel>
-                </suki:GlassCard>
-            </StackPanel>
-            
-        </ScrollViewer>
+    <ScrollViewer Width="700" Margin="24" Height="700">
+        <StackPanel>
+            <TextBlock Classes="h4" Margin="0 16 0 16" HorizontalAlignment="Center">Auto Login</TextBlock>
+            <suki:GlassCard Width="450" HorizontalAlignment="Center" Padding="24" Height="450" VerticalAlignment="Top">
+                <StackPanel>
+                    <Label Margin="0 16 0 0">Account:</Label>
+                    <ComboBox ItemsSource="{Binding AutoLoginConfig.Accounts}"
+                              SelectedItem="{Binding SelectedAutoLoginAccount}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="accountModels:AccountInfo">
+                                <TextBlock Text="{Binding Username}"></TextBlock>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <StackPanel>
+                        <Label Margin="0 16 0 0">Character name:</Label>
+                        <TextBox Text="{Binding  GameConfig.AutoLoginCharacter}"
+                                 Watermark="First character in the list">
+                        </TextBox>
+
+                        <Label Margin="0 16 0 0">Server:</Label>
+                        <TextBox Text="{Binding  GameConfig.AutoLoginServer}" Watermark="First server in the list"></TextBox>
+
+                        <Label Margin="0 16 0 0">Static Captcha:</Label>
+                        <TextBox Text="{Binding  GameConfig.StaticCaptcha}" Watermark="Send empty captcha if asked"></TextBox>
+
+                        <Grid ColumnDefinitions="*,*">
+                            <CheckBox Margin="0 16 0 0" IsChecked="{Binding GameConfig.EnableAutoLogin}">Enable auto login?</CheckBox>
+                            <Button Grid.Column="1" Margin="0 16 0 0" Width="200"
+                                    Command="{Binding OpenAccountManagerDialog}">
+                                Account manager
+                            </Button>
+                        </Grid>
+
+                    </StackPanel>
+                </StackPanel>
+            </suki:GlassCard>
+        </StackPanel>
+
+    </ScrollViewer>
 </UserControl>

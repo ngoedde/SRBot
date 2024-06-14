@@ -250,7 +250,8 @@ public static class IntersectionHelper
         if (!TryCalculateBaryCentricCoordinates(v0, v1, v2, p, out var baryCentric))
             return false;
 
-        p.Y = ((baryCentric.X * v0.Y) + (baryCentric.Y * v1.Y) + (baryCentric.Z * v2.Y)) / (baryCentric.X + baryCentric.Y + baryCentric.Z);
+        p.Y = ((baryCentric.X * v0.Y) + (baryCentric.Y * v1.Y) + (baryCentric.Z * v2.Y)) /
+              (baryCentric.X + baryCentric.Y + baryCentric.Z);
 
         return baryCentric.X is > 0f and < 1f &&
                baryCentric.Y is > 0f and < 1f &&
@@ -262,14 +263,16 @@ public static class IntersectionHelper
         if (!TryCalculateBaryCentricCoordinates(v0, v1, v2, p, out var baryCentric))
             return false;
 
-        p.Y = ((baryCentric.X * v0.Y) + (baryCentric.Y * v1.Y) + (baryCentric.Z * v2.Y)) / (baryCentric.X + baryCentric.Y + baryCentric.Z);
+        p.Y = ((baryCentric.X * v0.Y) + (baryCentric.Y * v1.Y) + (baryCentric.Z * v2.Y)) /
+              (baryCentric.X + baryCentric.Y + baryCentric.Z);
 
         return baryCentric.X is >= 0f and <= 1f &&
                baryCentric.Y is >= 0f and <= 1f &&
                baryCentric.Z is >= 0f and <= 1f;
     }
 
-    private static bool TryCalculateBaryCentricCoordinates(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 p, out Vector3 baryCentric)
+    private static bool TryCalculateBaryCentricCoordinates(Vector3 v0, Vector3 v1, Vector3 v2, Vector3 p,
+        out Vector3 baryCentric)
     {
         Unsafe.SkipInit(out baryCentric);
 

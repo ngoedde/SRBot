@@ -19,7 +19,8 @@ public sealed class NetTrafficProfiler
 
     public bool TryRemoveProfile(int profileId) => _profiles.TryRemove(profileId, out _);
 
-    public bool TryGetProfile(int profileId, [MaybeNullWhen(false)] out NetTrafficProfile profile) => _profiles.TryGetValue(profileId, out profile);
+    public bool TryGetProfile(int profileId, [MaybeNullWhen(false)] out NetTrafficProfile profile) =>
+        _profiles.TryGetValue(profileId, out profile);
 
     public (int ReceivedSegments, int SentSegments, long ReceivedBytes, long SentBytes) GetTotalProfile()
     {
@@ -37,6 +38,7 @@ public sealed class NetTrafficProfiler
 
             item.Reset();
         }
+
         return (receivedSegments, sentSegments, receivedBytes, sentBytes);
     }
 }

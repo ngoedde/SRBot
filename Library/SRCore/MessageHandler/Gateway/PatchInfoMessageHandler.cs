@@ -8,7 +8,7 @@ internal class PatchInfoMessageHandler(PatchInfo patchInfo) : SRNetwork.MessageH
 {
     public override PacketHandler Handler => Handle;
     public override ushort Opcode => GatewayMsgId.PatchInfoAck;
-    
+
     public override ValueTask<bool> Handle(Session session, Packet packet)
     {
         try

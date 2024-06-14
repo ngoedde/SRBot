@@ -15,7 +15,7 @@ internal class CharacterDataEnd(Models.Player player) : SRNetwork.MessageHandler
         try
         {
             player.ParsePacket(session, player.CharacterDataPacket.Lock());
-            
+
             return OnHandled(session, packet);
         }
         catch (Exception e)

@@ -61,7 +61,8 @@ public struct MessageID : IEquatable<MessageID>
 
     public static MessageID Create(ushort value) => new MessageID(value);
 
-    public static MessageID Create(MessageDirection dir, MessageType type, ushort operation) => new MessageID(dir, type, operation);
+    public static MessageID Create(MessageDirection dir, MessageType type, ushort operation) =>
+        new MessageID(dir, type, operation);
 
     public override string ToString() => $"0x{_value:X4} [{this.Direction}; {this.Type}; 0x{this.Operation:X3}]";
 

@@ -55,7 +55,10 @@ public struct RegionId : IEquatable<RegionId>
     public bool IsDungeon
     {
         get { return Convert.ToBoolean((_value & DUNGEON_MASK) >> DUNGEON_OFFSET); }
-        set { _value = (ushort)((_value & ~DUNGEON_MASK) | ((Convert.ToByte(value) << DUNGEON_OFFSET) & DUNGEON_MASK)); }
+        set
+        {
+            _value = (ushort)((_value & ~DUNGEON_MASK) | ((Convert.ToByte(value) << DUNGEON_OFFSET) & DUNGEON_MASK));
+        }
     }
 
     public Vector3 Position => new Vector3(this.WorldX, 0.0f, this.WorldZ);
@@ -151,8 +154,8 @@ public struct RegionId : IEquatable<RegionId>
     {
         return new RegionId[8]
         {
-            new RegionId((byte)(this.X - 1), (byte)(this.Z + 1)),  //TopLeft
-            new RegionId(this.X, (byte)(this.Z + 1)),  //TopMid
+            new RegionId((byte)(this.X - 1), (byte)(this.Z + 1)), //TopLeft
+            new RegionId(this.X, (byte)(this.Z + 1)), //TopMid
             new RegionId((byte)(this.X + 1), (byte)(this.Z + 1)), //TopRight
 
             new RegionId((byte)(this.X - 1), this.Z), //Left
@@ -168,8 +171,8 @@ public struct RegionId : IEquatable<RegionId>
     {
         Debug.Assert(rids.Length >= 8, "Span is too short");
 
-        rids[1] = new RegionId((byte)(this.X - 1), (byte)(this.Z + 1));  //TopLeft
-        rids[2] = new RegionId(this.X, (byte)(this.Z + 1));  //TopMid
+        rids[1] = new RegionId((byte)(this.X - 1), (byte)(this.Z + 1)); //TopLeft
+        rids[2] = new RegionId(this.X, (byte)(this.Z + 1)); //TopMid
         rids[3] = new RegionId((byte)(this.X + 1), (byte)(this.Z + 1)); //TopRight
 
         rids[4] = new RegionId((byte)(this.X - 1), this.Z); //MidLeft
@@ -184,8 +187,8 @@ public struct RegionId : IEquatable<RegionId>
     {
         return new RegionId[9]
         {
-            new RegionId((byte)(this.X - 1), (byte)(this.Z + 1)),  //TopLeft
-            new RegionId(this.X, (byte)(this.Z + 1)),  //TopMid
+            new RegionId((byte)(this.X - 1), (byte)(this.Z + 1)), //TopLeft
+            new RegionId(this.X, (byte)(this.Z + 1)), //TopMid
             new RegionId((byte)(this.X + 1), (byte)(this.Z + 1)), //TopRight
 
             new RegionId((byte)(this.X - 1), this.Z), //MidLeft
@@ -202,8 +205,8 @@ public struct RegionId : IEquatable<RegionId>
     {
         Debug.Assert(rids.Length >= 9, "Span is too short");
 
-        rids[1] = new RegionId((byte)(this.X - 1), (byte)(this.Z + 1));  //TopLeft
-        rids[2] = new RegionId(this.X, (byte)(this.Z + 1));  //TopMid
+        rids[1] = new RegionId((byte)(this.X - 1), (byte)(this.Z + 1)); //TopLeft
+        rids[2] = new RegionId(this.X, (byte)(this.Z + 1)); //TopMid
         rids[3] = new RegionId((byte)(this.X + 1), (byte)(this.Z + 1)); //TopRight
 
         rids[4] = new RegionId((byte)(this.X - 1), this.Z); //MidLeft
@@ -262,9 +265,11 @@ public struct RegionId : IEquatable<RegionId>
 
     public static bool operator <=(RegionId left, RegionId right) => left.X <= right.X && left.Z <= right.Z;
 
-    public static RegionId operator +(RegionId left, RegionId right) => new RegionId((byte)(left.X + right.X), (byte)(left.Z + right.Z));
+    public static RegionId operator +(RegionId left, RegionId right) =>
+        new RegionId((byte)(left.X + right.X), (byte)(left.Z + right.Z));
 
-    public static RegionId operator -(RegionId left, RegionId right) => new RegionId((byte)(left.X - right.X), (byte)(left.Z - right.Z));
+    public static RegionId operator -(RegionId left, RegionId right) =>
+        new RegionId((byte)(left.X - right.X), (byte)(left.Z - right.Z));
 
     #endregion Operators
 }

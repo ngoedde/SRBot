@@ -3,7 +3,7 @@
 public class RefText : Entity<string>
 {
     public override string Id => NameStrId;
-    
+
     private const int LANG_OFFSET = 2;
     private const int LANG_COUNT = 14;
     public string Text;

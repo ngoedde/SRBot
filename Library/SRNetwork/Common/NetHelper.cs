@@ -8,16 +8,19 @@ public static class NetHelper
 {
     internal const int BufferSize = 4096;
 
-    public static Socket CreateTcpSocket() => new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+    public static Socket CreateTcpSocket() =>
+        new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 
-    public static Socket CreateUdpSocket() => new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+    public static Socket CreateUdpSocket() =>
+        new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
 
     public static IPEndPoint ToIPEndPoint(string? hostOrIP, ushort port)
     {
         ArgumentNullException.ThrowIfNull(hostOrIP);
 
         if (!IPAddress.TryParse(hostOrIP, out IPAddress? address))
-            address = Array.Find(Dns.GetHostEntry(hostOrIP).AddressList, p => p.AddressFamily == AddressFamily.InterNetwork);
+            address = Array.Find(Dns.GetHostEntry(hostOrIP).AddressList,
+                p => p.AddressFamily == AddressFamily.InterNetwork);
 
         return new IPEndPoint(address!, port);
     }

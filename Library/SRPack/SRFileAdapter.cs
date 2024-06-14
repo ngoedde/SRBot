@@ -12,7 +12,7 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
     public string FileName { get; } = fileName;
 
     #endregion
-    
+
     private readonly SRAdapter.SRPack _pack = new();
 
     public SRFileAdapter(string fileName, string password = "169841") : this(fileName, password,
@@ -178,5 +178,4 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
             Type = f.Type == SRPackEntryType.File ? FileSystemEntryType.File : FileSystemEntryType.Folder
         });
     }
-
 }

@@ -32,8 +32,8 @@ namespace SRCore.Models
             agentHandshakePacket.WriteString(Password);
             agentHandshakePacket.WriteByte(ContentId);
             agentHandshakePacket.WriteByteArray(new byte[6]);
-            
-            _proxy.SendToServer(agentHandshakePacket);    
+
+            _proxy.SendToServer(agentHandshakePacket);
         }
     }
 }

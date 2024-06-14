@@ -9,12 +9,13 @@ using ViewLocator = SRBot.Utils.ViewLocator;
 
 namespace SRBot.Page.Game;
 
-public class GamePageModel(AccountService accountService, ViewLocator viewLocator, ConfigService configService) : PageModel("srbot_page_game",
-    "Game",
-    0, MaterialIconKind.Gamepad)
+public class GamePageModel(AccountService accountService, ViewLocator viewLocator, ConfigService configService)
+    : PageModel("srbot_page_game",
+        "Game",
+        0, MaterialIconKind.Gamepad)
 {
     private int _autoLoginId;
-    
+
     public AutoLoginConfig AutoLoginConfig => accountService.Config;
     public GameConfig GameConfig => configService.GetConfig<GameConfig>() ?? new GameConfig();
 
@@ -24,7 +25,7 @@ public class GamePageModel(AccountService accountService, ViewLocator viewLocato
         set
         {
             GameConfig.AutoLoginId = value?.Id ?? 0;
-            
+
             this.RaiseAndSetIfChanged(ref _autoLoginId, value?.Id ?? 0);
         }
     }

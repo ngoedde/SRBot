@@ -5,10 +5,10 @@
              xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
              xmlns:utils="clr-namespace:SRBot.Utils"
              RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
     <Application.Styles>
         <FluentTheme />
-        <sukiUi:SukiTheme ThemeColor="Red"/>
+        <sukiUi:SukiTheme ThemeColor="Red" />
         <materialIcons:MaterialIconStyles />
     </Application.Styles>
 </Application>

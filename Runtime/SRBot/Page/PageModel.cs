@@ -3,7 +3,11 @@ using ReactiveUI.Fody.Helpers;
 
 namespace SRBot.Page;
 
-public abstract class PageModel(string name, string title, int position = 0, MaterialIconKind icon = MaterialIconKind.Home)
+public abstract class PageModel(
+    string name,
+    string title,
+    int position = 0,
+    MaterialIconKind icon = MaterialIconKind.Home)
     : ViewModel
 {
     [Reactive] public string Name { get; set; } = name;

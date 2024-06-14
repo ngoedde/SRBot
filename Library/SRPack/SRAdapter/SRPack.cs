@@ -40,7 +40,7 @@ internal partial class SRPack
 
         await GetBlockAsync(string.Empty);
     }
-    
+
     public async Task<KeyValuePair<string, SRPackBlock[]>> GetBlockAndPathAsync(long blockPosition)
     {
         var blocks = await GetOrReadBlocksAt(blockPosition);
@@ -48,19 +48,20 @@ internal partial class SRPack
         {
             throw new IOException($"Block at position {blockPosition} not found!");
         }
-        
+
         var path = await ResolvePathFromBlock(blocks);
         return new KeyValuePair<string, SRPackBlock[]>(path, blocks);
     }
-    
+
     private async Task<string> ResolvePathFromBlock(SRPackBlock[] blocks)
     {
         if (blocks.Length == 0)
         {
             throw new IOException("Blocks are empty!");
         }
+
         var path = string.Empty;
-        
+
         //Root block
         if (blocks[0].Position == SRPackBlock.RootBlockPosition)
         {
@@ -72,20 +73,20 @@ internal partial class SRPack
         {
             var parentBlockPosition = blocks.GetParentBlockPosition();
             var parentBlocks = await GetOrReadBlocksAt(parentBlockPosition);
-            
+
             if (!parentBlocks.TryGetEntry(blocks[0].Position, out var blockEntry))
             {
                 throw new IOException("Block entry not found in parent block.");
             }
-            
+
             path = PathUtils.Combine(blockEntry.Name, path);
             blocks = parentBlocks;
         }
 
         return path;
     }
-    
-    
+
+
     private void InitializeBlowfish(string password, byte[] salt)
     {
         var key = Blowfish.GenerateFinalBlowfishKey(password, salt);
@@ -93,7 +94,7 @@ internal partial class SRPack
         _blowfish = new Blowfish();
         _blowfish.Initialize(key);
     }
-    
+
     public async Task CloseAsync()
     {
         if (_fileStream != null)

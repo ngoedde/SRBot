@@ -16,7 +16,8 @@ public class MessageAllocator : IMessageAllocator
 
     public int Id { get; set; }
 
-    public Message NewMsg([CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public Message NewMsg([CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null,
+        [CallerLineNumber] int lineNumber = -1)
     {
         var msg = _messagePool.Rent();
         //var msg = MessagePool2.Shared.Get();
@@ -26,7 +27,8 @@ public class MessageAllocator : IMessageAllocator
         return msg;
     }
 
-    public Message NewMsg(MessageID id, int receiverId = -1, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public Message NewMsg(MessageID id, int receiverId = -1, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
         var msg = this.NewMsg(memberName, filePath, lineNumber);
         msg.ID = id;
@@ -36,7 +38,8 @@ public class MessageAllocator : IMessageAllocator
         return msg;
     }
 
-    public Message NewLocalMsg(MessageID id, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public Message NewLocalMsg(MessageID id, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
         var msg = this.NewMsg(memberName, filePath, lineNumber);
         msg.ID = id;

@@ -3,7 +3,7 @@ using System;
 namespace SRBot.Dialog;
 
 [Flags]
-public enum MessageBoxButtons: byte
+public enum MessageBoxButtons : byte
 {
     None = 0,
     Ok = 2,

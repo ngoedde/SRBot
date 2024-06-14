@@ -4,11 +4,11 @@ namespace SRGame.Client;
 
 public class ClientFileSystem
 {
-    public bool IsInitialized => Media is {IsInitialized:true} && Data is {IsInitialized:true};
+    public bool IsInitialized => Media is { IsInitialized: true } && Data is { IsInitialized: true };
 
     public IAsyncFileAdapter? Media { get; private set; }
     public IAsyncFileAdapter? Data { get; private set; }
-    
+
     public string Path => System.IO.Path.GetDirectoryName(Media?.FileName) ?? string.Empty;
 
     public async Task InitializeAsync(string mediaPath, string dataPath)
@@ -19,7 +19,7 @@ public class ClientFileSystem
         await Media.InitializeAsync();
         await Data.InitializeAsync();
     }
-    
+
     public async Task<string> ReadFileText(AssetPack assetPack, string path)
     {
         if (!IsInitialized)
@@ -32,7 +32,7 @@ public class ClientFileSystem
             _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
         };
     }
-    
+
     public async Task<MemoryStream> ReadFileBytes(AssetPack assetPack, string path)
     {
         if (!IsInitialized)
@@ -45,7 +45,7 @@ public class ClientFileSystem
             _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
         };
     }
-    
+
     public async Task<bool> FileExists(AssetPack assetPack, string path)
     {
         if (!IsInitialized)

@@ -10,17 +10,19 @@ namespace SRNetwork;
 public class NetEngine
 {
     public delegate void ClientConnectedEventHandler(Session session);
+
     public delegate void ClientDisconnectedEventHandler(Session session);
 
     public delegate void ConnectedEventHandler(Session session);
+
     public delegate void DisconnectedEventHandler(Session session);
-    
+
     public event ClientConnectedEventHandler? ClientConnected;
     public event ClientDisconnectedEventHandler? ClientDisconnected;
-    
+
     public event ConnectedEventHandler? Connected;
     public event DisconnectedEventHandler? Disconnected;
-    
+
     private readonly IDGenerator32 _generator;
     private readonly NetAcceptor _acceptor;
     private readonly NetConnector _connector;
@@ -32,7 +34,7 @@ public class NetEngine
     public NetTrafficProfiler Profiler { get; }
 
     public string Identity { get; set; } = NetIdentity.GatewayServer;
-    
+
     public NetEngine()
     {
         Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
@@ -50,13 +52,13 @@ public class NetEngine
     public async Task StopAsync()
     {
         await _acceptor.StopAsync();
-        
+
         foreach (var session in _sessionManager)
         {
             // if (session.)
             await session.DisconnectAsync();
         }
-    
+
         _sessionManager.Clear();
     }
 
@@ -65,11 +67,11 @@ public class NetEngine
         var security = new Security();
         security.GenerateSecurity(true, true, true);
         security.ChangeIdentity(Identity, 0);
-        
+
         var session = _sessionManager.CreateSession(socket, security);
         session.Profiler = this.Profiler.AddProfile(session.Id);
         session.Start();
-        
+
         OnClientConnected(session);
     }
 
@@ -79,7 +81,7 @@ public class NetEngine
         var session = _sessionManager.CreateSession(socket, security);
         session.Profiler = this.Profiler.AddProfile(session.Id);
         session.Start();
-        
+
         OnConnected(session);
     }
 

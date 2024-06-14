@@ -13,13 +13,12 @@ public abstract class AppPlugin
 
     public virtual void Shutdown(Kernel kernel)
     {
-        
     }
-    
+
     public virtual void Initialize(Kernel kernel)
     {
     }
-    
+
     public virtual void BuildServices(IServiceCollection services)
     {
     }

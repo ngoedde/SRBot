@@ -1,5 +1,4 @@
-﻿
-namespace SRNetwork.Common.Router;
+﻿namespace SRNetwork.Common.Router;
 
 public interface INetMsgRouter
 {

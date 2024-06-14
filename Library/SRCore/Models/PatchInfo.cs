@@ -13,10 +13,11 @@ public class PatchInfo(IServiceProvider serviceProvider) : GameModel(serviceProv
     private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
     private readonly ClientInfoManager _clientInfoManager = serviceProvider.GetRequiredService<ClientInfoManager>();
     private readonly Game _game = serviceProvider.GetRequiredService<Game>();
-    
+
     public delegate void PatchInfoUpdatedHandler(Session session, PatchInfo patchInfo);
+
     public event PatchInfoUpdatedHandler? PatchInfoUpdated;
-    
+
     [Reactive] public PatchErrorCode ErrorCode { get; internal set; }
     public bool PatchRequired => ErrorCode > 0;
     [Reactive] public uint LatestVersion { get; internal set; }
@@ -40,10 +41,9 @@ public class PatchInfo(IServiceProvider serviceProvider) : GameModel(serviceProv
         var messageResult = (MessageResult)packet.ReadByte();
         if (messageResult == MessageResult.Error)
         {
-            ErrorCode = (PatchErrorCode) packet.ReadByte();
+            ErrorCode = (PatchErrorCode)packet.ReadByte();
             if (ErrorCode == PatchErrorCode.UPDATE)
             {
-                
                 DownloadServerIp = packet.ReadString();
                 DownloadServerPort = packet.ReadUShort();
                 LatestVersion = packet.ReadUInt();

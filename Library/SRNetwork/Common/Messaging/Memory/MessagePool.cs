@@ -29,6 +29,7 @@ public class MessagePool : CustomObjectPool<Message>, IMessagePool
                 throw new Exception("Trying to rent already rented.");
             result.IsRented = true;
         }
+
         return result;
     }
 
@@ -40,6 +41,7 @@ public class MessagePool : CustomObjectPool<Message>, IMessagePool
                 throw new Exception("Trying to free already freed.");
             item.IsRented = false;
         }
+
         item.Reset();
         base.Return(item);
     }

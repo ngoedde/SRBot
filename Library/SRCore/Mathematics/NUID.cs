@@ -5,14 +5,11 @@ namespace SRCore.Mathematics;
 [StructLayout(LayoutKind.Explicit)]
 public struct NUID : System.IEquatable<NUID>
 {
-    [FieldOffset(0)]
-    private readonly uint _id;
+    [FieldOffset(0)] private readonly uint _id;
 
-    [FieldOffset(0)]
-    private readonly RegionId _regionId;
+    [FieldOffset(0)] private readonly RegionId _regionId;
 
-    [FieldOffset(2)]
-    private readonly ushort _localID;
+    [FieldOffset(2)] private readonly ushort _localID;
 
     public RegionId RegionId => _regionId;
     public ushort LocaUID => _localID;

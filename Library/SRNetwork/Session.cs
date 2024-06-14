@@ -10,25 +10,27 @@ namespace SRNetwork;
 public class Session
 {
     public delegate void MessageReceivedEventHandler(Packet packet);
+
     public delegate void MessageSentEventHandler(Packet packet);
-    
+
     public event MessageReceivedEventHandler? MessageReceived;
     public event MessageSentEventHandler? MessageSent;
-    
+
     public delegate void DisconnectedEventHandler(DisconnectReason reason);
+
     public event DisconnectedEventHandler? Disconnected;
-    
+
     private readonly Socket _socket;
     private readonly Security _security;
     private readonly PacketHandlerManager _handlerManager;
-    
+
     private bool _disconnect;
     private Task _task = null!;
 
     public int Id { get; set; }
 
     public NetTrafficProfile? Profiler { get; set; }
-    
+
     public EndPoint? RemoteEndPoint => _socket.RemoteEndPoint;
 
     public Session(int id, Socket socket, Security security, PacketHandlerManager handlerManager)
@@ -52,16 +54,16 @@ public class Session
 
         _security.Send(packet);
         await this.TransferOutgoing().ConfigureAwait(false);
-        
+
         OnMessageSent(packet);
-        
+
         return true;
     }
 
     public async Task DisconnectAsync()
     {
         await _socket.DisconnectAsync(false);
-        
+
         OnDisconnected(DisconnectReason.EngineError);
     }
 
@@ -70,7 +72,7 @@ public class Session
         await this.TransferIncoming().ConfigureAwait(false);
         await this.TransferOutgoing().ConfigureAwait(false);
     }
-    
+
     private async ValueTask TransferOutgoing()
     {
         var packets = _security.TransferOutgoing();
@@ -97,9 +99,9 @@ public class Session
 
                 if (packet.Opcode == 0x5000 || packet.Opcode == 0x9000)
                     continue;
-                
+
                 await _handlerManager.Handle(this, packet);
-                
+
                 var hookedPacket = await _handlerManager.Hook(this, packet);
                 OnMessageReceived(hookedPacket);
             }
@@ -117,7 +119,8 @@ public class Session
 
             while (!cancellationToken.IsCancellationRequested)
             {
-                var bytesReceived = await _socket.ReceiveAsync(pinnedMemory, SocketFlags.None, cancellationToken).ConfigureAwait(false);
+                var bytesReceived = await _socket.ReceiveAsync(pinnedMemory, SocketFlags.None, cancellationToken)
+                    .ConfigureAwait(false);
                 if (bytesReceived == 0)
                 {
                     await this.DisconnectAsync(DisconnectReason.ClosedByPeer, cancellationToken).ConfigureAwait(false);
@@ -149,7 +152,8 @@ public class Session
         }
     }
 
-    private async ValueTask<bool> DisconnectAsync(DisconnectReason reason, CancellationToken cancellationToken = default)
+    private async ValueTask<bool> DisconnectAsync(DisconnectReason reason,
+        CancellationToken cancellationToken = default)
     {
         _disconnect = true;
         await _socket.DisconnectAsync(false, cancellationToken);

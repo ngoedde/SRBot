@@ -10,19 +10,37 @@ public class TransferBuffer
     public byte[] Buffer
     {
         get { return m_buffer; }
-        set { lock (m_lock) { m_buffer = value; } }
+        set
+        {
+            lock (m_lock)
+            {
+                m_buffer = value;
+            }
+        }
     }
 
     public int Offset
     {
         get { return m_offset; }
-        set { lock (m_lock) { m_offset = value; } }
+        set
+        {
+            lock (m_lock)
+            {
+                m_offset = value;
+            }
+        }
     }
 
     public int Size
     {
         get { return m_size; }
-        set { lock (m_lock) { m_size = value; } }
+        set
+        {
+            lock (m_lock)
+            {
+                m_size = value;
+            }
+        }
     }
 
     public TransferBuffer(TransferBuffer rhs)
@@ -72,6 +90,7 @@ public class TransferBuffer
             m_buffer = new byte[buffer.Length];
             System.Buffer.BlockCopy(buffer, 0, m_buffer, 0, buffer.Length);
         }
+
         m_offset = offset;
         m_size = size;
         m_lock = new object();

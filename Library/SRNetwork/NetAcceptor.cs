@@ -38,7 +38,7 @@ public class NetAcceptor
         _listener.Close();
         if (_task == null)
             return;
-        
+
         await _task.ConfigureAwait(false);
     }
 

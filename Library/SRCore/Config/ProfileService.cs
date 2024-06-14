@@ -72,7 +72,7 @@ public sealed class ProfileService
     {
         Config.ActiveProfile = profile.Name;
         ActiveProfile = profile;
-        
+
         await LoadActiveProfileConfigs(profile.ConfigDirectory);
 
         OnProfileChanged(profile);
@@ -91,7 +91,9 @@ public sealed class ProfileService
 
     private async Task LoadActiveProfileConfigs(string configDirectory)
     {
-        _ = await _configService.LoadConfigurationAsync(Path.Combine(configDirectory, GameConfig.FileName), new GameConfig()).ConfigureAwait(false);
+        _ = await _configService
+            .LoadConfigurationAsync(Path.Combine(configDirectory, GameConfig.FileName), new GameConfig())
+            .ConfigureAwait(false);
     }
 
     private void OnProfileChanged(Model.Profile profile)
@@ -100,7 +102,7 @@ public sealed class ProfileService
 
     private void OnProfileConfigLoaded(ProfileConfig config)
         => ProfileConfigLoaded?.Invoke(config);
-    
+
     private static ProfileConfig GetDefaultProfileConfig()
     {
         return new ProfileConfig
@@ -112,7 +114,8 @@ public sealed class ProfileService
 
     private static Profile GetDefaultProfile()
     {
-        return new Profile(Path.Combine(Kernel.ConfigDirectory, ProfileConfig.DefaultProfileName), ProfileConfig.DefaultProfileName)
+        return new Profile(Path.Combine(Kernel.ConfigDirectory, ProfileConfig.DefaultProfileName),
+            ProfileConfig.DefaultProfileName)
         {
             Description = "The default profile."
         };

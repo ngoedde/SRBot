@@ -14,12 +14,12 @@ public class ItemRepository(ClientFileSystem clientFileSystem) : EntityRepositor
         {
             if (string.IsNullOrEmpty(dataFile))
                 continue;
-            
+
             var data = await ReadTextFileLines($"server_dep/silkroad/textdata/{dataFile}");
-            
+
             ParseLinesToEntities(data);
         }
-        
+
         OnLoaded();
     }
 }

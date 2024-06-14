@@ -18,7 +18,7 @@ public class Attributes : ReactiveObject
     [Reactive] public uint MaxMana { get; internal set; }
     [Reactive] public ushort Strength { get; internal set; }
     [Reactive] public ushort Intelligence { get; internal set; }
-    
+
     public static Attributes FromPacket(Packet packet)
     {
         return new Attributes

@@ -17,27 +17,28 @@ internal class ClientlessManager(
     ClientInfoManager clientInfoManager,
     AgentLogin agentLogin,
     CharacterLobby characterLobby
-) {
-    
+)
+{
     public void Initialize()
     {
         proxy.GatewayConnected += ProxyOnGatewayConnected;
         proxy.ClientConnected += ProxyOnClientConnected;
-        
+
         proxy.GetHandler<Authentication>()!.Handled += OnAuthenticationHandled;
-        
+
         patchInfo.PatchInfoUpdated += OnPatchInfoUpdated;
     }
 
     private void OnAuthenticationHandled(SRNetwork.MessageHandler handler, Session session, Packet packet)
     {
         var result = (MessageResult)packet.ReadByte();
-        if (result != MessageResult.Success) {
+        if (result != MessageResult.Success)
+        {
             return;
         }
-        
+
         packet.Reset();
-            
+
         characterLobby.Request();
     }
 
@@ -48,12 +49,12 @@ internal class ClientlessManager(
 
         if ((proxy.Context & ProxyContext.Agent) != 0)
             return;
-        
+
         //For clientless operation -> Connect to gateway
         var endpoint = clientInfoManager.GetGatewayEndPoint();
         await proxy.ConnectToGateway(endpoint);
     }
-    
+
     private void ProxyOnGatewayConnected(Session serverSession)
     {
         if ((proxy.Context & ProxyContext.Client) == 0)
@@ -65,14 +66,13 @@ internal class ClientlessManager(
         if (patchInfo.PatchRequired)
         {
             Log.Fatal("!!! Game update available !!! Please run Silkroad.exe to update the client.");
-            
+
             await session.DisconnectAsync();
-            
+
             return;
         }
 
         if ((proxy.Context & ProxyContext.Client) == 0)
             shardList.Request();
     }
-
 }

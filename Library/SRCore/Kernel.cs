@@ -27,14 +27,20 @@ public sealed class Kernel(
     public event KernelShutdownEventHandler? KernelShutdown;
 
     public delegate void InterruptEventHandler(Kernel kernel, string message, LogEventLevel level);
+
     public event InterruptEventHandler? Interrupt;
-    
+
     #endregion
 
     private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
     private readonly Game _game = serviceProvider.GetRequiredService<Game>();
-    private readonly IEnumerable<SRNetwork.MessageHandler> _messageHandlers = serviceProvider.GetServices<SRNetwork.MessageHandler>();
-    private readonly IEnumerable<SRNetwork.MessageHook> _messageHooks = serviceProvider.GetServices<SRNetwork.MessageHook>();
+
+    private readonly IEnumerable<SRNetwork.MessageHandler> _messageHandlers =
+        serviceProvider.GetServices<SRNetwork.MessageHandler>();
+
+    private readonly IEnumerable<SRNetwork.MessageHook> _messageHooks =
+        serviceProvider.GetServices<SRNetwork.MessageHook>();
+
     private readonly ProfileService _profileService = serviceProvider.GetRequiredService<ProfileService>();
     private readonly ClientlessManager _clientlessManager = serviceProvider.GetRequiredService<ClientlessManager>();
     private readonly AccountService _accountService = serviceProvider.GetRequiredService<AccountService>();
@@ -53,18 +59,18 @@ public sealed class Kernel(
 
         if (IsInitialized)
             throw new Exception("Kernel is already initialized. Use ShutdownAsync before reinitializing");
-        
+
         //Folder structure
         Directory.CreateDirectory(ConfigDirectory);
-        
+
         await _profileService.LoadProfilesAsync().ConfigureAwait(false);
         await _accountService.Initialize("").ConfigureAwait(false);
-        
+
         _proxy.Initialize(serviceProvider);
         _loginService.Initialize();
         _clientlessManager.Initialize();
         _profileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;
-        
+
         IsInitialized = true;
 
         OnKernelInitialized(this);
@@ -86,10 +92,10 @@ public sealed class Kernel(
             await _proxy.ShutdownAsync();
             _bot.StopBot();
         }
-        
+
         Log.Write(level, message);
     }
-    
+
     /// <summary>
     /// Shuts down the SRKernel and all services it depends on.
     /// </summary>
@@ -100,12 +106,12 @@ public sealed class Kernel(
         //Game shutdown
         await _game.CloseAsync();
         await _proxy.ShutdownAsync();
-        
+
         IsInitialized = false;
 
         OnKernelShutdown(this);
     }
-    
+
     private void OnKernelInitialized(Kernel kernel)
     {
         KernelInitialized?.Invoke(kernel);
@@ -119,7 +125,7 @@ public sealed class Kernel(
     private void OnInterrupt(Kernel kernel, string message, LogEventLevel level)
     {
         Interrupt?.Invoke(kernel, message, level);
-        
+
         Log.Debug($"[{level}] Kernel interrupt: {message}");
     }
 }
@@ -137,20 +143,20 @@ public static class KernelExtensions
         services.AddSingleton<Profile>(provider =>
         {
             var profileService = provider.GetRequiredService<ProfileService>();
-            
+
             return profileService.ActiveProfile;
         });
-        
+
         services.AddSingleton<EntityManager>();
         services.AddSingleton<ClientInfoManager>();
-        
+
         //Game models
         var gameModels = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
             .Where(p => !p.IsAbstract && typeof(GameModel).IsAssignableFrom(p));
         foreach (var type in gameModels)
             services.AddSingleton(type);
-        
+
         //Networking
         var packetHandler = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(s => s.GetTypes())
@@ -171,13 +177,13 @@ public static class KernelExtensions
             .Where(p => !p.IsAbstract && typeof(BotBase).IsAssignableFrom(p));
         foreach (var type in botBases)
             services.AddSingleton(typeof(BotBase), type);
-        
+
         services.AddSingleton<Bot>();
         services.AddSingleton<Proxy>();
         services.AddSingleton<ClientlessManager>();
         services.AddSingleton<AccountService>();
         services.AddSingleton<LoginService>();
-     
+
         return services;
     }
 }

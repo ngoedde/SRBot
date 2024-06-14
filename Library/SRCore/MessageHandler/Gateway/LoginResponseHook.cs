@@ -21,11 +21,13 @@ internal class LoginResponseHook(IServiceProvider serviceProvider) : MessageHook
         var messageResult = (MessageResult)packet.ReadByte();
         if (messageResult != MessageResult.Success)
         {
-            _ = Kernel.Panic($"Login failed [reason={packet.ReadByte():X}]. Please check your credentials or try again later.", LogEventLevel.Error,(Proxy.Context & ProxyContext.Client) == 0);
-                
+            _ = Kernel.Panic(
+                $"Login failed [reason={packet.ReadByte():X}]. Please check your credentials or try again later.",
+                LogEventLevel.Error, (Proxy.Context & ProxyContext.Client) == 0);
+
             return ValueTask.FromResult(packet);
         }
-            
+
         var token = packet.ReadUInt();
         var agentIp = packet.ReadString();
         var agentPort = packet.ReadUShort();
@@ -33,7 +35,7 @@ internal class LoginResponseHook(IServiceProvider serviceProvider) : MessageHook
         AgentLogin.Token = token;
         AgentLogin.AgentServerIp = agentIp;
         AgentLogin.AgentServerPort = agentPort;
-          
+
         //Only hook client login responses
         if ((Proxy.Context & ProxyContext.Client) == 0)
             return OnHooked(session, packet);

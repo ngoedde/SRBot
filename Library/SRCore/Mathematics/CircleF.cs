@@ -22,5 +22,6 @@ public readonly struct CircleF
 
     public bool Contains(Vector3 point) => MathHelper.Distance2DSqrt(_position, point) <= (_radius * _radius);
 
-    public bool Intersects(Vector2 min, Vector2 max, out Vector2 point) => IntersectionHelper.SegmentCircle(min, max, _position, _radius, out point);
+    public bool Intersects(Vector2 min, Vector2 max, out Vector2 point) =>
+        IntersectionHelper.SegmentCircle(min, max, _position, _radius, out point);
 }

@@ -19,9 +19,9 @@ public class Profile(string configDirectory, string name) : ConfigElement
     [Reactive] public string PackPassword { get; set; } = "169841";
 
     [Reactive] public ClientType ClientType { get; set; } = ClientType.Vietnam188;
-    
+
     public static implicit operator string(Profile profile) => profile.Name;
-    
+
     public override string ToString()
     {
         return Name;

@@ -11,7 +11,7 @@ public class RefSkill : Entity<int>
 
     private int _id;
     public override int Id => _id;
-        
+
     public byte Service;
     public int GroupID;
     public string Basic_Code;
@@ -101,7 +101,7 @@ public class RefSkill : Entity<int>
     #endregion Fields
 
     #region IReferenceObj
-    
+
     public override bool Parse(EntityParser parser)
     {
         //Skip disabled

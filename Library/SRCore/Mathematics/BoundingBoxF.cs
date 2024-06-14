@@ -36,8 +36,8 @@ public readonly struct BoundingBoxF : IEquatable<BoundingBoxF>
     public bool Contains(in Vector3 p)
     {
         return p.X >= _min.X && p.X <= _max.X
-            && p.Y >= _min.Y && p.Y <= _max.Y
-            && p.Z >= _min.Z && p.Z <= _max.Z;
+                             && p.Y >= _min.Y && p.Y <= _max.Y
+                             && p.Z >= _min.Z && p.Z <= _max.Z;
     }
 
     public override bool Equals(object? obj) => obj is BoundingBoxF f && this.Equals(f);
@@ -50,11 +50,15 @@ public readonly struct BoundingBoxF : IEquatable<BoundingBoxF>
 
     public static bool operator !=(BoundingBoxF left, BoundingBoxF right) => !(left == right);
 
-    public static BoundingBoxF operator +(BoundingBoxF left, BoundingBoxF right) => new BoundingBoxF(left._min + right._min, left._max + right._max);
+    public static BoundingBoxF operator +(BoundingBoxF left, BoundingBoxF right) =>
+        new BoundingBoxF(left._min + right._min, left._max + right._max);
 
-    public static BoundingBoxF operator -(BoundingBoxF left, BoundingBoxF right) => new BoundingBoxF(left._min + right._min, left._max + right._max);
+    public static BoundingBoxF operator -(BoundingBoxF left, BoundingBoxF right) =>
+        new BoundingBoxF(left._min + right._min, left._max + right._max);
 
-    public static BoundingBoxF operator *(BoundingBoxF left, float right) => new BoundingBoxF(left._min * right, left._max * right);
+    public static BoundingBoxF operator *(BoundingBoxF left, float right) =>
+        new BoundingBoxF(left._min * right, left._max * right);
 
-    public static BoundingBoxF operator /(BoundingBoxF left, float right) => new BoundingBoxF(left._min / right, left._max / right);
+    public static BoundingBoxF operator /(BoundingBoxF left, float right) =>
+        new BoundingBoxF(left._min / right, left._max / right);
 }

@@ -2,32 +2,26 @@ using System.Runtime.InteropServices;
 
 namespace SRCore.Mathematics;
 
-
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct TypeId
     : System.IEquatable<TypeId>
 {
-    [FieldOffset(0)]
-    private readonly uint _id;
+    [FieldOffset(0)] private readonly uint _id;
 
-    [FieldOffset(0)]
-    private readonly byte _tid1;
-    
-    [FieldOffset(1)]
-    private readonly byte _tid2;
-    
-    [FieldOffset(2)]
-    private readonly byte _tid3;
-    
-    [FieldOffset(3)]
-    private readonly byte _tid4;
-    
+    [FieldOffset(0)] private readonly byte _tid1;
+
+    [FieldOffset(1)] private readonly byte _tid2;
+
+    [FieldOffset(2)] private readonly byte _tid3;
+
+    [FieldOffset(3)] private readonly byte _tid4;
+
     public byte T1 => _tid1;
     public byte T2 => _tid2;
     public byte T3 => _tid3;
     public byte T4 => _tid4;
     public uint Id => _id;
-    
+
     public bool Equals(TypeId other)
     {
         return _id == other._id;

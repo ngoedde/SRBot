@@ -29,37 +29,35 @@ public class LoginService(IServiceProvider serviceProvider)
         ShardList.ShardListUpdated += ShardListOnShardListUpdated;
         CharacterLobby.CharacterListUpdated += CharacterLobbyOnCharacterListUpdated;
     }
-    
+
     public void Login(string username, string password, Shard shard)
     {
         var msg = new Packet(GatewayMsgId.LoginReq, true);
         var contentId = ClientInfoManager.DivisionInfo.ContentId;
-        
+
         msg.WriteByte(contentId);
         msg.WriteString(username);
         msg.WriteString(password);
         msg.WriteUShort(shard.Id);
-        
+
         // Save login info for agent server
         AgentLogin.Username = username;
         AgentLogin.Password = password;
         AgentLogin.ShardId = shard.Id;
         AgentLogin.ContentId = contentId;
-        
+
         Proxy.SendToServer(msg);
     }
-    
+
     public void Logout()
     {
-        
-    }        
+    }
 
 
     public void SolveCaptcha(string captcha)
     {
-        
     }
-    
+
     /// <summary>
     /// Auto login: Join game after the character list has been received.
     /// </summary>
@@ -68,15 +66,17 @@ public class LoginService(IServiceProvider serviceProvider)
     {
         if (!GameConfig.EnableAutoLogin)
             return;
-        
-        var character = characterLobby.Characters.FirstOrDefault(c => string.Equals(c.Name, GameConfig.AutoLoginCharacter, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(GameConfig.AutoLoginCharacter));
+
+        var character = characterLobby.Characters.FirstOrDefault(c =>
+            string.Equals(c.Name, GameConfig.AutoLoginCharacter, StringComparison.OrdinalIgnoreCase) ||
+            string.IsNullOrEmpty(GameConfig.AutoLoginCharacter));
         if (character == null)
         {
             _ = Kernel.Panic("Auto login is enabled but no character is selected!", LogEventLevel.Warning);
-            
+
             return;
         }
-        
+
         characterLobby.Join(character);
     }
 
@@ -88,23 +88,26 @@ public class LoginService(IServiceProvider serviceProvider)
     {
         if (!GameConfig.EnableAutoLogin)
             return;
-        
+
         var selectedAccount = AccountService.GetAccount(GameConfig.AutoLoginId);
         if (selectedAccount == null)
         {
             _ = Kernel.Panic("Auto login is enabled but no account is selected!", LogEventLevel.Warning);
-            
+
             return;
         }
-        
-        var shard = shardList.Shards.FirstOrDefault(s => string.Equals(s.Name, GameConfig.AutoLoginServer, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(GameConfig.AutoLoginServer) );
+
+        var shard = shardList.Shards.FirstOrDefault(s =>
+            string.Equals(s.Name, GameConfig.AutoLoginServer, StringComparison.OrdinalIgnoreCase) ||
+            string.IsNullOrEmpty(GameConfig.AutoLoginServer));
         if (shard == null)
         {
-            _ = Kernel.Panic("Auto login is enabled but no server is selected or the server could not be found!", LogEventLevel.Warning);
-            
+            _ = Kernel.Panic("Auto login is enabled but no server is selected or the server could not be found!",
+                LogEventLevel.Warning);
+
             return;
         }
-        
+
         // Bot start -> auto login fail -> shutdown?
         Log.Information("Auto login enabled. Logging in...");
         Login(selectedAccount.Username, selectedAccount.Password, shard);

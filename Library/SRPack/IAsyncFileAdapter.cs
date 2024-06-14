@@ -3,7 +3,7 @@ namespace SRPack;
 public interface IAsyncFileAdapter
 {
     #region Properties
-    
+
     /// <summary>
     ///     Returns the file name to the file or folder that is being used in the adapter.
     /// </summary>
@@ -13,11 +13,11 @@ public interface IAsyncFileAdapter
     ///     Returns a value indicating if the file adapter is initialized.
     /// </summary>
     public bool IsInitialized { get; }
-    
+
     #endregion
 
     #region Methods
-    
+
     /// <summary>
     ///     Read all bytes from a file asynchronously.
     /// </summary>
@@ -92,6 +92,6 @@ public interface IAsyncFileAdapter
     /// <param name="filePath">The absolute path to the file or folder</param>
     /// <returns></returns>
     public Task<bool> ExistsAsync(string filePath);
-    
+
     #endregion Methods
 }

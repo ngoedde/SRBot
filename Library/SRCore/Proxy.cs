@@ -12,11 +12,15 @@ namespace SRCore;
 public class Proxy
 {
     public delegate void ClientConnectedEventHandler(Session clientSession);
+
     public delegate void GatewayConnectedEventHandler(Session serverSession);
+
     public delegate void AgentConnectedEventHandler(Session serverSession);
 
     public delegate void ClientDisconnectedEventHandler();
+
     public delegate void GatewayDisconnectedEventHandler();
+
     public delegate void AgentDisconnectedEventHandler();
 
     public event ClientConnectedEventHandler? ClientConnected;
@@ -39,7 +43,7 @@ public class Proxy
     private IEnumerable<SRNetwork.MessageHandler> Handlers => _serviceProvider.GetServices<SRNetwork.MessageHandler>();
     private IEnumerable<MessageHook> Hooks => _serviceProvider.GetServices<SRNetwork.MessageHook>();
     private AgentLogin AgentLogin => _serviceProvider.GetRequiredService<AgentLogin>();
-  
+
     public Proxy()
     {
         Server.Connected += Proxy_OnServerConnected;
@@ -155,11 +159,12 @@ public class Proxy
                 return;
 
             packet.Reset();
-            
+
             Task.Run(KeepAliveAgentSession);
         }
 
-        if ((Context & ProxyContext.Client) != 0) {
+        if ((Context & ProxyContext.Client) != 0)
+        {
             ClientSession?.Send(packet);
         }
     }
@@ -220,7 +225,7 @@ public class Proxy
     {
         await Client.StopAsync();
         await Server.StopAsync();
-        
+
         Context = ProxyContext.None;
     }
 
@@ -239,7 +244,7 @@ public class Proxy
     {
         return Handlers.FirstOrDefault(handler => handler.Opcode == opcode);
     }
-    
+
     public TMessageHandler? GetHandler<TMessageHandler>() where TMessageHandler : SRNetwork.MessageHandler
     {
         return (TMessageHandler?)Handlers.FirstOrDefault(handler => handler is TMessageHandler);
@@ -254,7 +259,7 @@ public class Proxy
     {
         return (TMessageHook?)Hooks.FirstOrDefault(hook => hook is TMessageHook);
     }
-    
+
     protected virtual void OnClientConnected(Session clientSession)
     {
         ClientConnected?.Invoke(clientSession);

@@ -25,11 +25,14 @@ public abstract class MessageStream : IMessageReader, IMessageWriter, IDisposabl
 
     #region IMessageReader
 
-    public abstract bool TryRead<T>(out T value, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1) where T : unmanaged;
+    public abstract bool TryRead<T>(out T value, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1) where T : unmanaged;
 
-    public abstract bool TryRead<T>(Span<T> values, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1) where T : unmanaged;
+    public abstract bool TryRead<T>(Span<T> values, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1) where T : unmanaged;
 
-    public bool TryRead(out DateTime value, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public bool TryRead(out DateTime value, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
         value = default;
 
@@ -45,15 +48,21 @@ public abstract class MessageStream : IMessageReader, IMessageWriter, IDisposabl
         return true;
     }
 
-    public abstract bool TryRead([NotNullWhen(true)] out string value, int length, Encoding encoding, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1);
+    public abstract bool TryRead([NotNullWhen(true)] out string value, int length, Encoding encoding,
+        [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null,
+        [CallerLineNumber] int lineNumber = -1);
 
-    public bool TryRead([NotNullWhen(true)] out string value, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public bool TryRead([NotNullWhen(true)] out string value, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
         => this.TryRead(out value, Encoding.ASCII, memberName, filePath, lineNumber);
 
-    public bool TryRead([NotNullWhen(true)] out string value, int length, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public bool TryRead([NotNullWhen(true)] out string value, int length, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
         => this.TryRead(out value, length, Encoding.ASCII, memberName, filePath, lineNumber);
 
-    public bool TryRead([NotNullWhen(true)] out string value, Encoding encoding, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public bool TryRead([NotNullWhen(true)] out string value, Encoding encoding,
+        [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null,
+        [CallerLineNumber] int lineNumber = -1)
     {
         if (!this.TryRead(out ushort length, memberName, filePath, lineNumber))
         {
@@ -64,14 +73,18 @@ public abstract class MessageStream : IMessageReader, IMessageWriter, IDisposabl
         return this.TryRead(out value, length, encoding, memberName, filePath, lineNumber);
     }
 
-    public bool TryDeserialize<T>([NotNullWhen(true)] out T deserializeable, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public bool TryDeserialize<T>([NotNullWhen(true)] out T deserializeable,
+        [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null,
+        [CallerLineNumber] int lineNumber = -1)
         where T : IMessageDeserializer, new()
     {
         deserializeable = new T();
         return deserializeable.TryDeserialize(this);
     }
 
-    public bool TryDeserialize<T>(ICollection<T> collection, IMessageCollectionDeserializer collectionDeserializer, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public bool TryDeserialize<T>(ICollection<T> collection, IMessageCollectionDeserializer collectionDeserializer,
+        [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null,
+        [CallerLineNumber] int lineNumber = -1)
         where T : IMessageDeserializer, new()
         => collectionDeserializer.Deserialize(this, collection);
 

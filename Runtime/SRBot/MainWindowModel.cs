@@ -75,7 +75,7 @@ public class MainWindowModel : ViewModel
     public bool IsBotIdle => Bot.CurrentBot?.State is BotState.Idle;
 
     public Player Player => _serviceProvider.GetRequiredService<Player>();
-  
+
     #endregion
 
     public MainWindowModel(IServiceProvider serviceProvider)
@@ -85,7 +85,7 @@ public class MainWindowModel : ViewModel
 
         // Get required services from the service provider, to not blow up the constructor.
         _serviceProvider = serviceProvider;
-       
+
         Game.GameStopLoading += OnGameStopLoading;
         Game.GameStartLoading += OnGameStartLoading;
         ProfileService.ActiveProfileChanged += OnActiveProfileChanged;
@@ -183,7 +183,7 @@ public class MainWindowModel : ViewModel
                 await Proxy.StartClientProxy(ProfileService.ActiveProfile.ClientListeningPort);
             }
         }
-        
+
         Bot.StartBot();
     }
 
@@ -216,6 +216,6 @@ public class MainWindowModel : ViewModel
     {
         SukiHost.ShowDialog(ServerListDialogModel, allowBackgroundClose: true);
     }
-    
+
     #endregion
 }

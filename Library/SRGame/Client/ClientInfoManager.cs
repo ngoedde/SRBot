@@ -8,22 +8,23 @@ namespace SRGame.Client;
 public class ClientInfoManager(ClientFileSystem fileSystem)
 {
     public delegate void LoadedEventArgs();
+
     public event LoadedEventArgs? Loaded;
-    
+
     public DivisionInfo DivisionInfo { get; private set; } = new(0, []);
 
     public ushort GatewayPort { get; private set; }
 
     public uint Version { get; private set; }
-    
+
     public string Path => fileSystem.Path;
-    
+
     public async Task LoadAsync()
     {
         DivisionInfo = await LoadDivisionInfoAsync();
         GatewayPort = await LoadGatewayPort();
         Version = await LoadVersion();
-        
+
         OnLoaded();
     }
 
@@ -76,15 +77,15 @@ public class ClientInfoManager(ClientFileSystem fileSystem)
         blowfish.Initialize("SILKROADVERSION"u8.ToArray(), 0, 8);
 
         var decodedVersionBuffer = blowfish.Decode(versionBuffer);
-        return decodedVersionBuffer == null 
-            ? 0 
+        return decodedVersionBuffer == null
+            ? 0
             : uint.Parse(Encoding.ASCII.GetString(decodedVersionBuffer, 0, 4));
     }
 
     public IPEndPoint GetGatewayEndPoint()
     {
         var division = DivisionInfo.Divisions[0].GatewayServers[0];
-      
+
         return ToIPEndPoint(division, GatewayPort);
     }
 
@@ -93,7 +94,8 @@ public class ClientInfoManager(ClientFileSystem fileSystem)
         ArgumentNullException.ThrowIfNull(hostOrIP);
 
         if (!IPAddress.TryParse(hostOrIP, out IPAddress? address))
-            address = Array.Find(Dns.GetHostEntry(hostOrIP).AddressList, p => p.AddressFamily == AddressFamily.InterNetwork);
+            address = Array.Find(Dns.GetHostEntry(hostOrIP).AddressList,
+                p => p.AddressFamily == AddressFamily.InterNetwork);
 
         return new IPEndPoint(address!, port);
     }

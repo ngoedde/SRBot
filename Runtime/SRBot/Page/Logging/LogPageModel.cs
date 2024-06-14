@@ -12,10 +12,11 @@ public class LogPageModel : PageModel
 {
     private readonly ConfigService _configService;
 
-    public LogPageModel(MainThreadLogEventSink memoryLogEventSink, ConfigService configService) : base("srbot_page_log", "Log", 99, MaterialIconKind.ConsoleLine)
+    public LogPageModel(MainThreadLogEventSink memoryLogEventSink, ConfigService configService) : base("srbot_page_log",
+        "Log", 99, MaterialIconKind.ConsoleLine)
     {
         _configService = configService;
-        
+
         memoryLogEventSink.LogEventReceived += MemoryLogSinkOnLogEventReceived;
     }
 
@@ -23,7 +24,7 @@ public class LogPageModel : PageModel
     {
         if (_configService.GetConfig<LogConfig>() is { RefreshLogView: false })
             return;
-        
+
         Logs.Add(logEvent);
     }
 
@@ -34,7 +35,7 @@ public class LogPageModel : PageModel
     public void ClearLogs()
     {
         Logs.Clear();
-        
+
         Log.Information("Logs cleared");
     }
 }

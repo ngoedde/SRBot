@@ -138,7 +138,7 @@ internal partial class SRPack
                 throw new IOException($"Folder {folderPath} not found.");
             }
 
-            currentBlock = await GetOrReadBlocksAt( entry.DataPosition).ConfigureAwait(false);
+            currentBlock = await GetOrReadBlocksAt(entry.DataPosition).ConfigureAwait(false);
         }
 
         return currentBlock;

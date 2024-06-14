@@ -19,6 +19,7 @@ public static class KeyExchangeHelper
             X >>= 1;
             mult = (mult * mult) % P;
         }
+
         return (uint)result;
     }
 

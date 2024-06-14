@@ -50,7 +50,9 @@
                     </suki:BusyArea>
                     <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
                         <TextBlock IsVisible="{Binding IsBotRunning}">TPS:</TextBlock>
-                        <TextBlock Grid.Column="1" IsVisible="{Binding IsBotRunning}" Text="{Binding Bot.TicksPerSecond}"></TextBlock>
+                        <TextBlock Grid.Column="1" IsVisible="{Binding IsBotRunning}"
+                                   Text="{Binding Bot.TicksPerSecond}">
+                        </TextBlock>
                     </Grid>
                 </StackPanel>
             </suki:SukiSideMenu.FooterContent>
@@ -60,9 +62,13 @@
 
             <suki:GroupBox Header="Game" Margin="16" DockPanel.Dock="Top">
                 <StackPanel>
-                    <TextBlock Classes="h4" Text="{Binding Player.Name}"/>
-                    <ProgressBar Value="{Binding Player.Health}" Maximum="{Binding Player.Attributes.MaxHealth}" ShowProgressText="False"></ProgressBar>
-                    <ProgressBar Value="{Binding Player.Mana}" Maximum="{Binding Player.Attributes.MaxMana}" Classes="Accent" ShowProgressText="False"></ProgressBar>
+                    <TextBlock Classes="h4" Text="{Binding Player.Name}" />
+                    <ProgressBar Value="{Binding Player.Health}" Maximum="{Binding Player.Attributes.MaxHealth}"
+                                 ShowProgressText="False">
+                    </ProgressBar>
+                    <ProgressBar Value="{Binding Player.Mana}" Maximum="{Binding Player.Attributes.MaxMana}"
+                                 Classes="Accent" ShowProgressText="False">
+                    </ProgressBar>
                 </StackPanel>
             </suki:GroupBox>
             <suki:GroupBox Header="Target" Margin="16" DockPanel.Dock="Top">
@@ -84,11 +90,11 @@
                             <Label>Weapon:</Label>
                         </StackPanel>
                         <StackPanel Grid.Column="1">
-                            <TextBlock Text="{Binding Player.Level}"/>
-                            <TextBlock Text="{Binding Player.Attributes.Strength}"/>
-                            <TextBlock Text="{Binding Player.Attributes.Intelligence}"/>
-                            <TextBlock Text="{Binding Player.Gold}"/>
-                            <TextBlock Text="{Binding Player.SkillPoints}"/>
+                            <TextBlock Text="{Binding Player.Level}" />
+                            <TextBlock Text="{Binding Player.Attributes.Strength}" />
+                            <TextBlock Text="{Binding Player.Attributes.Intelligence}" />
+                            <TextBlock Text="{Binding Player.Gold}" />
+                            <TextBlock Text="{Binding Player.SkillPoints}" />
                             <TextBlock>0</TextBlock>
                             <TextBlock>0</TextBlock>
                         </StackPanel>
@@ -120,13 +126,13 @@
                         <materialIcons:MaterialIcon Kind="Stop" />
                     </Button>
                 </Panel>
-                    <!-- <Button Classes="Flat Rounded Accent" Width="64" Height="38" HorizontalAlignment="Left" Command="{Binding SaveConfig}"> -->
-                    <!--     <materialIcons:MaterialIcon Kind="ContentSave" /> -->
-                    <!-- </Button> -->
-        
+                <!-- <Button Classes="Flat Rounded Accent" Width="64" Height="38" HorizontalAlignment="Left" Command="{Binding SaveConfig}"> -->
+                <!--     <materialIcons:MaterialIcon Kind="ContentSave" /> -->
+                <!-- </Button> -->
+
                 <!-- </Grid> -->
             </suki:GroupBox>
         </DockPanel>
     </Grid>
 
-</suki:SukiWindow> 
+</suki:SukiWindow>

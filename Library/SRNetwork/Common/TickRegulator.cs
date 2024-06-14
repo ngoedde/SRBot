@@ -42,6 +42,7 @@ public class TickRegulator
             _accumulatedTime -= _updateTime;
             return true;
         }
+
         return false;
     }
 

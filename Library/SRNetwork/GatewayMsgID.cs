@@ -25,7 +25,7 @@ public static class GatewayMsgId
     public static readonly MessageID
         ArticleInfoReq = MessageID.Create(MessageDirection.Req, MessageType.Framework, 0x104); // 0x6104
 
-    public static readonly MessageID 
+    public static readonly MessageID
         ArticleInfoAck = MessageID.Create(MessageDirection.Ack, MessageType.Framework, 0x104); // 0xA104
 
     public static readonly MessageID

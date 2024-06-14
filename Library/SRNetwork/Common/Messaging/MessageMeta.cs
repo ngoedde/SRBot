@@ -38,7 +38,8 @@ public struct MessageMeta : IEquatable<MessageMeta>
     public bool Encrypted
     {
         get => ((_value & ENCRYPTED_MASK) >> ENCRYPTED_OFFSET) != 0;
-        set => _value = (ushort)((_value & ~ENCRYPTED_MASK) | ((Convert.ToByte(value) << ENCRYPTED_OFFSET) & ENCRYPTED_MASK));
+        set => _value = (ushort)((_value & ~ENCRYPTED_MASK) |
+                                 ((Convert.ToByte(value) << ENCRYPTED_OFFSET) & ENCRYPTED_MASK));
     }
 
     #endregion Properties

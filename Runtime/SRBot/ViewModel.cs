@@ -4,5 +4,4 @@ namespace SRBot;
 
 public class ViewModel : ReactiveObject
 {
-    
 }

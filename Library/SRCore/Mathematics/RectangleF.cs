@@ -42,16 +42,17 @@ public readonly struct RectangleF : IEquatable<RectangleF>
     public bool Contains(Vector2 point)
     {
         return point.X >= _min.X && point.X <= _max.X
-            && point.Y >= _min.Y && point.Y <= _max.Y;
+                                 && point.Y >= _min.Y && point.Y <= _max.Y;
     }
 
     public bool Contains(Vector3 point)
     {
         return point.X >= _min.X && point.X <= _max.X
-            && point.Z >= _min.Y && point.Z <= _max.X;
+                                 && point.Z >= _min.Y && point.Z <= _max.X;
     }
 
-    public bool Intersects(RectangleF other) => other._min.X < _max.X && _min.X < other._max.X && other._min.Y < _max.Y && _min.Y < other._max.Y;
+    public bool Intersects(RectangleF other) => other._min.X < _max.X && _min.X < other._max.X &&
+                                                other._min.Y < _max.Y && _min.Y < other._max.Y;
 
     public override bool Equals(object? obj) => obj is RectangleF f && this.Equals(f);
 
@@ -59,13 +60,17 @@ public readonly struct RectangleF : IEquatable<RectangleF>
 
     public override int GetHashCode() => HashCode.Combine(_min, _max);
 
-    public static RectangleF operator +(RectangleF left, RectangleF right) => new RectangleF(left._min + right._min, left._max + left._max);
+    public static RectangleF operator +(RectangleF left, RectangleF right) =>
+        new RectangleF(left._min + right._min, left._max + left._max);
 
-    public static RectangleF operator -(RectangleF left, RectangleF right) => new RectangleF(left._min - right._min, left._max - left._max);
+    public static RectangleF operator -(RectangleF left, RectangleF right) =>
+        new RectangleF(left._min - right._min, left._max - left._max);
 
-    public static RectangleF operator *(RectangleF left, float right) => new RectangleF(left._min * right, left._max * right);
+    public static RectangleF operator *(RectangleF left, float right) =>
+        new RectangleF(left._min * right, left._max * right);
 
-    public static RectangleF operator /(RectangleF left, float right) => new RectangleF(left._min / right, left._max / right);
+    public static RectangleF operator /(RectangleF left, float right) =>
+        new RectangleF(left._min / right, left._max / right);
 
     public static bool operator ==(RectangleF left, RectangleF right) => left.Equals(right);
 

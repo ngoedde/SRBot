@@ -25,7 +25,7 @@ public class AccountManagerDialogModel(AccountService accountService) : ViewMode
     {
         if (accountInfo == null)
             return;
-        
+
         accountService.RemoveAccount(accountInfo);
         if (SelectedAccount == accountInfo)
             SelectedAccount = AccountService.Config.Accounts.FirstOrDefault();
@@ -35,7 +35,7 @@ public class AccountManagerDialogModel(AccountService accountService) : ViewMode
     {
         await accountService.SaveAsync();
         SukiHost.ShowToast("Account Manager", "Accounts have been saved!", SukiToastType.Success);
-        
+
         SukiHost.CloseDialog();
     }
 }

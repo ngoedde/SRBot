@@ -25,8 +25,9 @@ internal class SessionManager : IReadOnlyCollection<Session>
         var session = new Session(id, socket, security, _packetHandlerManager);
         return _sessions[id] = session;
     }
-    
-    public bool TryFindSessionById(int id, [MaybeNullWhen(false)] out Session session) => _sessions.TryGetValue(id, out session);
+
+    public bool TryFindSessionById(int id, [MaybeNullWhen(false)] out Session session) =>
+        _sessions.TryGetValue(id, out session);
 
     public int Count => _sessions.Count;
 

@@ -15,6 +15,7 @@ internal class VerboseIteratorMessageCollectionSerializer : IMessageCollectionSe
             if (!writer.TryWrite(ITERATOR_NEXT)) return false;
             if (!writer.TrySerialize(item)) return false;
         }
+
         return writer.TryWrite(ITERATOR_END);
     }
 
@@ -30,11 +31,13 @@ internal class VerboseIteratorMessageCollectionSerializer : IMessageCollectionSe
             if (iterator == ITERATOR_END)
                 break;
 
-            Debug.Assert(iterator == ITERATOR_NEXT, $"Unexpected ITERATOR_NEXT value. (Expected: {ITERATOR_NEXT}; Actual: {iterator}");
+            Debug.Assert(iterator == ITERATOR_NEXT,
+                $"Unexpected ITERATOR_NEXT value. (Expected: {ITERATOR_NEXT}; Actual: {iterator}");
 
             if (!reader.TryDeserialize(out T item)) return false;
             collection.Add(item);
         }
+
         return true;
     }
 }

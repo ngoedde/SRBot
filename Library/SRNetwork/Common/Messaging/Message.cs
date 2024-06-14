@@ -40,7 +40,8 @@ public class Message : MessageStream
     {
         get
         {
-            return (ushort)(MemoryMarshal.Read<ushort>(this.GetSpan(META_OFFSET, Unsafe.SizeOf<ushort>())) & ~HEADER_ENC_MASK);
+            return (ushort)(MemoryMarshal.Read<ushort>(this.GetSpan(META_OFFSET, Unsafe.SizeOf<ushort>())) &
+                            ~HEADER_ENC_MASK);
         }
         set
         {
@@ -56,7 +57,8 @@ public class Message : MessageStream
         set
         {
             var span = this.GetSpan(META_OFFSET, Unsafe.SizeOf<ushort>());
-            var size = (ushort)((MemoryMarshal.Read<ushort>(span) & ~HEADER_ENC_MASK) | (value ? HEADER_ENC_MASK : default));
+            var size = (ushort)((MemoryMarshal.Read<ushort>(span) & ~HEADER_ENC_MASK) |
+                                (value ? HEADER_ENC_MASK : default));
             MemoryMarshal.Write(this.GetSpan(META_OFFSET, Unsafe.SizeOf<ushort>()), ref size);
         }
     }
@@ -132,6 +134,7 @@ public class Message : MessageStream
         {
             length += bytesPerLine - (length % bytesPerLine);
         }
+
         for (int x = 0; x <= length; ++x)
         {
             if (x % bytesPerLine == 0)
@@ -141,11 +144,13 @@ public class Message : MessageStream
                     output.Append($"  {ascii_output.ToString()}{Environment.NewLine}");
                     ascii_output.Clear();
                 }
+
                 if (x != length)
                 {
                     output.Append($"{x:d10}   ");
                 }
             }
+
             if (x < buffer.Length)
             {
                 output.Append($"{buffer[x]:X2} ");
@@ -165,6 +170,7 @@ public class Message : MessageStream
                 ascii_output.Append('.');
             }
         }
+
         return output.ToString();
     }
 
@@ -176,11 +182,13 @@ public class Message : MessageStream
 
     public Memory<byte> GetWrittenMemory() => _memory.Slice(0, this.WritePosition);
 
-    public bool TryCopyTo(Message destination) => this.GetSpan(0, this.WritePosition).TryCopyTo(destination.GetSpan(0, this.WritePosition));
+    public bool TryCopyTo(Message destination) =>
+        this.GetSpan(0, this.WritePosition).TryCopyTo(destination.GetSpan(0, this.WritePosition));
 
     // ------------------------------------------------
 
-    public override bool TryRead<T>(out T value, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public override bool TryRead<T>(out T value, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
         var size = (ushort)Unsafe.SizeOf<T>();
         if (this.ReadPosition + size > this.WritePosition)
@@ -199,7 +207,8 @@ public class Message : MessageStream
         return true;
     }
 
-    public override bool TryRead<T>(Span<T> values, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public override bool TryRead<T>(Span<T> values, [CallerMemberName] string? memberName = null,
+        [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
     {
         var valueBytes = MemoryMarshal.AsBytes(values);
 
@@ -218,7 +227,9 @@ public class Message : MessageStream
         return true;
     }
 
-    public override bool TryRead([NotNullWhen(true)] out string value, int length, Encoding encoding, [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null, [CallerLineNumber] int lineNumber = -1)
+    public override bool TryRead([NotNullWhen(true)] out string value, int length, Encoding encoding,
+        [CallerMemberName] string? memberName = null, [CallerFilePath] string? filePath = null,
+        [CallerLineNumber] int lineNumber = -1)
     {
         if (this.ReadPosition + length > this.WritePosition)
         {
@@ -245,6 +256,7 @@ public class Message : MessageStream
             this.UpdateDataSize();
             return true;
         }
+
         return false;
     }
 
@@ -257,6 +269,7 @@ public class Message : MessageStream
             this.UpdateDataSize();
             return true;
         }
+
         return false;
     }
 
@@ -300,6 +313,7 @@ public class Message : MessageStream
         if (Environment.HasShutdownStarted)
             return;
 
-        Console.WriteLine($"Message was leaked. Created in {this.CallerMemberName}\n({this.CallerFilePath}:{this.CallerFileLine})");
+        Console.WriteLine(
+            $"Message was leaked. Created in {this.CallerMemberName}\n({this.CallerFilePath}:{this.CallerFileLine})");
     }
 }

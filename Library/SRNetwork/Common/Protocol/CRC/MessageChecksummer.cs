@@ -67,9 +67,11 @@ public sealed class MessageChecksummer : IMessageChecksummer
                         eax >>= 1;
                     }
                 }
+
                 finalTable[finalIndex++] = eax;
             }
         }
+
         return finalTable;
     }
 
@@ -89,6 +91,7 @@ public sealed class MessageChecksummer : IMessageChecksummer
         for (int x = 0; x < length; x++)
             checksum = checksum >> 8 ^ _table[_seed + ((buffer[x] ^ checksum) & byte.MaxValue)];
 
-        return (byte)((checksum >> 24 & byte.MaxValue) + (checksum >> 8 & byte.MaxValue) + (checksum >> 16 & byte.MaxValue) + (checksum & byte.MaxValue));
+        return (byte)((checksum >> 24 & byte.MaxValue) + (checksum >> 8 & byte.MaxValue) +
+                      (checksum >> 16 & byte.MaxValue) + (checksum & byte.MaxValue));
     }
 }

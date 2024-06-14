@@ -12,8 +12,9 @@ namespace SRBot.Utils;
 public class MainThreadLogEventSink : ILogEventSink
 {
     public delegate void LogEventReceivedEventHandler(LogEvent logEvent);
+
     public event LogEventReceivedEventHandler? LogEventReceived;
-    
+
     public void Emit(LogEvent logEvent)
     {
         OnLogEventReceived(logEvent);
@@ -27,17 +28,20 @@ public class MainThreadLogEventSink : ILogEventSink
             LogEventReceived?.Invoke(logevent);
 
             if (logevent.Level == LogEventLevel.Error || logevent.Level == LogEventLevel.Fatal)
-                SukiHost.ShowToast("Error", logevent.MessageTemplate.Text, SukiToastType.Error, TimeSpan.FromSeconds(5));
-            
+                SukiHost.ShowToast("Error", logevent.MessageTemplate.Text, SukiToastType.Error,
+                    TimeSpan.FromSeconds(5));
+
             if (logevent.Level == LogEventLevel.Warning)
-                SukiHost.ShowToast("Warning", logevent.MessageTemplate.Text, SukiToastType.Warning,TimeSpan.FromSeconds(5));
+                SukiHost.ShowToast("Warning", logevent.MessageTemplate.Text, SukiToastType.Warning,
+                    TimeSpan.FromSeconds(5));
         });
     }
 }
 
 public static class LogSinkExtensions
 {
-    public static LoggerConfiguration InMemorySink(this LoggerSinkConfiguration loggerSinkConfiguration, MainThreadLogEventSink eventSink)
+    public static LoggerConfiguration InMemorySink(this LoggerSinkConfiguration loggerSinkConfiguration,
+        MainThreadLogEventSink eventSink)
     {
         return loggerSinkConfiguration.Sink(eventSink);
     }

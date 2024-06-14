@@ -17,13 +17,13 @@ public class ViewLocator(AppPluginLoader pluginLoader) : IDataTemplate
         var fullName = data?.GetType().FullName;
         if (fullName is null)
             return new TextBlock { Text = "Data is null or has no name." };
-        
+
         var name = fullName.Replace("PageModel", "Page");
         name = name.Replace("WindowModel", "Window");
         name = name.Replace("DialogModel", "Dialog");
 
         var type = pluginLoader.GetTypeFromAssemblies(name);
-        
+
         if (type is null)
             return new TextBlock { Text = $"No View For {name}." };
 
@@ -36,6 +36,6 @@ public class ViewLocator(AppPluginLoader pluginLoader) : IDataTemplate
         res.DataContext = data;
         return res;
     }
-    
+
     public bool Match(object? data) => data is INotifyPropertyChanged;
 }

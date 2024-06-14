@@ -21,10 +21,12 @@ public static class TimerHelper
     public static long GetTimestamp() => Stopwatch.GetTimestamp();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long GetElaspedTime(long startingTimestamp) => (long)((GetTimestamp() - startingTimestamp) * s_tickFrequency);
+    public static long GetElaspedTime(long startingTimestamp) =>
+        (long)((GetTimestamp() - startingTimestamp) * s_tickFrequency);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static long GetElaspedTime(long startingTimestamp, long endingTimestamp) => (long)((endingTimestamp - startingTimestamp) * s_tickFrequency);
+    public static long GetElaspedTime(long startingTimestamp, long endingTimestamp) =>
+        (long)((endingTimestamp - startingTimestamp) * s_tickFrequency);
 
     //[MethodImpl(MethodImplOptions.AggressiveInlining)]
     //public static TimeSpan GetElaspedTimeSpan(long startingTimestamp) => Stopwatch.GetElapsedTime(startingTimestamp);

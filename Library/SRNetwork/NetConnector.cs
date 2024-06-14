@@ -17,7 +17,7 @@ public class NetConnector
     }
 
     public ValueTask ConnectAsync(string hostOrIP, ushort port, CancellationToken cancellationToken = default)
-         => this.ConnectAsync(NetHelper.ToIPEndPoint(hostOrIP, port), cancellationToken);
+        => this.ConnectAsync(NetHelper.ToIPEndPoint(hostOrIP, port), cancellationToken);
 
     public async ValueTask ConnectAsync(EndPoint endPoint, CancellationToken cancellationToken = default)
     {
@@ -29,7 +29,7 @@ public class NetConnector
         try
         {
             await socket.ConnectAsync(endPoint, cancellationToken).ConfigureAwait(false);
-            
+
             _connected(socket);
         }
         catch (Exception ex)

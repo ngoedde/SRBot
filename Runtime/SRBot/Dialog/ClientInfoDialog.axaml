@@ -49,9 +49,11 @@
                                  TextAlignment="Right" />
                         <TextBox theme:TextBoxExtensions.Prefix="Version:" Text="{Binding Version}"
                                  TextAlignment="Right" />
-                        <TextBox theme:TextBoxExtensions.Prefix="Division:" Text="{Binding DivisionInfo.Divisions[0].Name}"
+                        <TextBox theme:TextBoxExtensions.Prefix="Division:"
+                                 Text="{Binding DivisionInfo.Divisions[0].Name}"
                                  TextAlignment="Right" />
-                        <TextBox theme:TextBoxExtensions.Prefix="Gateway IP: " Text="{Binding DivisionInfo.Divisions[0].GatewayServers[0]}"
+                        <TextBox theme:TextBoxExtensions.Prefix="Gateway IP: "
+                                 Text="{Binding DivisionInfo.Divisions[0].GatewayServers[0]}"
                                  TextAlignment="Right" />
                         <TextBox theme:TextBoxExtensions.Prefix="Gateway Port: " Text="{Binding GatewayPort}"
                                  TextAlignment="Right" />

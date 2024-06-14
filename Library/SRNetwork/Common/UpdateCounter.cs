@@ -15,6 +15,7 @@ public class UpdateCounter
             _latestUpdateCount = _updateAccumulator;
             _updateAccumulator = 0;
         }
+
         return _latestUpdateCount;
     }
 }

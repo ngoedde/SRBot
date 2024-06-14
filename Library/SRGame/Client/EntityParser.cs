@@ -13,7 +13,7 @@ public class EntityParser
         _length = _data.Length;
     }
 
-    public bool TryParse<TEntity, TPrimaryKey>(out TEntity entity) 
+    public bool TryParse<TEntity, TPrimaryKey>(out TEntity entity)
         where TEntity : Entity.Entity<TPrimaryKey>
     {
         entity = Activator.CreateInstance<TEntity>();
@@ -21,7 +21,7 @@ public class EntityParser
 
         return true;
     }
-    
+
     public int GetColumnCount()
     {
         return _data.Length;

@@ -1,5 +1,4 @@
-﻿
-namespace SRNetwork.Common.Extensions;
+﻿namespace SRNetwork.Common.Extensions;
 
 public static class RandomExtensions
 {

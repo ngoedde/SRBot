@@ -12,15 +12,15 @@ public class RegionPosition : ReactiveObject
     [Reactive] public uint XOffset { get; internal set; }
     [Reactive] public uint YOffset { get; internal set; }
     [Reactive] public uint ZOffset { get; internal set; }
-    
+
     public Mathematics.RegionPosition ToRegionPosition() => new(RegionId, new Vector3(XOffset, YOffset, ZOffset));
 
     public static RegionPosition FromPacket(Packet packet)
     {
         var result = new RegionPosition();
-        
+
         var regionId = packet.ReadUShort();
-        
+
         result.RegionId = new RegionId(regionId);
         if (regionId < short.MaxValue)
         {
@@ -34,7 +34,7 @@ public class RegionPosition : ReactiveObject
             result.ZOffset = packet.ReadUInt();
             result.YOffset = packet.ReadUInt();
         }
-        
+
         return result;
     }
 }

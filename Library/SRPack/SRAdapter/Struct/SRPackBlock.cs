@@ -27,7 +27,7 @@ internal static class SRPackBlockExtensions
         catch
         {
             entry = default;
-            
+
             return false;
         }
     }
@@ -44,11 +44,11 @@ internal static class SRPackBlockExtensions
         catch
         {
             entry = default;
-            
+
             return false;
         }
     }
-    
+
     public static IEnumerable<SRPackEntry> GetEntries(this IEnumerable<SRPackBlock> blocks)
     {
         return blocks.SelectMany(block => block.Entries);
@@ -56,19 +56,20 @@ internal static class SRPackBlockExtensions
 
     public static IEnumerable<SRPackEntry> GetFilesAndFolders(this IEnumerable<SRPackBlock> blocks)
     {
-        return blocks.SelectMany(block => block.Entries.Where(e => e.Type != SRPackEntryType.Empty)).OrderBy(e => e.Type);
+        return blocks.SelectMany(block => block.Entries.Where(e => e.Type != SRPackEntryType.Empty))
+            .OrderBy(e => e.Type);
     }
-    
+
     public static IEnumerable<SRPackEntry> GetFiles(this IEnumerable<SRPackBlock> blocks)
     {
         return blocks.SelectMany(block => block.Entries.Where(e => e.Type == SRPackEntryType.File));
     }
-    
+
     public static IEnumerable<SRPackEntry> GetFolders(this IEnumerable<SRPackBlock> blocks)
     {
         return blocks.SelectMany(block => block.Entries.Where(e => e.Type == SRPackEntryType.Folder));
     }
-    
+
     public static IEnumerable<SRPackEntry> GetEmpties(this IEnumerable<SRPackBlock> blocks)
     {
         return blocks.SelectMany(block => block.Entries.Where(e => e.Type == SRPackEntryType.Empty));

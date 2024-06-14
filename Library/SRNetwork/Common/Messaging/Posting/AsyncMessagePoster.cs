@@ -12,7 +12,8 @@ public class AsyncMessagePoster : IAsyncMessagePoster
     private readonly AsyncMsgHandler<Message> _handleMsg;
     private readonly AsyncMsgHandler<Message> _sendMsg;
 
-    public AsyncMessagePoster(int id, ChannelWriter<Message> localWriter, AsyncMsgHandler<Message> handleMsg, AsyncMsgHandler<Message> sendMsg)
+    public AsyncMessagePoster(int id, ChannelWriter<Message> localWriter, AsyncMsgHandler<Message> handleMsg,
+        AsyncMsgHandler<Message> sendMsg)
     {
         _id = id;
         _localWriter = localWriter;

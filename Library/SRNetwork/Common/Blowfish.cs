@@ -52,7 +52,7 @@ public sealed class Blowfish
             0x83260376, 0x6295CFA9, 0x11C81968, 0x4E734A41, 0xB3472DCA, 0x7B14A94A, 0x1B510052, 0x9A532915,
             0xD60F573F, 0xBC9BC6E4, 0x2B60A476, 0x81E67400, 0x08BA6FB5, 0x571BE91F, 0xF296EC6B, 0x2A0DD915,
             0xB6636521, 0xE7B9F9B6, 0xFF34052E, 0xC5855664, 0x53B02D5D, 0xA99F8FA1, 0x08BA4799, 0x6E85076A,
- },
+        },
         {
             0x4B7A70E9, 0xB5B32944, 0xDB75092E, 0xC4192623, 0xAD6EA6B0, 0x49A7DF7D, 0x9CEE60B8, 0x8FEDB266,
             0xECAA8C71, 0x699A17FF, 0x5664526C, 0xC2B19EE1, 0x193602A5, 0x75094C29, 0xA0591340, 0xE4183A3E,
@@ -209,14 +209,22 @@ public sealed class Blowfish
         uint Xr = xr;
 
         Xl ^= _pArray[N + 1];
-        this.ROUND(ref Xr, Xl, 16); this.ROUND(ref Xl, Xr, 15);
-        this.ROUND(ref Xr, Xl, 14); this.ROUND(ref Xl, Xr, 13);
-        this.ROUND(ref Xr, Xl, 12); this.ROUND(ref Xl, Xr, 11);
-        this.ROUND(ref Xr, Xl, 10); this.ROUND(ref Xl, Xr, 09);
-        this.ROUND(ref Xr, Xl, 08); this.ROUND(ref Xl, Xr, 07);
-        this.ROUND(ref Xr, Xl, 06); this.ROUND(ref Xl, Xr, 05);
-        this.ROUND(ref Xr, Xl, 04); this.ROUND(ref Xl, Xr, 03);
-        this.ROUND(ref Xr, Xl, 02); this.ROUND(ref Xl, Xr, 01);
+        this.ROUND(ref Xr, Xl, 16);
+        this.ROUND(ref Xl, Xr, 15);
+        this.ROUND(ref Xr, Xl, 14);
+        this.ROUND(ref Xl, Xr, 13);
+        this.ROUND(ref Xr, Xl, 12);
+        this.ROUND(ref Xl, Xr, 11);
+        this.ROUND(ref Xr, Xl, 10);
+        this.ROUND(ref Xl, Xr, 09);
+        this.ROUND(ref Xr, Xl, 08);
+        this.ROUND(ref Xl, Xr, 07);
+        this.ROUND(ref Xr, Xl, 06);
+        this.ROUND(ref Xl, Xr, 05);
+        this.ROUND(ref Xr, Xl, 04);
+        this.ROUND(ref Xl, Xr, 03);
+        this.ROUND(ref Xr, Xl, 02);
+        this.ROUND(ref Xl, Xr, 01);
         Xr ^= _pArray[0];
 
         xl = Xr;
@@ -229,14 +237,22 @@ public sealed class Blowfish
         uint Xr = xr;
 
         Xl ^= _pArray[0];
-        this.ROUND(ref Xr, Xl, 01); this.ROUND(ref Xl, Xr, 02);
-        this.ROUND(ref Xr, Xl, 03); this.ROUND(ref Xl, Xr, 04);
-        this.ROUND(ref Xr, Xl, 05); this.ROUND(ref Xl, Xr, 06);
-        this.ROUND(ref Xr, Xl, 07); this.ROUND(ref Xl, Xr, 08);
-        this.ROUND(ref Xr, Xl, 09); this.ROUND(ref Xl, Xr, 10);
-        this.ROUND(ref Xr, Xl, 11); this.ROUND(ref Xl, Xr, 12);
-        this.ROUND(ref Xr, Xl, 13); this.ROUND(ref Xl, Xr, 14);
-        this.ROUND(ref Xr, Xl, 15); this.ROUND(ref Xl, Xr, 16);
+        this.ROUND(ref Xr, Xl, 01);
+        this.ROUND(ref Xl, Xr, 02);
+        this.ROUND(ref Xr, Xl, 03);
+        this.ROUND(ref Xl, Xr, 04);
+        this.ROUND(ref Xr, Xl, 05);
+        this.ROUND(ref Xl, Xr, 06);
+        this.ROUND(ref Xr, Xl, 07);
+        this.ROUND(ref Xl, Xr, 08);
+        this.ROUND(ref Xr, Xl, 09);
+        this.ROUND(ref Xl, Xr, 10);
+        this.ROUND(ref Xr, Xl, 11);
+        this.ROUND(ref Xl, Xr, 12);
+        this.ROUND(ref Xr, Xl, 13);
+        this.ROUND(ref Xl, Xr, 14);
+        this.ROUND(ref Xr, Xl, 15);
+        this.ROUND(ref Xl, Xr, 16);
         Xr ^= _pArray[N + 1];
 
         xr = Xl;
@@ -244,7 +260,9 @@ public sealed class Blowfish
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private uint F(uint x) => ((_sBoxes[0, (x >> 24) & 0xFF] + _sBoxes[1, (x >> 16) & 0xFF]) ^ _sBoxes[2, (x >> 8) & 0xFF]) + _sBoxes[3, (x >> 0) & 0xFF];
+    private uint F(uint x) =>
+        ((_sBoxes[0, (x >> 24) & 0xFF] + _sBoxes[1, (x >> 16) & 0xFF]) ^ _sBoxes[2, (x >> 8) & 0xFF]) +
+        _sBoxes[3, (x >> 0) & 0xFF];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ROUND(ref uint a, uint b, int n) => a ^= this.F(b) ^ _pArray[n];
