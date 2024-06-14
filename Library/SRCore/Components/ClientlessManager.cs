@@ -40,7 +40,6 @@ internal class ClientlessManager(
             
         characterLobby.Request();
     }
-    
 
     private async void ProxyOnClientConnected(Session clientSession)
     {

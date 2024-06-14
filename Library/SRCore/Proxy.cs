@@ -2,7 +2,6 @@ using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
-using SRCore.MessageHandler.Gateway;
 using SRCore.Models;
 using SRNetwork;
 using SRNetwork.Common;
@@ -36,7 +35,6 @@ public class Proxy
     public Session? ClientSession { get; private set; }
     public Session? ServerSession { get; private set; }
 
-    private Task? _agentKeepAliveTask = null!;
     private IServiceProvider _serviceProvider;
     private IEnumerable<SRNetwork.MessageHandler> Handlers => _serviceProvider.GetServices<SRNetwork.MessageHandler>();
     private IEnumerable<MessageHook> Hooks => _serviceProvider.GetServices<SRNetwork.MessageHook>();
@@ -158,7 +156,7 @@ public class Proxy
 
             packet.Reset();
             
-            _agentKeepAliveTask = Task.Run(KeepAliveAgentSession);
+            Task.Run(KeepAliveAgentSession);
         }
 
         if ((Context & ProxyContext.Client) != 0) {
@@ -222,6 +220,8 @@ public class Proxy
     {
         await Client.StopAsync();
         await Server.StopAsync();
+        
+        Context = ProxyContext.None;
     }
 
     private async void KeepAliveAgentSession()
