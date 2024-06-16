@@ -1,6 +1,6 @@
 namespace SRPack.SRAdapter.Utils;
 
-internal static class PathUtils
+public static class PathUtils
 {
     private static readonly char SeparatorChar = Path.DirectorySeparatorChar;
 

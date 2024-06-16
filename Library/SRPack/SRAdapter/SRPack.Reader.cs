@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using SRPack.SRAdapter.Struct;
 using SRPack.SRAdapter.Utils;
 
@@ -5,8 +6,16 @@ namespace SRPack.SRAdapter;
 
 internal partial class SRPack
 {
+    private long _lastLockedTimestampTicks;
+    private bool _isLocked;
+    
     public async Task<SRPackEntry> GetEntryAsync(string path)
     {
+        if (_fileStream == null || !Initialized)
+        {
+            throw new IOException("SRPack is not initialized.");
+        }
+        
         path = PathUtils.Normalize(path);
 
         var fileName = PathUtils.GetFileName(path);
@@ -27,17 +36,26 @@ internal partial class SRPack
         {
             throw new IOException("SRPack is not initialized.");
         }
-
+        
         var buffer = new byte[entry.Size];
 
-        _fileStream.Seek(entry.DataPosition, SeekOrigin.Begin);
-        var bytesRead = await _fileStream.ReadAsync(buffer).ConfigureAwait(false);
-        if (bytesRead != buffer.Length)
+        try
         {
-            throw new Exception("Unable to read file entry, file stream interruption.");
+            await WaitForRelease();
+            
+            _fileStream.Seek(entry.DataPosition, SeekOrigin.Begin);
+            var bytesRead = await _fileStream.ReadAsync(buffer).ConfigureAwait(false);
+            if (bytesRead != buffer.Length)
+            {
+                throw new Exception("Unable to read file entry, file stream interruption.");
+            }
+            
+            return buffer;
         }
-
-        return buffer;
+        finally
+        {
+            Unlock();
+        }
     }
 
     private async Task<SRPackHeader> ReadHeader()
@@ -100,8 +118,8 @@ internal partial class SRPack
             {
                 Type = (SRPackEntryType)reader.ReadByte(),
                 Name = reader.ReadString(89),
-                CreateTime = DateTime.FromFileTimeUtc(reader.ReadInt64()),
-                ModifyTime = DateTime.FromFileTimeUtc(reader.ReadInt64()),
+                CreateTime = reader.ReadInt64(),
+                ModifyTime = reader.ReadInt64(),
                 DataPosition = reader.ReadInt64(),
                 Size = reader.ReadUInt32(),
                 NextBlock = reader.ReadInt64(),
@@ -114,6 +132,7 @@ internal partial class SRPack
 
     public async Task<SRPackBlock[]> GetBlockAsync(string folderPath)
     {
+        
         //Resolve root if not done yet.
         if (folderPath == string.Empty && !_index.TryGetValue(SRPackBlock.RootBlockPosition, out _))
         {
@@ -124,21 +143,28 @@ internal partial class SRPack
 
         folderPath = PathUtils.Normalize(folderPath);
         var currentBlock = _index[SRPackBlock.RootBlockPosition];
-
         if (folderPath == string.Empty)
         {
             return currentBlock;
         }
 
-        var folders = PathUtils.Explode(folderPath);
-        foreach (var folderName in folders)
+        try
         {
-            if (!currentBlock.TryGetEntry(folderName, out var entry))
+            await WaitForRelease();   
+            var folders = PathUtils.Explode(folderPath);
+            foreach (var folderName in folders)
             {
-                throw new IOException($"Folder {folderPath} not found.");
-            }
+                if (!currentBlock.TryGetEntry(folderName, out var entry))
+                {
+                    throw new IOException($"Folder {folderPath} not found.");
+                }
 
-            currentBlock = await GetOrReadBlocksAt(entry.DataPosition).ConfigureAwait(false);
+                currentBlock = await GetOrReadBlocksAt(entry.DataPosition).ConfigureAwait(false);
+            }
+        }
+        finally
+        {
+            Unlock();
         }
 
         return currentBlock;
@@ -156,6 +182,7 @@ internal partial class SRPack
         var blockCollection = new List<SRPackBlock> { block };
         var nextBlockEntry = block.Entries[19];
 
+        var sw = Stopwatch.StartNew();
         while (nextBlockEntry.NextBlock > 0)
         {
             block = await ReadBlockAt(nextBlockEntry.NextBlock, blockBuffer).ConfigureAwait(false);
@@ -163,10 +190,36 @@ internal partial class SRPack
 
             nextBlockEntry = block.Entries[19];
         }
+        Debug.WriteLine($"GetOrReadBlocksAt took {sw.ElapsedMilliseconds}ms for {blockCollection.Count}.");
 
         var blocks = blockCollection.ToArray();
         _index.Add(position, blocks);
 
         return blocks;
+    }
+
+    private void Lock()
+    {
+        _isLocked = true;
+        _lastLockedTimestampTicks = DateTimeOffset.Now.Ticks;
+    }
+
+    private void Unlock()
+    {
+        _isLocked = false;
+        _lastLockedTimestampTicks = 0;
+    }
+    
+    private async Task WaitForRelease()
+    {
+        while (_isLocked && (_lastLockedTimestampTicks > 0) && DateTimeOffset.Now.Ticks - _lastLockedTimestampTicks < 5000 * 10000)
+        {
+            await Task.Delay(10);
+        }
+        
+        if (_isLocked) 
+            throw new IOException("SRPack: Possible deadlock detected. Reading from SRPack is locked for too long.");
+
+        Lock();
     }
 }

@@ -1,3 +1,4 @@
+using System.IO;
 using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Media.Imaging;
@@ -148,14 +149,14 @@ public class DDSImage
                 return null;
             }
 
-            var writeableBitmap = new WriteableBitmap(new PixelSize(Width, Height), new Vector(96, 96), PixelFormat.Rgba8888);
+            var writeableBitmap = new WriteableBitmap(new PixelSize(Width, Height), new Vector(96, 96), PixelFormat.Bgra8888, AlphaFormat.Opaque);
             using (var fb = writeableBitmap.Lock())
             {
                 var buffer = new byte[PixelsData.Length * 4];
                 System.Buffer.BlockCopy(PixelsData, 0, buffer, 0, buffer.Length);
                 Marshal.Copy(buffer, 0, fb.Address, buffer.Length);
             }
-
+            
             return writeableBitmap;
         }
 

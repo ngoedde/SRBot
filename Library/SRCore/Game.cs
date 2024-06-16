@@ -80,22 +80,22 @@ public class Game
         }
         catch (Exception e)
         {
-            Log.Error("Failed to load game data: {Message}", e.Message);
+            Log.Error($"Failed to load game data: {e.Message}");
         }
 
         OnGameStopLoading(this);
         OnGameInitialized(this);
     }
 
-    public async Task CloseAsync()
+    public async Task Close()
     {
         IsLoaded = false;
         _entityManager.Clear();
 
         if (!_fileSystem.IsInitialized) return;
 
-        await _fileSystem.Media?.CloseAsync();
-        await _fileSystem.Data?.CloseAsync();
+       await _fileSystem.Media?.CloseAsync(); 
+       await _fileSystem.Data?.CloseAsync();
     }
 
     protected virtual void OnGameInitialized(Game game)

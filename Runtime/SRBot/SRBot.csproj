@@ -65,4 +65,10 @@
         </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="SRPack">
+        <HintPath>..\Build\Debug\SRPack.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

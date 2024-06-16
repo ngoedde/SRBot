@@ -8,7 +8,7 @@ public class FileSystemEntryInfo(string path)
     public string Path { get; } = path;
     public uint DataSize { get; init; } = 0;
     public long DataPosition { get; init; } = 0;
-    public DateTime CreateTime { get; init; } = DateTime.MinValue;
-    public DateTime ModifyTime { get; init; } = DateTime.MinValue;
+    public long CreateTime { get; init; } = 0;
+    public long ModifyTime { get; init; } = 0;
     public FileSystemEntryType Type { get; init; } = FileSystemEntryType.Unsupported;
 }

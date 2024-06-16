@@ -107,7 +107,7 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
         Log.Debug("Shutting down SRKernel...");
 
         //Game shutdown
-        await _game.CloseAsync();
+        _game.Close();
         await _proxy.ShutdownAsync();
 
         IsInitialized = false;

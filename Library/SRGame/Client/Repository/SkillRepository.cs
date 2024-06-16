@@ -21,8 +21,7 @@ public class SkillRepository(ClientFileSystem clientFileSystem) : EntityReposito
             if (string.IsNullOrEmpty(dataFile))
                 continue;
 
-            var fileContent =
-                await FileSystem.ReadFileBytes(AssetPack.Media, $"server_dep/silkroad/textdata/{dataFile}");
+            var fileContent = await FileSystem.ReadFileBytes(AssetPack.Media, $"server_dep/silkroad/textdata/{dataFile}");
             IEnumerable<string> lines;
             if (clientType <= ClientType.Vietnam274)
             {

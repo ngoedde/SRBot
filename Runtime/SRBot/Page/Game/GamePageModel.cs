@@ -4,6 +4,7 @@ using SRBot.Dialog.GamePage;
 using SRCore.Components;
 using SRCore.Config;
 using SRCore.Config.Model;
+using SRCore.Service;
 using SukiUI.Controls;
 using ViewLocator = SRBot.Utils.ViewLocator;
 

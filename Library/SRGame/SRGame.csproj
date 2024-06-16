@@ -18,11 +18,17 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\SRPack\SRPack.csproj"/>
+        <PackageReference Include="Serilog" Version="4.0.0-dev-02195"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Serilog" Version="4.0.0-dev-02195"/>
+      <Reference Include="SRPack">
+        <HintPath>..\..\Runtime\Build\Debug\SRPack.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\SRPack\SRPack.csproj" />
     </ItemGroup>
 
 </Project>

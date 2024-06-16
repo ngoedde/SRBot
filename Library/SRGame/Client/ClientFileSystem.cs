@@ -1,4 +1,5 @@
-﻿using SRPack;
+﻿using Serilog;
+using SRPack;
 
 namespace SRGame.Client;
 
@@ -25,12 +26,21 @@ public class ClientFileSystem
         if (!IsInitialized)
             throw new Exception("FileSystem is not initialized!");
 
-        return assetPack switch
+        try
         {
-            AssetPack.Media => await Media!.ReadAllTextAsync(path),
-            AssetPack.Data => await Data!.ReadAllTextAsync(path),
-            _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
-        };
+            return assetPack switch
+            {
+                AssetPack.Media => await Media!.ReadAllTextAsync(path),
+                AssetPack.Data => await Data!.ReadAllTextAsync(path),
+                _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
+            };
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Error loading asset {path}: {e.Message}");
+
+            return string.Empty;
+        }
     }
 
     public async Task<MemoryStream> ReadFileBytes(AssetPack assetPack, string path)
@@ -38,12 +48,21 @@ public class ClientFileSystem
         if (!IsInitialized)
             throw new Exception("FileSystem is not initialized!");
 
-        return assetPack switch
+        try
         {
-            AssetPack.Media => await Media!.ReadAllAsync(path).ConfigureAwait(false),
-            AssetPack.Data => await Data!.ReadAllAsync(path).ConfigureAwait(false),
-            _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
-        };
+            return assetPack switch
+            {
+                AssetPack.Media => await Media!.ReadAllAsync(path),
+                AssetPack.Data => await Data!.ReadAllAsync(path),
+                _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
+            };
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Error loading asset {path}: {e.Message}");
+
+            return new MemoryStream();
+        }
     }
 
     public async Task<bool> FileExists(AssetPack assetPack, string path)
@@ -51,11 +70,18 @@ public class ClientFileSystem
         if (!IsInitialized)
             throw new Exception("FileSystem is not initialized!");
 
-        return assetPack switch
+        try
         {
-            AssetPack.Media => await Media!.ExistsAsync(path),
-            AssetPack.Data => await Data!.ExistsAsync(path),
-            _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
-        };
+            return assetPack switch
+            {
+                AssetPack.Media => await Media!.ExistsAsync(path),
+                AssetPack.Data => await Data!.ExistsAsync(path),
+                _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
+            };
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
     }
 }

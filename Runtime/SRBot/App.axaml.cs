@@ -102,6 +102,7 @@ public partial class App : Application
         services.AddSingleton<AppConfigLoader>();
         services.AddSingleton<MessageBoxManager>();
         services.AddSingleton<ViewLocator>();
+        services.AddSingleton<IconCache>();
         // services.AddSingleton<PageNavigationService>();
 
         // View models

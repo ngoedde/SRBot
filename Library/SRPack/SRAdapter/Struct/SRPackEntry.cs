@@ -5,8 +5,8 @@ internal record SRPackEntry
     public const int EntrySize = 128;
     public SRPackEntryType Type = SRPackEntryType.Empty;
     public string Name = string.Empty;
-    public DateTime CreateTime = DateTime.MinValue;
-    public DateTime ModifyTime = DateTime.MinValue;
+    public long CreateTime = 0;
+    public long ModifyTime = 0;
     public long DataPosition = 0;
     public uint Size = 0;
     public long NextBlock = 0;

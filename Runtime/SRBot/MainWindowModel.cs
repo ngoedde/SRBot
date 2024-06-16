@@ -13,6 +13,7 @@ using ReactiveUI.Fody.Helpers;
 using SRBot.Config;
 using SRBot.Dialog;
 using SRBot.Page;
+using SRBot.Utils;
 using SRCore;
 using SRCore.Botting;
 using SRCore.Config;
@@ -38,6 +39,8 @@ public class MainWindowModel : ViewModel
     public ServerListDialogModel ServerListDialogModel => _serviceProvider.GetRequiredService<ServerListDialogModel>();
     public ClientInfoManager ClientInfoManager => _serviceProvider.GetRequiredService<ClientInfoManager>();
     public EntityManager EntityManager => _serviceProvider.GetRequiredService<EntityManager>();
+    public IconCache IconCache => _serviceProvider.GetRequiredService<IconCache>();
+    public ClientFileSystem FileSystem => _serviceProvider.GetRequiredService<ClientFileSystem>();
 
     #region Properties
 
@@ -96,6 +99,7 @@ public class MainWindowModel : ViewModel
         Bot.BotStopped += OnBotStopped;
     }
 
+
     private void OnBotStopped(BotBase bot)
     {
         this.RaisePropertyChanged(nameof(IsBotRunning));
@@ -125,7 +129,7 @@ public class MainWindowModel : ViewModel
     private void OnGameStopLoading(Game kernel)
     {
         SetLoading(new LoadingState());
-
+        
         this.RaisePropertyChanged(nameof(IsGameInitialized));
     }
 
@@ -151,7 +155,7 @@ public class MainWindowModel : ViewModel
         if (logConfig != null)
             App.LoggingLevelSwitch.MinimumLevel = logConfig.LogLevel;
 
-        await Game.CloseAsync();
+        Game.Close();
         await Game.LoadGameDataAsync();
     }
 

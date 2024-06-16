@@ -3,7 +3,7 @@ using ReactiveUI;
 using SRCore.Config;
 using SRCore.Config.Model;
 
-namespace SRCore.Components;
+namespace SRCore.Service;
 
 public class AccountService(ConfigService configService) : ReactiveObject
 {

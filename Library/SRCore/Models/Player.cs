@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using DynamicData;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using SRCore.Models.Character;
@@ -118,9 +119,11 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
         //Inventory
         InventorySize = packet.ReadByte();
         var inventoryCount = packet.ReadByte();
-        for (var i = 0; i < inventoryCount; i++)
-            Inventory.Add(ItemFactory.ParseFromPacket(packet, EntityManager));
-
+        var items = Enumerable.Range(0, inventoryCount)
+            .Select(_ => ItemFactory.ParseFromPacket(packet, EntityManager))
+            .ToList();
+        Inventory.AddRange(items);  
+        
         //Avatar Inventory
         AvatarInventorySize = packet.ReadByte();
         var avatarInventoryCount = packet.ReadByte();

@@ -1,4 +1,4 @@
-﻿namespace SRGame;
+﻿namespace SRCore.Models.CharacterSelection;
 
 public enum CharacterSelectionMemberClass : byte
 {
