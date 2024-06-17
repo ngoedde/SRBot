@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using SRCore.Models.CharacterSelection;
+using SRCore.Models.Inventory;
 using SRGame;
+using SRGame.Client;
 using SRNetwork;
 using SRNetwork.SilkroadSecurityApi;
 
@@ -18,6 +20,7 @@ public class CharacterLobby(IServiceProvider serviceProvider) : GameModel(servic
     [Reactive] public ObservableCollection<CharacterSelection.Character> Characters { get; private set; } = new();
 
     private readonly Proxy _proxy = serviceProvider.GetRequiredService<Proxy>();
+    private readonly EntityManager _entityManager = serviceProvider.GetRequiredService<EntityManager>();
 
     public void Join(CharacterSelection.Character character)
     {
@@ -81,20 +84,32 @@ public class CharacterLobby(IServiceProvider serviceProvider) : GameModel(servic
                 var inventoryCount = packet.ReadByte();
                 for (var j = 0; j < inventoryCount; j++)
                 {
-                    character.Inventory.Add(new CharacterSelectionItem
+                    var refObjItemId = packet.ReadInt();
+                    var refObjItem = _entityManager.GetItem(refObjItemId);
+                    if (refObjItem == null)
                     {
-                        RefObjId = packet.ReadUInt(),
-                        Plus = packet.ReadByte()
+                        throw new Exception($"Item {refObjItemId} not found in entity manager.");
+                    }
+                    
+                    character.Inventory.Add(new InventoryItemBasic(refObjItem)
+                    {
+                        OptLevel = packet.ReadByte()
                     });
                 }
 
                 var avatarInventoryCount = packet.ReadByte();
                 for (var j = 0; j < avatarInventoryCount; j++)
                 {
-                    character.AvatarInventory.Add(new CharacterSelectionItem
+                    var refObjItemId = packet.ReadInt();
+                    var refObjItem = _entityManager.GetItem(refObjItemId);
+                    if (refObjItem == null)
                     {
-                        RefObjId = packet.ReadUInt(),
-                        Plus = packet.ReadByte()
+                        throw new Exception($"Item {refObjItemId} not found in entity manager.");
+                    }
+                    
+                    character.AvatarInventory.Add(new InventoryItemBasic(refObjItem)
+                    {
+                        OptLevel = packet.ReadByte()
                     });
                 }
 

@@ -77,6 +77,16 @@ public sealed class EntityManager(ClientFileSystem fileSystem)
 
     public RefObjChar? GetCharacter(int id) => CharacterRepository.GetEntity(id);
 
+    public RefObjCommon? GetRefObjCommon(int id)
+    {
+        if (ItemRepository.Entities.TryGetValue(id, out var item))
+            return item;
+        if (CharacterRepository.Entities.TryGetValue(id, out var character))
+            return character;
+
+        return null;
+    }
+    
     private string PrintStats()
     {
         var sb = new StringBuilder();

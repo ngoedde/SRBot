@@ -6,7 +6,7 @@ using SRGame;
 using SRGame.Client;
 using SRNetwork.SilkroadSecurityApi;
 
-namespace SRCore.Models.Character;
+namespace SRCore.Models;
 
 public class State : ReactiveObject
 {
@@ -18,7 +18,7 @@ public class State : ReactiveObject
     [Reactive] public float HwanSpeed { get; internal set; }
     [Reactive] public ObservableCollection<Buff> Buffs { get; internal set; } = new();
 
-    internal State FromPacket(Packet packet, EntityManager entityManager)
+    internal static State FromPacket(Packet packet, EntityManager entityManager)
     {
         var result = new State();
         result.LifeState = (LifeState)packet.ReadByte();

@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
+             xmlns:vm="clr-namespace:SRBot.Page.World"
+             x:DataType="vm:WorldPageModel"
+             VerticalAlignment="Stretch"
+             HorizontalAlignment="Stretch"
+             xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+             MaxWidth="800"
+             Margin="16"
+             x:Class="SRBot.Page.World.WorldPage">
+    <ScrollViewer MaxHeight="800" Width="800">
+        <StackPanel>
+
+            <TextBlock Classes="h4" Margin="0 0 0 16" HorizontalAlignment="Center">Minimap</TextBlock>
+
+            <Panel Background="Black" Width="512" Height="512" Margin="0 0 0 32" />
+            <DataGrid MaxHeight="400" Height="400" Background="Red" Width="600" ItemsSource="{Binding Spawn.Entities}"
+                      AutoGenerateColumns="True" IsReadOnly="True">
+
+            </DataGrid>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

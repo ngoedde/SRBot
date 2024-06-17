@@ -1,6 +1,6 @@
 ﻿namespace SRGame;
 
-public enum ScrollState : byte
+public enum ScrollMode : byte
 {
     None = 0,
 

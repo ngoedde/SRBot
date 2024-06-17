@@ -63,6 +63,10 @@
           <DependentUpon>LogPage.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
+        <Compile Update="Page\World\WorldPage.axaml.cs">
+          <DependentUpon>InventoryPage.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
     </ItemGroup>
 
     <ItemGroup>
