@@ -13,6 +13,8 @@ public abstract class Entity(RefObjCommon? refObjCommon) : ReactiveObject
     
     [Reactive] public EntityPosition Position { get; internal set; } = new EntityPosition();
 
+    [Reactive] public virtual string Name { get; internal set; } = refObjCommon?.Name ?? string.Empty;
+
     public void ParseEntity(Packet packet)
     {
         UniqueId = packet.ReadUInt();

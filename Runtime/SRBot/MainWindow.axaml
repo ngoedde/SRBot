@@ -66,6 +66,10 @@
             <suki:GroupBox Header="Game" Margin="16" DockPanel.Dock="Top">
                 <StackPanel>
                     <TextBlock Classes="h4" Text="{Binding Player.Name}" />
+                    <TextBlock Text="{Binding Player.Bionic.Position.RegionId}" />
+                    <TextBlock Text="{Binding Player.Bionic.Position.X}" />
+                    <TextBlock Text="{Binding Player.Bionic.Position.Y}" />
+                    <TextBlock Text="{Binding Player.Bionic.Position.Z}" />
                     <ProgressBar Value="{Binding Player.Health}" Maximum="{Binding Player.Attributes.MaxHealth}"
                                  ShowProgressText="False">
                     </ProgressBar>

@@ -1,22 +1,21 @@
-using SRCore.Models.Character;
+﻿using SRCore.Models;
 
-namespace SRCore.MessageHandler.Agent.Character;
-
-using Models;
 using SRNetwork;
 using SRNetwork.SilkroadSecurityApi;
 
-internal class CharacterStats(Player player) : MessageHandler
+namespace SRCore.MessageHandler.Agent.Character;
+
+internal class Reset(Player player, Spawn spawn) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
-    public override ushort Opcode => AgentMsgId.CharacterStatsUpdate;
+    public override ushort Opcode => AgentMsgId.CharacterReset;
 
     public override ValueTask<bool> Handle(Session session, Packet packet)
     {
         try
         {
-            player.Attributes = Attributes.FromPacket(packet);
+            spawn.Clear();
 
             return OnHandled(session, packet);
         }

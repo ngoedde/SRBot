@@ -4,11 +4,13 @@ using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
 using SRCore.Models.Character;
 using SRCore.Models.CollectionBook;
+using SRCore.Models.EntitySpawn;
 using SRCore.Models.Inventory;
 using SRCore.Models.Quests;
 using SRCore.Models.Skills;
 using SRGame;
 using SRGame.Client;
+using SRGame.Client.Entity.RefObject;
 using SRNetwork;
 using SRNetwork.SilkroadSecurityApi;
 
@@ -18,7 +20,9 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 {
     #region Properties
 
+    [Reactive] public EntityBionic Bionic { get; internal set; }
     [Reactive] public ObservableCollection<Item> Inventory { get; internal set; } = new();
+    [Reactive] public RefObjChar RefObjChar => EntityManager.GetCharacter(RefObjId)!;
     [Reactive] public ObservableCollection<Item> AvatarInventory { get; internal set; } = new();
     [Reactive] public ObservableCollection<Mastery> Masteries { get; internal set; } = new();
     [Reactive] public ObservableCollection<Skill> Skills { get; internal set; } = new();
@@ -46,11 +50,17 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
     [Reactive] public byte FrPvpMode { get; internal set; }
     [Reactive] public byte InventorySize { get; internal set; }
     [Reactive] public byte AvatarInventorySize { get; internal set; }
-    [Reactive] public Movement Movement { get; internal set; } = new();
-    [Reactive] public EntityPosition Position { get; internal set; } = new();
-    [Reactive] public State State { get; internal set; } = new();
+
+    [Obsolete("Use Bionic.Position instead")]
+    public EntityPosition Position => Bionic.Position;
+
+    [Obsolete("Use Bionic.State instead")]
+    public State State => Bionic.State;
+
+    [Obsolete("Use Bionic.UniqueId instead")]
+    public uint UniqueId => Bionic.UniqueId;
+
     [Reactive] public uint[] CompletedQuests { get; internal set; } = [];
-    [Reactive] public uint UniqueId { get; internal set; }
     [Reactive] public string Name { get; internal set; } = "Not in game";
     [Reactive] public Job Job { get; internal set; } = new();
     [Reactive] public PvPState PvPState { get; internal set; }
@@ -84,7 +94,7 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
         Quests.Clear();
         CollectionBook.Clear();
         QuestMarks.Clear();
-        
+
         // Inventory = new ObservableCollection<Item>();
         // AvatarInventory = new ObservableCollection<Item>();
         // Masteries = new ObservableCollection<Mastery>();
@@ -122,8 +132,8 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
         var items = Enumerable.Range(0, inventoryCount)
             .Select(_ => ItemFactory.ParseFromPacket(packet, EntityManager))
             .ToList();
-        Inventory.AddRange(items);  
-        
+        Inventory.AddRange(items);
+
         //Avatar Inventory
         AvatarInventorySize = packet.ReadByte();
         var avatarInventoryCount = packet.ReadByte();
@@ -188,10 +198,11 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
         }
 
         CollectionBook = Character.CollectionBook.FromPacket(packet);
-        UniqueId = packet.ReadUInt();
-        Position = EntityPosition.FromPacket(packet);
-        Movement = Movement.FromPacket(packet);
-        State = State.FromPacket(packet, EntityManager);
+
+        Bionic = new EntityBionic(RefObjChar);
+        Bionic.ParseEntity(packet);
+        Bionic.ParseBionic(packet, EntityManager);
+
         Name = packet.ReadString();
         Job = Job.FromPacket(packet);
         PvPState = (PvPState)packet.ReadByte();

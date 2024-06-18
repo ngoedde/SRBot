@@ -9,10 +9,12 @@ namespace SRCore.Models;
 public class RegionPosition : ReactiveObject
 {
     [Reactive] public RegionId RegionId { get; internal set; }
-    [Reactive] public uint XOffset { get; internal set; }
-    [Reactive] public uint YOffset { get; internal set; }
-    [Reactive] public uint ZOffset { get; internal set; }
+    [Reactive] public float XOffset { get; internal set; }
+    [Reactive] public float YOffset { get; internal set; }
+    [Reactive] public float ZOffset { get; internal set; }
 
+    public Vector3 Local => new Vector3(XOffset, YOffset, ZOffset);
+    public Vector3 World => Vector3.Transform(Local, RegionId.LocalToWorld);
     public Mathematics.RegionPosition ToRegionPosition() => new(RegionId, new Vector3(XOffset, YOffset, ZOffset));
 
     public static RegionPosition FromPacket(Packet packet)
@@ -36,5 +38,32 @@ public class RegionPosition : ReactiveObject
         }
 
         return result;
+    }
+
+    public float DistanceTo(RegionPosition other)
+    {
+        return Vector3.Distance(World, other.World);
+    }
+
+    public float DistanceTo(Vector3 other)
+    {
+        return Vector3.Distance(World, other);
+    }
+
+    public float DistanceTo(EntityPosition other)
+    {
+        return Vector3.Distance(World, other.World);
+    }
+
+    public EntityPosition ToEntityPosition(ushort angle = 0)
+    {
+        return new EntityPosition
+        {
+            RegionId = RegionId,
+            X = XOffset,
+            Y = YOffset,
+            Z = ZOffset,
+            Angle = angle
+        };
     }
 }

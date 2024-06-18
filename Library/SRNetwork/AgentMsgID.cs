@@ -32,6 +32,9 @@ public static class AgentMsgId
         CharacterDataEnd = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4A6); // 0x34A5
 
     public static readonly MessageID
+        CharacterReset = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4B5); // 0x34A5
+
+    public static readonly MessageID
         CharacterData = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x13);
     public static readonly MessageID
         CharacterStatsUpdate = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x3D);
@@ -42,4 +45,17 @@ public static class AgentMsgId
         GroupSpawnEnd = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x18);
     public static readonly MessageID
         GroupSpawnData = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x19);
+
+    public static readonly MessageID
+        EntityUpdateAngle = MessageID.Create(MessageDirection.Ack, MessageType.Game, 0x24);
+
+    public static readonly MessageID
+        EntityUpdatePosition = MessageID.Create(MessageDirection.Ack, MessageType.Game, 0x23);
+
+    public static readonly MessageID
+        EntityUpdateMovement = MessageID.Create(MessageDirection.Ack, MessageType.Game, 0x21);
+
+    public static readonly MessageID
+        EntityUpdateSpeed = MessageID.Create(MessageDirection.Ack, MessageType.Game, 0xD0);
+
 }

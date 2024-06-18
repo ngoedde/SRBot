@@ -76,6 +76,7 @@ public sealed class EntityManager(ClientFileSystem fileSystem)
         CharacterRepository.Entities.FirstOrDefault(s => s.Value.CodeName == codeName).Value;
 
     public RefObjChar? GetCharacter(int id) => CharacterRepository.GetEntity(id);
+    public RefObjChar? GetCharacter(uint id) => CharacterRepository.GetEntity((int)id);
 
     public RefObjCommon? GetRefObjCommon(int id)
     {

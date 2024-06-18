@@ -13,7 +13,7 @@ public class EntityBionic(RefObjChar refObjChar) : Entity(refObjChar)
 
     public void ParseBionic(Packet packet, EntityManager entityManager)
     {
-        Movement = Movement.FromPacket(packet);
+        Movement = Movement.FromPacketNoSource(this, packet);
         State = State.FromPacket(packet, entityManager);
     }
 }

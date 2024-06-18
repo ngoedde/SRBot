@@ -7,7 +7,7 @@ namespace SRCore.Models.EntitySpawn.Entities;
 
 public class EntityPlayer(RefObjChar refObjChar) : EntityCharacter(refObjChar)
 {
-    [Reactive] public string Name { get; internal set; }
+    [Reactive] public override string Name { get; internal set; }
     [Reactive] public byte JobType { get; internal set; }
     [Reactive] public byte JobLevel { get; internal set; }
     [Reactive] public PvPState PvPState { get; internal set; }

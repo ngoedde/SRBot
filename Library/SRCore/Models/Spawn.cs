@@ -25,6 +25,17 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
     {
         for (var i = 0; i < GroupSpawnCount; i++)
         {
+            if (GroupSpawnType == GroupSpawnType.Despawn)
+            {
+                var despawnUniqueId = packet.ReadUInt();
+                var entity = Entities.FirstOrDefault(x => x.UniqueId == despawnUniqueId);
+                if (entity != null)
+                {
+                    Entities.Remove(entity);
+                }
+
+                return;
+            }
             var refObjId = packet.ReadUInt();
             if (refObjId == uint.MaxValue)
             {
@@ -165,5 +176,24 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
         item.ParseItem(packet);
 
         Entities.Add(item);
+    }
+
+    public void Clear()
+    {
+        Entities.Clear();
+    }
+
+    public bool TryGetEntity(uint uniqueId, out Entity? entity)
+    {
+        entity = Entities.FirstOrDefault(x => x.UniqueId == uniqueId);
+
+        return entity != null;
+    }
+
+    public bool TryGetEntity<TEntityType>(uint uniqueId, out TEntityType? entity) where TEntityType : Entity
+    {
+        entity = Entities.FirstOrDefault(x => x.UniqueId == uniqueId) as TEntityType;
+
+        return entity != null;
     }
 }

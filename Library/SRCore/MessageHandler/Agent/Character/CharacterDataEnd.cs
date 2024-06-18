@@ -15,7 +15,7 @@ internal class CharacterDataEnd(Player player, Proxy proxy) : SRNetwork.MessageH
         try
         {
             player.ParsePacket(session, player.CharacterDataPacket.Lock());
-            
+
             //Ready to play in case of clientless
             if ((proxy.Context & ProxyContext.Client) != 0) 
                 return OnHandled(session, packet);

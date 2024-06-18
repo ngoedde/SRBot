@@ -6,12 +6,12 @@ namespace SRCore.Models.EntitySpawn.Entities;
 
 public class EntityCos(RefObjChar refObjChar) : EntityBionic(refObjChar)
 {
-    [Reactive] public string Name { get; set; } = string.Empty;
-    [Reactive] public string? OwnerName { get; set; }
-    [Reactive] public uint OwnerUniqueId { get; set; }
-    [Reactive] public byte OwnerJobType { get; set; }
-    [Reactive] public byte OwnerPvpState { get; set; }
-    [Reactive] public string? GuildName { get; set; }
+    [Reactive] public override string Name { get; internal set; } = string.Empty;
+    [Reactive] public string? OwnerName { get; internal set; }
+    [Reactive] public uint OwnerUniqueId { get; internal set; }
+    [Reactive] public byte OwnerJobType { get; internal set; }
+    [Reactive] public byte OwnerPvpState { get; internal set; }
+    [Reactive] public string? GuildName { get; internal set; }
 
     public void ParseCos(Packet packet)
     {
