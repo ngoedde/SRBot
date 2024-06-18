@@ -1,0 +1,55 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="450"
+                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                 xmlns:windows="clr-namespace:SRBot.Windows"
+                 xmlns:apg="clr-namespace:Avalonia.PropertyGrid.Controls;assembly=Avalonia.PropertyGrid"
+                 x:Class="SRBot.Windows.ObjectBrowserWindow"
+                 x:DataType="windows:ObjectBrowserWindowModel"
+                 CanResize="False"
+                 Height="800"
+                 Width="1280"
+                 Title="ObjectBrowser">
+    <StackPanel>
+        <TextBox Margin="0 16 0  16" Width="300" Watermark="Search for name, id, codename etc..."
+                 HorizontalAlignment="Left"
+                 Text="{Binding Filter}">
+        </TextBox>
+        
+        <Grid ColumnDefinitions="Auto, Auto">
+            <TabControl TabStripPlacement="Top" Width="1000" HorizontalAlignment="Left">
+                <TabItem Header="{Binding ItemsTabTitle}">
+                        <DataGrid ItemsSource="{Binding ItemsSearchResult}"
+                                  AutoGenerateColumns="False" IsReadOnly="True"
+                                  MaxHeight="600"
+                                  MinHeight="600"
+                                  MaxWidth="900"
+                                  Width="900"
+                                  SelectedItem="{Binding SelectedItem}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
+                                <DataGridTextColumn Header="CodeName" Binding="{Binding CodeName}" />
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                                <DataGridTextColumn Header="TypeID1" Binding="{Binding TypeID1}" />
+                                <DataGridTextColumn Header="TypeID2" Binding="{Binding TypeID2}" />
+                                <DataGridTextColumn Header="TypeID3" Binding="{Binding TypeID3}" />
+                                <DataGridTextColumn Header="TypeID4" Binding="{Binding TypeID4}" />
+                                <DataGridTextColumn Header="Rarity" Binding="{Binding Rarity}" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                </TabItem>
+                <TabItem Header="Char">
+
+                </TabItem>
+                <TabItem Header="Skill">
+
+                </TabItem>
+            </TabControl>
+            <suki:GlassCard Grid.Column="1" Width="300" Margin="-48 0 0 0">
+                <suki:PropertyGrid Item="{Binding SelectedItem}"></suki:PropertyGrid>
+            </suki:GlassCard>
+            </Grid>
+    </StackPanel>
+</suki:SukiWindow>

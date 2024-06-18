@@ -20,6 +20,7 @@
                       IsEnabled="{Binding IsGameInitialized}" />
             <MenuItem Header="Show server list" Command="{Binding ShowServerListDialog}"
                       IsEnabled="{Binding IsServerListAvailable}" />
+            <MenuItem Header="Object browser..." Command="{Binding ShowObjectBrowserWindow}"/>
         </MenuItem>
     </suki:SukiWindow.MenuItems>
     <Grid ColumnDefinitions="Auto, *">

@@ -17,6 +17,7 @@ using SRBot.Config;
 using SRBot.Dialog;
 using SRBot.Page;
 using SRBot.Utils;
+using SRBot.Windows;
 using SRCore;
 using ILogger = Serilog.ILogger;
 using ViewLocator = SRBot.Utils.ViewLocator;
@@ -30,6 +31,8 @@ public partial class App : Application
 
     private static Kernel Kernel => ServiceProvider.GetRequiredService<Kernel>();
     private static IServiceProvider ServiceProvider { get; set; } = null!;
+    
+    public static MainWindow MainWindow { get; private set; }
 
     public override void Initialize()
     {
@@ -49,7 +52,8 @@ public partial class App : Application
             var viewLocator = ServiceProvider.GetRequiredService<IDataTemplate>();
 
             var mainVm = ServiceProvider.GetRequiredService<MainWindowModel>();
-            desktop.MainWindow = viewLocator.Build(mainVm) as MainWindow;
+            MainWindow = viewLocator.Build(mainVm) as MainWindow;
+            desktop.MainWindow = MainWindow;
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -111,6 +115,7 @@ public partial class App : Application
         if (viewlocator is not null)
             services.AddSingleton(viewlocator);
         services.AddSingleton<MainWindowModel>();
+        services.AddSingleton<ObjectBrowserWindowModel>();
         services.AddSingleton<ServerListDialogModel>();
         services.AddSingleton<ClientInfoDialogModel>();
 

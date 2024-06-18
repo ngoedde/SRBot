@@ -70,9 +70,9 @@ public abstract class RefObjCommon : Entity<int>
     private string _assocFile1;
     private string _assocFile2;
 
-    [Translation(nameof(NameStrID))] public string Name { get; set; }
+    [Translation(nameof(NameStrID))] public string Name { get; set; } = string.Empty;
 
-    [Translation(nameof(DescStrID))] public string Description { get; set; }
+    [Translation(nameof(DescStrID))] public string Description { get; set; } = string.Empty;
 
     public bool Active
     {

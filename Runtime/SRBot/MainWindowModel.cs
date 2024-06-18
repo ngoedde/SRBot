@@ -14,6 +14,7 @@ using SRBot.Config;
 using SRBot.Dialog;
 using SRBot.Page;
 using SRBot.Utils;
+using SRBot.Windows;
 using SRCore;
 using SRCore.Botting;
 using SRCore.Config;
@@ -23,6 +24,7 @@ using SRGame.Client;
 using SRNetwork;
 using SukiUI.Controls;
 using SukiUI.Enums;
+using ViewLocator = SRBot.Utils.ViewLocator;
 
 namespace SRBot;
 
@@ -37,10 +39,12 @@ public class MainWindowModel : ViewModel
     public Proxy Proxy => _serviceProvider.GetRequiredService<Proxy>();
     public PatchInfo PatchInfo => _serviceProvider.GetRequiredService<PatchInfo>();
     public ServerListDialogModel ServerListDialogModel => _serviceProvider.GetRequiredService<ServerListDialogModel>();
+    public ObjectBrowserWindowModel ObjectBrowserWindowModel => _serviceProvider.GetRequiredService<ObjectBrowserWindowModel>();
     public ClientInfoManager ClientInfoManager => _serviceProvider.GetRequiredService<ClientInfoManager>();
     public EntityManager EntityManager => _serviceProvider.GetRequiredService<EntityManager>();
     public IconCache IconCache => _serviceProvider.GetRequiredService<IconCache>();
     public ClientFileSystem FileSystem => _serviceProvider.GetRequiredService<ClientFileSystem>();
+    public ViewLocator ViewLocator => _serviceProvider.GetRequiredService<ViewLocator>();
 
     #region Properties
 
@@ -222,6 +226,15 @@ public class MainWindowModel : ViewModel
     public void ShowServerListDialog()
     {
         SukiHost.ShowDialog(ServerListDialogModel, allowBackgroundClose: true);
+    }
+
+    public async void ShowObjectBrowserWindow()
+    {
+        var window = ViewLocator.Build(ObjectBrowserWindowModel) as ObjectBrowserWindow;
+        
+        window.Show();
+        // window.Show();
+        //SukiHost.ShowDialog(ObjectBrowserWindowModel, allowBackgroundClose: true);
     }
 
     #endregion
