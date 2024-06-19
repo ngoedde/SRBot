@@ -62,6 +62,7 @@ public class RegionPosition : ReactiveObject
 
     public Vector3 Local => new Vector3(XOffset, YOffset, ZOffset);
     public Vector3 World => Vector3.Transform(Local, RegionId.LocalToWorld);
+
     public float XCoordinate => XOffset == 0 ? 0 : RegionId.IsDungeon ? XOffset / 10 : (RegionId.X - 135) * 192 + XOffset / 10;
     public float YCoordinate => ZOffset == 0 ? 0 : RegionId.IsDungeon ? ZOffset / 10 : (RegionId.Z - 92) * 192 + ZOffset / 10;
 
@@ -74,19 +75,20 @@ public class RegionPosition : ReactiveObject
         result.RegionId = new RegionId(regionId);
         if (regionId < short.MaxValue)
         {
-            result.XOffset = packet.ReadUShort();
-            result.YOffset = packet.ReadUShort();
-            result.ZOffset = packet.ReadUShort();
+            result.XOffset = packet.ReadShort() / 10f;
+            result.YOffset = packet.ReadShort();
+            result.ZOffset = packet.ReadShort() / 10f;
         }
         else
         {
-            result.XOffset = packet.ReadUInt();
-            result.ZOffset = packet.ReadUInt();
-            result.YOffset = packet.ReadUInt();
+            result.XOffset = packet.ReadInt() / 10f;
+            result.YOffset = packet.ReadInt();
+            result.ZOffset = packet.ReadInt() / 10f;
         }
 
         return result;
     }
+
 
     public float DistanceTo(RegionPosition other)
     {
@@ -98,7 +100,7 @@ public class RegionPosition : ReactiveObject
         return Vector3.Distance(World, other);
     }
     
-    public OrientedRegionPosition ToOrientedPosition(ushort angle = 0)
+    public OrientedRegionPosition ToOrientedPosition(float angle = 0)
     {
         return new OrientedRegionPosition
         {
@@ -108,5 +110,62 @@ public class RegionPosition : ReactiveObject
             ZOffset = ZOffset,
             Angle = angle
         };
+    }
+    public void TieBreak()
+    {
+        // Used to break a position which is exactly on 0 or 1920 after region transition.
+        const float breakThreshold = 0.01f;
+
+        // X
+        if (XOffset.IsApproximately(RegionId.Width))
+        {
+            XOffset = MathHelper.Epsilon;
+            _regionId.X++;
+        }
+        else if (XOffset.IsApproximatelyZero(0.0f))
+        {
+            XOffset = RegionId.Width - breakThreshold;
+            _regionId.X--;
+        }
+
+        // Z
+        if (ZOffset.IsApproximately(RegionId.Length))
+        {
+            ZOffset = MathHelper.Epsilon;
+            _regionId.Z++;
+        }
+        else if (ZOffset.IsApproximatelyZero(0.0f))
+        {
+            ZOffset = RegionId.Length - breakThreshold;
+            _regionId.Z--;
+        }
+    }
+
+    public void Normalize()
+    {
+        if (RegionId.IsDungeon)
+            return;
+
+        if (XOffset > RegionId.Width)
+        {
+            _regionId.X += (byte)(XOffset / RegionId.Width);
+            XOffset %= RegionId.Width;
+        }
+        else if (XOffset < 0.0f)
+        {
+            _regionId.X += (byte)(XOffset / RegionId.Width);
+            XOffset = RegionId.Width + (XOffset % RegionId.Width);
+        }
+
+        if (ZOffset > RegionId.Length)
+        {
+            _regionId.Z += (byte)(ZOffset / RegionId.Length);
+            ZOffset %= RegionId.Length;
+        }
+        else if (ZOffset < 0.0f)
+        {
+            _regionId.Z += (byte)(ZOffset / RegionId.Length);
+            ZOffset = RegionId.Length + (ZOffset % RegionId.Length);
+        }
     }
 }

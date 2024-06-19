@@ -8,6 +8,7 @@ using SRCore.Models.EntitySpawn;
 using SRCore.Models.Inventory;
 using SRCore.Models.Quests;
 using SRCore.Models.Skills;
+using SRCore.Service;
 using SRGame;
 using SRGame.Client;
 using SRGame.Client.Entity.RefObject;
@@ -238,8 +239,5 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 
         WorldId = packet.ReadUShort();
         LayerId = packet.ReadUShort();
-        
-        if (Bionic.Movement.Destination != null)
-            Bionic.Movement.Start(Bionic.Position, Bionic.State.Speed);
     }
 }

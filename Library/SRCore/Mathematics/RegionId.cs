@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using System.Security.Cryptography;
 
 namespace SRCore.Mathematics;
 
@@ -65,7 +66,17 @@ public struct RegionId : IEquatable<RegionId>
 
     public Matrix4x4 LocalToWorld => Matrix4x4.CreateTranslation(this.WorldX, 0, this.WorldZ);
     public Matrix4x4 WorldToLocal => Matrix4x4.CreateTranslation(-this.WorldX, 0, -this.WorldZ);
+    public static Vector3 Transform(Vector3 value, RegionId sourceRegion, RegionId targetRegion)
+    {
+        if (sourceRegion != targetRegion)
+        {
+            var localX = value.X + ((targetRegion.X - sourceRegion.X) * Width);
+            var localZ = value.Z + ((targetRegion.Z - sourceRegion.Z) * Length);
 
+            value = new Vector3(localX, 0, localZ);
+        }
+        return value;
+    }
     public float WorldX
     {
         get

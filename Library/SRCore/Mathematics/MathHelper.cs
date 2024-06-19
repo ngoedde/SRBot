@@ -8,6 +8,7 @@ using MathF = System.MathF;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using SRCore.Models;
 
 namespace SRCore.Mathematics;
 
@@ -86,8 +87,8 @@ public static class MathHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Distance2DSqrt(RegionPosition left, RegionPosition right)
     {
-        var dx = ((left.RegionId.X - right.RegionId.X) * RegionId.Width) + (left.Offset.X - right.Offset.X);
-        var dz = ((left.RegionId.Z - right.RegionId.Z) * RegionId.Length) + (left.Offset.Z - right.Offset.Z);
+        var dx = ((left.RegionId.X - right.RegionId.X) * RegionId.Width) + (left.XOffset - right.XOffset);
+        var dz = ((left.RegionId.Z - right.RegionId.Z) * RegionId.Length) + (left.ZOffset - right.ZOffset);
 
         return (dx * dx) + (dz * dz);
     }

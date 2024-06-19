@@ -7,17 +7,17 @@ namespace SRCore.Models;
 
 public class OrientedRegionPosition : RegionPosition
 {
-    [Reactive] public ushort Angle { get; internal set; }
+    [Reactive] public float Angle { get; internal set; }
     
     public new static OrientedRegionPosition FromPacket(Packet packet)
     {
         var result = new OrientedRegionPosition
         {
             RegionId = new RegionId(packet.ReadUShort()),
-            XOffset = packet.ReadFloat(),
+            XOffset = packet.ReadFloat() / 10f,
             YOffset = packet.ReadFloat(),
-            ZOffset = packet.ReadFloat(),
-            Angle = packet.ReadUShort()
+            ZOffset = packet.ReadFloat() / 10f,
+            Angle = packet.ReadUShort() / 10000f
         };
 
         return result;

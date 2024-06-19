@@ -10,6 +10,7 @@ using SRCore.Config.Model;
 using SRCore.Models;
 using SRCore.Service;
 using SRGame.Client;
+using SRNetwork.Common;
 
 namespace SRCore;
 
@@ -47,6 +48,7 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
     private readonly AccountService _accountService = serviceProvider.GetRequiredService<AccountService>();
     private readonly LoginService _loginService = serviceProvider.GetRequiredService<LoginService>();
     private readonly Bot _bot = serviceProvider.GetRequiredService<Bot>();
+    private readonly MainLoopRegistry _mainLoopRegistry = serviceProvider.GetRequiredService<MainLoopRegistry>();
 
     public bool IsInitialized { get; private set; }
 
@@ -54,7 +56,7 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
     /// Initializes required services used by SRCore. This method should be called before using any other services.
     /// </summary>
     /// <exception cref="Exception"></exception>
-    public async Task InitializeAsync()
+    public async Task RunAsync(CancellationToken token = default)
     {
         RxApp.MainThreadScheduler = scheduler;
         
@@ -73,12 +75,75 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
         _loginService.Initialize();
         _clientlessManager.Initialize();
         _profileService.ActiveProfileChanged += ProfileServiceOnActiveProfileChanged;
-
+        
         IsInitialized = true;
 
         OnKernelInitialized(this);
 
         Log.Debug("SRKernel initialized.");
+
+        Task.Run(Tick, token);
+    }
+
+    private void Tick()
+    {
+        if (!IsInitialized)
+            return;
+
+        var prevTime = TimerHelper.GetTimestamp();
+        var spinner = new SpinWait();
+        /*
+    *    public void Run()
+      {
+      var prevTime = TimerHelper.GetTimestamp();
+      var spinner = new SpinWait();
+
+      while (!_exit)
+      {
+      var curTime = TimerHelper.GetTimestamp();
+      var elaspedTime = TimerHelper.GetElaspedTime(prevTime, curTime);
+
+
+
+      // Calculate how many milliseconds until the next update is due.
+      const int sleepAccuracyCompensation = 0; // 0 = slightly inaccurate, 1 = hightly accurate
+      var updateDueTime = (int)((prevTime + TARGET_VARIABLE_TIME - TimerHelper.GetTimestamp()) * UsToMs);
+      if (updateDueTime > 0 && updateDueTime <= (int)(TARGET_VARIABLE_TIME * UsToMs))
+      Thread.Sleep(updateDueTime - sleepAccuracyCompensation);
+
+      // Spin the CPU idle for the remaining microseconds
+      // SpinWait will try to mix in Sleep(0) and Yield so we remaing responsive
+      // while avoiding stavation or cache contention.
+
+      while (TimerHelper.GetElaspedTime(prevTime) < TARGET_VARIABLE_TIME)
+      spinner.SpinOnce(-1); // -1 to disable Sleep(1+) because we already slept
+
+      _lastSpinCount = spinner.Count;
+      spinner.Reset();
+      }
+      this.OnExit();
+      }
+    */
+        var TARGET_VARIABLE_TIME = 16666; // 60fps
+        while (true)
+        {
+            var curTime = TimerHelper.GetTimestamp();
+            var elaspedTime = TimerHelper.GetElaspedTime(prevTime, curTime);
+
+            _mainLoopRegistry.Run();
+            prevTime = curTime;
+
+            const int sleepAccuracyCompensation = 0; // 0 = slightly inaccurate, 1 = hightly accurate
+            var updateDueTime = (int)((prevTime + TARGET_VARIABLE_TIME - TimerHelper.GetTimestamp()));
+            if (updateDueTime > 0 && updateDueTime <= (int)(TARGET_VARIABLE_TIME))
+                Thread.Sleep(updateDueTime - sleepAccuracyCompensation);
+
+            while (TimerHelper.GetElaspedTime(prevTime) < TARGET_VARIABLE_TIME)
+                spinner.SpinOnce(-1); // -1 to disable Sleep(1+) because we already slept
+
+            spinner.Reset();
+        }
+
     }
 
     private void ProfileServiceOnActiveProfileChanged(Profile profile)
@@ -152,6 +217,7 @@ public static class KernelExtensions
 
         services.AddSingleton<EntityManager>();
         services.AddSingleton<ClientInfoManager>();
+        services.AddSingleton<MainLoopRegistry>();
 
         //Game models
         var gameModels = AppDomain.CurrentDomain.GetAssemblies()

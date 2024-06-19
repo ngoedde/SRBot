@@ -4,7 +4,7 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.MessageHandler.Agent.Character;
 
-internal class CharacterDataEnd(Player player, Proxy proxy) : SRNetwork.MessageHandler
+internal class CharacterDataEnd(Player player, Proxy proxy, Spawn spawn) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
@@ -14,6 +14,7 @@ internal class CharacterDataEnd(Player player, Proxy proxy) : SRNetwork.MessageH
     {
         try
         {
+            spawn.Reset();
             player.ParsePacket(session, player.CharacterDataPacket.Lock());
 
             //Ready to play in case of clientless

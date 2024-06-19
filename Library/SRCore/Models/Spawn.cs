@@ -4,6 +4,7 @@ using ReactiveUI.Fody.Helpers;
 using Serilog.Events;
 using SRCore.Models.EntitySpawn;
 using SRCore.Models.EntitySpawn.Entities;
+using SRCore.Service;
 using SRGame.Client;
 using SRGame.Client.Entity.RefObject;
 using SRNetwork;
@@ -11,15 +12,24 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models;
 
-public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider)
+public class Spawn : GameModel
 {
     [Reactive] public ObservableCollection<Entity> Entities { get; internal set; } = new();
 
     internal Packet GroupSpawnPacket { get; set; } = new Packet(AgentMsgId.GroupSpawnData);
     internal ushort GroupSpawnCount { get; set; } = 0;
     internal GroupSpawnType GroupSpawnType { get; set; } = 0;
-    private EntityManager EntityManager => serviceProvider.GetRequiredService<EntityManager>();
-    private Kernel Kernel => serviceProvider.GetRequiredService<Kernel>();
+    private EntityManager EntityManager => _serviceProvider.GetRequiredService<EntityManager>();
+    private Kernel Kernel => _serviceProvider.GetRequiredService<Kernel>();
+    private Player Player => _serviceProvider.GetRequiredService<Player>();
+    private CancellationTokenSource _cancellationTokenSource = new();
+    private readonly IServiceProvider _serviceProvider;
+
+    public Spawn(IServiceProvider serviceProvider) : base(serviceProvider)
+    {
+        _serviceProvider = serviceProvider;
+        _serviceProvider.GetRequiredService<MainLoopRegistry>().Register(UpdateEntityPositions);
+    }
 
     internal override void ParsePacket(Session session, Packet packet)
     {
@@ -146,10 +156,6 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
                 Entities.Add(npc);
             }
         }
-
-        // Start moving
-        if (Entities.LastOrDefault() is EntityBionic { Movement.Destination: not null } entity)
-            entity.Movement.Start(entity.Position, entity.State.Speed);
     }
 
     private void ParseEventZone(Packet packet)
@@ -178,7 +184,7 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
         Entities.Add(item);
     }
 
-    public void Clear()
+    public void Reset()
     {
         Entities.Clear();
     }
@@ -195,5 +201,18 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
         entity = Entities.FirstOrDefault(x => x.UniqueId == uniqueId) as TEntityType;
 
         return entity != null;
+    }
+
+    private void UpdateEntityPositions()
+    {
+        Player.Bionic?.Movement.Update();
+
+        foreach (var entity in Entities)
+        {
+            if (entity is EntityBionic bionic)
+            {
+                bionic.Movement.Update();
+            }
+        }
     }
 }

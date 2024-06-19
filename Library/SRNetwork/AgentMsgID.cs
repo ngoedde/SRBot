@@ -6,7 +6,10 @@ public static class AgentMsgId
 {
     public static readonly MessageID
         ReadyToPlay = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x12); // 0x34A7
-    
+
+    public static readonly MessageID
+        GameReset = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4B5);
+
     public static readonly MessageID
         LoginActionReq = MessageID.Create(MessageDirection.Req, MessageType.Framework, 0x103); // 0x6103
 
@@ -29,10 +32,8 @@ public static class AgentMsgId
         CharacterDataStart = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4A5); // 0x34A5
 
     public static readonly MessageID
-        CharacterDataEnd = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4A6); // 0x34A5
+        CharacterDataEnd = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4A6);
 
-    public static readonly MessageID
-        CharacterReset = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x4B5); // 0x34A5
 
     public static readonly MessageID
         CharacterData = MessageID.Create(MessageDirection.NoDir, MessageType.Game, 0x13);

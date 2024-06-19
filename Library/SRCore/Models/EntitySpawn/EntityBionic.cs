@@ -9,7 +9,7 @@ public class EntityBionic : Entity
 {
     public EntityBionic(RefObjChar refObjChar) : base(refObjChar)
     {
-        Movement = new Movement(Position);
+        Movement = new Movement(this);
     }
 
     [Reactive] public RefObjChar RefObjChar { get; internal set; }
@@ -20,8 +20,5 @@ public class EntityBionic : Entity
     {
         Movement = Movement.FromPacketNoSource(this, packet);
         State = State.FromPacket(packet, entityManager);
-        
-        if (Movement.Destination != null)
-            Movement.Start(Position, State.Speed);
     }
 }

@@ -1,30 +1,105 @@
+using System.Diagnostics;
+using System.Numerics;
+using System.Security.Cryptography;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using SRCore.Mathematics;
 using SRCore.Models.EntitySpawn;
 using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models;
 
-public class Movement(OrientedRegionPosition source) : ReactiveObject
+public class Source : RegionPosition
 {
-    [Reactive] public RegionPosition? Destination { get; internal set; }
+    public static Source FromPacket(Packet packet)
+    {
+        var result = new Source();
+        var regionId = packet.ReadUShort();
+        result.RegionId = new RegionId(regionId);
+
+        if (regionId < short.MaxValue)
+        {
+            result.XOffset = packet.ReadShort() / 10f;
+            result.YOffset = packet.ReadFloat();
+            result.ZOffset = packet.ReadShort() / 10f;
+        }
+        else
+        {
+            result.XOffset = packet.ReadInt() / 10f;
+            result.YOffset = packet.ReadFloat();
+            result.ZOffset = packet.ReadInt() / 10f;
+        }
+
+        return result;
+    }
+
+    public Destination ToDestination()
+    {
+        return new Destination
+        {
+            RegionId = RegionId,
+            XOffset = XOffset,
+            YOffset = YOffset,
+            ZOffset = ZOffset
+        };
+    }
+}
+
+public class Destination : RegionPosition
+{
+    public static Destination FromPacket(Packet packet)
+    {
+        var result = new Destination();
+        var regionId = packet.ReadUShort();
+
+        result.RegionId = new RegionId(regionId);
+        if (regionId < short.MaxValue)
+        {
+            result.XOffset = packet.ReadShort();
+            result.YOffset = packet.ReadShort();
+            result.ZOffset = packet.ReadShort();
+        }
+        else
+        {
+            result.XOffset = packet.ReadInt();
+            result.YOffset = packet.ReadInt();
+            result.ZOffset = packet.ReadInt();
+        }
+
+        return result;
+    }
+
+    public Source ToSource()
+    {
+        return new Source
+        {
+            RegionId = RegionId,
+            XOffset = XOffset,
+            YOffset = YOffset,
+            ZOffset = ZOffset
+        };
+    }
+}
+
+public class Movement(EntityBionic bionic) : ReactiveObject
+{
+    [Reactive] public Destination? Destination { get; internal set; }
     [Reactive] public byte Type { get; internal set; }
     [Reactive] public MovementSourceType SourceType { get; internal set; }
     [Reactive] public float Angle { get; internal set; }
-    [Reactive] public RegionPosition Source { get; internal set; } = source;
-    [Reactive] public float Speed { get; internal set; }
-    
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
+    [Reactive] public Source Source { get; internal set; } = new Source{XOffset = bionic.Position.XOffset, YOffset = bionic.Position.YOffset, ZOffset = bionic.Position.ZOffset};
+
+    public bool AtDestination => Destination != null && Vector3.Distance(Source.World, Destination.World) < 1;
     
     internal static Movement FromPacketNoSource(EntityBionic bionic, Packet packet)
     {
-        var result = new Movement(bionic.Position);
+        var result = new Movement(bionic);
 
         var hasDestination = packet.ReadBool();
         result.Type = packet.ReadByte();
 
         if (hasDestination)
-            result.Destination = RegionPosition.FromPacket(packet);
+            result.Destination = Models.Destination.FromPacket(packet);
         else
         {
             result.SourceType = (MovementSourceType)packet.ReadByte();
@@ -36,21 +111,21 @@ public class Movement(OrientedRegionPosition source) : ReactiveObject
 
     internal static Movement FromPacketWithSource(EntityBionic bionic, Packet packet)
     {
-        var result = new Movement(bionic.Position);
+        var result = new Movement(bionic);
 
         var hasDestination = packet.ReadBool();
         if (hasDestination)
-            result.Destination = RegionPosition.FromPacket(packet);
+            result.Destination = Models.Destination.FromPacket(packet);
         else
         {
             result.SourceType = (MovementSourceType)packet.ReadByte();
-            result.Angle = packet.ReadUShort();
+            result.Angle = packet.ReadUShort() / 10000f;
         }
 
         var hasSource = packet.ReadBool();
         if (hasSource)
         {
-            result.Source = RegionPosition.FromPacket(packet);
+            result.Source = Models.Source.FromPacket(packet);
         }
 
         return result;
@@ -58,81 +133,43 @@ public class Movement(OrientedRegionPosition source) : ReactiveObject
 
     #region Tracking
 
-    public void Start(OrientedRegionPosition outputPosition, float speed = 50)
-    {
-        Speed = speed;
-        
-        var token = _cancellationTokenSource.Token;
-
-        Task.Run(() => TrackMovement(outputPosition, token), token);
-    }
 
     public void Stop()
     {
-        _cancellationTokenSource?.Cancel();
+        Destination = new Destination()
+        {
+            RegionId = bionic.Position.RegionId,
+            XOffset = bionic.Position.XOffset,
+            YOffset = bionic.Position.YOffset,
+            ZOffset = bionic.Position.ZOffset
+        };
     }
 
-    private async Task TrackMovement(OrientedRegionPosition outputPosition, CancellationToken token)
+    private DateTime _lastUpdate = DateTime.Now;
+    internal void Update()
     {
-        var startTime = DateTime.UtcNow;
-        var startPosition = Source;
-        var endPosition = Destination;
+        if (AtDestination || Destination == null)
+            return;
 
-        if (endPosition != null)
+        var deltaTime = (float)(DateTime.Now - _lastUpdate).TotalMilliseconds;
+        var destination = RegionId.Transform(Destination.Local, Destination.RegionId, Source.RegionId);
+        var direction = Vector3.Normalize(destination - Source.Local);
+
+        var newPosition = Source.Local + direction * bionic.State.Speed * deltaTime; 
+        var newSource = new Source
         {
-            var totalDistance = startPosition.DistanceTo(endPosition);
-            var totalTime = totalDistance / Speed;
+            RegionId = Source.RegionId,
+            XOffset = newPosition.X,
+            YOffset = newPosition.Y,
+            ZOffset = newPosition.Z
+        };
+        newSource.Normalize();
 
-            while (!token.IsCancellationRequested)
-            {
-                var elapsedTime = (DateTime.UtcNow - startTime).TotalSeconds;
-                if (elapsedTime >= totalTime)
-                {
-                    Source = Destination!;
-   
-                    return;
-                }
+        bionic.Position = Source.ToOrientedPosition(Angle);
 
-                var progress = elapsedTime / totalTime;
-                var newX = startPosition.XOffset + (endPosition.XOffset - startPosition.XOffset) * progress;
-                var newZ = startPosition.ZOffset + (endPosition.ZOffset - startPosition.ZOffset) * progress;
-                Source = new RegionPosition
-                {
-                    RegionId = startPosition.RegionId,
-                    XOffset = (float)newX,
-                    YOffset = startPosition.YOffset,
-                    ZOffset = (float)newZ
-                };
+        Source = newSource;
 
-                outputPosition.XOffset = (float)newX;
-                outputPosition.ZOffset = (float)newZ;
-
-                await Task.Delay(100, token);
-            }
-        }
-        else //Sky click
-        {
-            var angleInRadians = Angle * (Math.PI / 180); // Convert angle to radians
-            while (!token.IsCancellationRequested)
-            {
-                var elapsedTime = (DateTime.UtcNow - startTime).TotalSeconds;
-                var distanceTravelled = Speed * elapsedTime;
-                var newX = startPosition.XOffset + Math.Cos(angleInRadians) * distanceTravelled;
-                var newZ = startPosition.ZOffset + Math.Sin(angleInRadians) * distanceTravelled;
-                Source = new RegionPosition
-                {
-                    RegionId = startPosition.RegionId,
-                    XOffset = (float)newX,
-                    YOffset = startPosition.YOffset,
-                    ZOffset = (float)newZ
-                };
-
-                outputPosition.XOffset = (float)newX;
-                outputPosition.ZOffset = (float)newZ;
-
-                await Task.Delay(100, token);
-            }
-        }
+        _lastUpdate = DateTime.Now;
     }
 
     #endregion
@@ -140,6 +177,6 @@ public class Movement(OrientedRegionPosition source) : ReactiveObject
     public override string ToString()
     {
         return
-            $"Type: {Type}, Source: {Source.World}, Angle: {Angle}, Destination: {Destination?.World}, Speed: {Speed}";
+            $"Type: {Type}, Source: {Source.World}, Angle: {Angle}, Destination: {Destination?.World}, Speed: {bionic.State.Speed}";
     }
 }

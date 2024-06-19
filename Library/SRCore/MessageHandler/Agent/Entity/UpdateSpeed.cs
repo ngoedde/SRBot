@@ -25,7 +25,6 @@ internal class UpdateSpeed(Spawn spawn, Player player) : SRNetwork.MessageHandle
             
             bionic!.State.RunSpeed = runSpeed;
             bionic.State.WalkSpeed = walkSpeed;
-            bionic.Movement.Speed = bionic.State.Speed;
             
             return OnHandled(session, packet);
         }
