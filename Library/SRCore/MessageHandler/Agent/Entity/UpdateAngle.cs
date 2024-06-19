@@ -1,10 +1,11 @@
+using DynamicData;
 using SRCore.Models;
 using SRNetwork;
 using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.MessageHandler.Agent.Entity;
 
-internal class UpdateAngle(Spawn spawn) : SRNetwork.MessageHandler
+internal class UpdateAngle(Spawn spawn, Player player) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
@@ -17,9 +18,12 @@ internal class UpdateAngle(Spawn spawn) : SRNetwork.MessageHandler
             var uniqueId = packet.ReadUInt();
             var angle = packet.ReadUShort();
 
-            if (spawn.TryGetEntity(uniqueId, out var entity))
-                entity.Position.Angle = angle;
+            var bionic = uniqueId == player.Bionic.UniqueId ? player.Bionic : null;
+            if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
+                return OnHandled(session, packet);
 
+            bionic.Movement.Angle = angle;
+            
             return OnHandled(session, packet);
         }
         catch (Exception e)

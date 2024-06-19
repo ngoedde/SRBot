@@ -94,8 +94,6 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
             player.ParsePlayer(packet);
 
             Entities.Add(player);
-
-            return;
         }
         else if (refObjChar.TypeID2 == 2 && refObjChar.TypeID3 == 5)
         {
@@ -105,8 +103,6 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
             structure.ParseBionic(packet, EntityManager);
 
             Entities.Add(structure);
-
-            return;
         }
         else if (refObjChar.TypeID2 == 2)
         {
@@ -150,6 +146,10 @@ public class Spawn(IServiceProvider serviceProvider) : GameModel(serviceProvider
                 Entities.Add(npc);
             }
         }
+
+        // Start moving
+        if (Entities.LastOrDefault() is EntityBionic { Movement.Destination: not null } entity)
+            entity.Movement.Start(entity.Position, entity.State.Speed);
     }
 
     private void ParseEventZone(Packet packet)

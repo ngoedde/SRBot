@@ -5,15 +5,23 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models.EntitySpawn;
 
-public class EntityBionic(RefObjChar refObjChar) : Entity(refObjChar)
+public class EntityBionic : Entity
 {
+    public EntityBionic(RefObjChar refObjChar) : base(refObjChar)
+    {
+        Movement = new Movement(Position);
+    }
+
     [Reactive] public RefObjChar RefObjChar { get; internal set; }
-    [Reactive] public Movement Movement { get; internal set; } = new Movement();
+    [Reactive] public Movement Movement { get; internal set; } 
     [Reactive] public State State { get; internal set; } = new State();
 
     public void ParseBionic(Packet packet, EntityManager entityManager)
     {
         Movement = Movement.FromPacketNoSource(this, packet);
         State = State.FromPacket(packet, entityManager);
+        
+        if (Movement.Destination != null)
+            Movement.Start(Position, State.Speed);
     }
 }

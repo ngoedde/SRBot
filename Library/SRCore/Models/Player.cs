@@ -52,7 +52,7 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
     [Reactive] public byte AvatarInventorySize { get; internal set; }
 
     [Obsolete("Use Bionic.Position instead")]
-    public EntityPosition Position => Bionic.Position;
+    public OrientedRegionPosition Position => Bionic.Position;
 
     [Obsolete("Use Bionic.State instead")]
     public State State => Bionic.State;
@@ -238,5 +238,8 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 
         WorldId = packet.ReadUShort();
         LayerId = packet.ReadUShort();
+        
+        if (Bionic.Movement.Destination != null)
+            Bionic.Movement.Start(Bionic.Position, Bionic.State.Speed);
     }
 }

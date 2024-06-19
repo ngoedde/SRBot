@@ -1,6 +1,5 @@
 using System.Numerics;
 using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
 using SRCore.Mathematics;
 using SRNetwork.SilkroadSecurityApi;
 
@@ -8,14 +7,63 @@ namespace SRCore.Models;
 
 public class RegionPosition : ReactiveObject
 {
-    [Reactive] public RegionId RegionId { get; internal set; }
-    [Reactive] public float XOffset { get; internal set; }
-    [Reactive] public float YOffset { get; internal set; }
-    [Reactive] public float ZOffset { get; internal set; }
+    private float _x;
+    private float _y;
+    private float _z;
+    private RegionId _regionId = RegionId.Invalid;
+    
+    public RegionId RegionId
+    {
+        get => _regionId;
+        internal set
+        {
+            this.RaiseAndSetIfChanged(ref _regionId, value);
+            this.RaisePropertyChanged(nameof(XCoordinate));
+            this.RaisePropertyChanged(nameof(YCoordinate));
+            this.RaisePropertyChanged(nameof(World));
+            this.RaisePropertyChanged(nameof(Local));
+        }
+    }
+
+    public float XOffset
+    {
+        get => _x;
+        internal set
+        {
+            this.RaiseAndSetIfChanged(ref _x, value);
+            this.RaisePropertyChanged(nameof(XCoordinate));
+            this.RaisePropertyChanged(nameof(World));
+            this.RaisePropertyChanged(nameof(Local));
+        }
+    }
+
+    public float YOffset
+    {
+        get => _y;
+        internal set
+        {
+            this.RaiseAndSetIfChanged(ref _y, value);
+            this.RaisePropertyChanged(nameof(World));
+            this.RaisePropertyChanged(nameof(Local));
+        }
+    }
+
+    public float ZOffset
+    {
+        get => _z;
+        internal set
+        {
+            this.RaiseAndSetIfChanged(ref _z, value);
+            this.RaisePropertyChanged(nameof(World));
+            this.RaisePropertyChanged(nameof(Local));
+            this.RaisePropertyChanged(nameof(YCoordinate));
+        }
+    }
 
     public Vector3 Local => new Vector3(XOffset, YOffset, ZOffset);
     public Vector3 World => Vector3.Transform(Local, RegionId.LocalToWorld);
-    public Mathematics.RegionPosition ToRegionPosition() => new(RegionId, new Vector3(XOffset, YOffset, ZOffset));
+    public float XCoordinate => XOffset == 0 ? 0 : RegionId.IsDungeon ? XOffset / 10 : (RegionId.X - 135) * 192 + XOffset / 10;
+    public float YCoordinate => ZOffset == 0 ? 0 : RegionId.IsDungeon ? ZOffset / 10 : (RegionId.Z - 92) * 192 + ZOffset / 10;
 
     public static RegionPosition FromPacket(Packet packet)
     {
@@ -49,20 +97,15 @@ public class RegionPosition : ReactiveObject
     {
         return Vector3.Distance(World, other);
     }
-
-    public float DistanceTo(EntityPosition other)
+    
+    public OrientedRegionPosition ToOrientedPosition(ushort angle = 0)
     {
-        return Vector3.Distance(World, other.World);
-    }
-
-    public EntityPosition ToEntityPosition(ushort angle = 0)
-    {
-        return new EntityPosition
+        return new OrientedRegionPosition
         {
             RegionId = RegionId,
-            X = XOffset,
-            Y = YOffset,
-            Z = ZOffset,
+            XOffset = XOffset,
+            YOffset = YOffset,
+            ZOffset = ZOffset,
             Angle = angle
         };
     }

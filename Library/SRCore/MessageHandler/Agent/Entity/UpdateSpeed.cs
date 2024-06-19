@@ -18,18 +18,15 @@ internal class UpdateSpeed(Spawn spawn, Player player) : SRNetwork.MessageHandle
             var uniqueId = packet.ReadUInt();
             var walkSpeed = packet.ReadFloat();
             var runSpeed = packet.ReadFloat();
-
-            if (uniqueId == player.UniqueId)
-            {
-                player.State.WalkSpeed = walkSpeed;
-                player.State.RunSpeed = runSpeed;
-            }
-            if (spawn.TryGetEntity<EntityBionic>(uniqueId, out var entity))
-            {
-                entity.State.WalkSpeed = walkSpeed;
-                entity.State.RunSpeed = runSpeed;
-            }
-
+            
+            var bionic = uniqueId == player.Bionic.UniqueId ? player.Bionic : null;
+            if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
+                return OnHandled(session, packet);
+            
+            bionic!.State.RunSpeed = runSpeed;
+            bionic.State.WalkSpeed = walkSpeed;
+            bionic.Movement.Speed = bionic.State.Speed;
+            
             return OnHandled(session, packet);
         }
         catch (Exception e)

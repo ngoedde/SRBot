@@ -17,13 +17,12 @@ internal class UpdatePosition(Spawn spawn, Player player) : SRNetwork.MessageHan
         {
             var uniqueId = packet.ReadUInt();
             
-            var bionic = uniqueId == player.UniqueId ? player.Bionic : null;
-            if (bionic == null && !spawn.TryGetEntity<EntityBionic>(uniqueId, out bionic))
-            {
+            var bionic = uniqueId == player.Bionic.UniqueId ? player.Bionic : null;
+            if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
                 return OnHandled(session, packet);
-            }
 
-            bionic!.Position = EntityPosition.FromPacket(packet);
+            bionic!.Position = OrientedRegionPosition.FromPacket(packet);
+            bionic.Movement.Stop();
 
             return OnHandled(session, packet);
         }

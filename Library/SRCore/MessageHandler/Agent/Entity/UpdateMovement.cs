@@ -17,13 +17,12 @@ internal class UpdateMovement(Spawn spawn, Player player) : SRNetwork.MessageHan
         {
             var uniqueId = packet.ReadUInt();
 
-            var bionic = uniqueId == player.UniqueId ? player.Bionic : null;
-            if (bionic == null && !spawn.TryGetEntity<EntityBionic>(uniqueId, out bionic))
-            {
+                     
+            var bionic = uniqueId == player.Bionic.UniqueId ? player.Bionic : null;
+            if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
                 return OnHandled(session, packet);
-            }
 
-            bionic!.Movement = Movement.FromPacketWithSource(packet);
+            bionic!.Movement = Movement.FromPacketWithSource(bionic, packet);
             bionic.Movement.Start(bionic.Position, bionic.State.Speed);
 
             return OnHandled(session, packet);

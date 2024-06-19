@@ -22,10 +22,9 @@
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="Id" Binding="{Binding UniqueId}" />
 					<DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-					<DataGridTextColumn Header="Position" Binding="{Binding Position}"/>
+					<DataGridTextColumn Header="Position" Binding="{Binding Position.World}"/>
 				</DataGrid.Columns>
 			</DataGrid>
-
 		</StackPanel>
 	</ScrollViewer>
 
