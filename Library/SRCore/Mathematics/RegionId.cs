@@ -73,8 +73,9 @@ public struct RegionId : IEquatable<RegionId>
             var localX = value.X + ((targetRegion.X - sourceRegion.X) * Width);
             var localZ = value.Z + ((targetRegion.Z - sourceRegion.Z) * Length);
 
-            value = new Vector3(localX, 0, localZ);
+            value = new Vector3(localX, value.Y, localZ);
         }
+        
         return value;
     }
     public float WorldX

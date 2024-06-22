@@ -1,19 +1,19 @@
 ﻿namespace SRCore.Service
 {
-    internal class MainLoopRegistry
+    public class MainLoopRegistry
     {
-      private List<Action> _actions = new List<Action>();
+      private List<Action<long>> _actions = new();
 
-      public void Register(Action action)
+      public void Register(Action<long> action)
       {
             _actions.Add(action);
       }
 
-      public void Run()
+      public void Run(long delta)
         {
             foreach (var action in _actions)
             {
-                action();
+                action(delta);
             }
         }
     }

@@ -3,5 +3,6 @@ namespace SRCore.Models;
 public enum MovementSourceType : byte
 {
     Spinning,
-    SkyClick
+    SkyClick,
+    Default = byte.MaxValue
 }

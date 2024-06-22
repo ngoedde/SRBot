@@ -1,105 +1,32 @@
-using System.Diagnostics;
 using System.Numerics;
-using System.Security.Cryptography;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using SRCore.Mathematics;
 using SRCore.Models.EntitySpawn;
+using SRGame;
 using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.Models;
 
-public class Source : RegionPosition
-{
-    public static Source FromPacket(Packet packet)
-    {
-        var result = new Source();
-        var regionId = packet.ReadUShort();
-        result.RegionId = new RegionId(regionId);
-
-        if (regionId < short.MaxValue)
-        {
-            result.XOffset = packet.ReadShort() / 10f;
-            result.YOffset = packet.ReadFloat();
-            result.ZOffset = packet.ReadShort() / 10f;
-        }
-        else
-        {
-            result.XOffset = packet.ReadInt() / 10f;
-            result.YOffset = packet.ReadFloat();
-            result.ZOffset = packet.ReadInt() / 10f;
-        }
-
-        return result;
-    }
-
-    public Destination ToDestination()
-    {
-        return new Destination
-        {
-            RegionId = RegionId,
-            XOffset = XOffset,
-            YOffset = YOffset,
-            ZOffset = ZOffset
-        };
-    }
-}
-
-public class Destination : RegionPosition
-{
-    public static Destination FromPacket(Packet packet)
-    {
-        var result = new Destination();
-        var regionId = packet.ReadUShort();
-
-        result.RegionId = new RegionId(regionId);
-        if (regionId < short.MaxValue)
-        {
-            result.XOffset = packet.ReadShort();
-            result.YOffset = packet.ReadShort();
-            result.ZOffset = packet.ReadShort();
-        }
-        else
-        {
-            result.XOffset = packet.ReadInt();
-            result.YOffset = packet.ReadInt();
-            result.ZOffset = packet.ReadInt();
-        }
-
-        return result;
-    }
-
-    public Source ToSource()
-    {
-        return new Source
-        {
-            RegionId = RegionId,
-            XOffset = XOffset,
-            YOffset = YOffset,
-            ZOffset = ZOffset
-        };
-    }
-}
-
 public class Movement(EntityBionic bionic) : ReactiveObject
 {
-    [Reactive] public Destination? Destination { get; internal set; }
-    [Reactive] public byte Type { get; internal set; }
-    [Reactive] public MovementSourceType SourceType { get; internal set; }
+    [Reactive] public RegionPosition? Destination { get; internal set; }
+    [Reactive] public MovementType Type { get; internal set; }
+    [Reactive] public MovementSourceType SourceType { get; internal set; } = MovementSourceType.Default;
     [Reactive] public float Angle { get; internal set; }
-    [Reactive] public Source Source { get; internal set; } = new Source{XOffset = bionic.Position.XOffset, YOffset = bionic.Position.YOffset, ZOffset = bionic.Position.ZOffset};
 
-    public bool AtDestination => Destination != null && Vector3.Distance(Source.World, Destination.World) < 1;
-    
+    public bool AtDestination => (Destination != null && SourceType == MovementSourceType.Default) &&
+                                 bionic.Position.DistanceTo(Destination) < 0.01;
+
     internal static Movement FromPacketNoSource(EntityBionic bionic, Packet packet)
     {
         var result = new Movement(bionic);
 
         var hasDestination = packet.ReadBool();
-        result.Type = packet.ReadByte();
+        result.Type = (MovementType)packet.ReadByte();
 
         if (hasDestination)
-            result.Destination = Models.Destination.FromPacket(packet);
+            result.Destination = ReadDestination(packet);
         else
         {
             result.SourceType = (MovementSourceType)packet.ReadByte();
@@ -109,74 +36,140 @@ public class Movement(EntityBionic bionic) : ReactiveObject
         return result;
     }
 
-    internal static Movement FromPacketWithSource(EntityBionic bionic, Packet packet)
+    internal void UpdateFromPacket(Packet packet)
     {
-        var result = new Movement(bionic);
 
         var hasDestination = packet.ReadBool();
-        if (hasDestination)
-            result.Destination = Models.Destination.FromPacket(packet);
+        if (hasDestination) 
+        {
+            SourceType = MovementSourceType.Default;
+            Destination = ReadDestination(packet);
+        }
         else
         {
-            result.SourceType = (MovementSourceType)packet.ReadByte();
-            result.Angle = packet.ReadUShort() / 10000f;
+            SourceType = (MovementSourceType)packet.ReadByte();
+            Angle = packet.ReadUShort() / 10_000f;
+
+            Destination = null;
         }
 
         var hasSource = packet.ReadBool();
         if (hasSource)
         {
-            result.Source = Models.Source.FromPacket(packet);
+            var source = ReadSource(packet).ToOrientedPosition(bionic.Position.Angle);
+
+            bionic.Position = source;
+        }
+    }
+
+    #region Tracking
+
+    internal void TackPosition(long deltaTime)
+    {
+        if (AtDestination)
+            return;
+
+        var speed = Type switch
+        {
+            MovementType.Walk => bionic.State.WalkSpeed * Constants.Scale,
+            MovementType.Run => bionic.State.RunSpeed * Constants.Scale,
+            _ => 0
+        };
+
+        var newPosition = bionic.Position.Local;
+        var source = bionic.Position.Local;
+        
+        if (SourceType == MovementSourceType.Default)
+        {
+            if (Destination == null)
+                return;
+            
+            if (bionic.Position.RegionId != Destination!.RegionId)
+            {
+
+            }
+
+            var destination = RegionId.Transform(Destination.Local, Destination.RegionId, bionic.Position.RegionId);
+            var distanceToDestination = Vector3.Distance(bionic.Position.Local, destination); //Distance between regions is too high! > 200 with actual 2
+            
+            var direction = Vector3.Normalize(destination - source);
+            var time = (float)deltaTime / TimeSpan.TicksPerSecond;
+
+            newPosition = source + direction * speed * time;
+
+            var distanceTraveled = Vector3.Distance(source, newPosition);
+
+            //Destination reached
+            if (distanceTraveled == 0 || distanceTraveled >= distanceToDestination)
+            {
+                newPosition = destination;
+
+                Destination = null;
+            }
+        } 
+        else if (SourceType == MovementSourceType.SkyClick)
+        {
+            var angle = Angle * MathF.PI / short.MaxValue;
+            var direction = new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle));
+
+            newPosition = source + direction * speed * deltaTime / TimeSpan.TicksPerSecond;
+        }
+
+        bionic.Position.XOffset = newPosition.X;
+        bionic.Position.YOffset = newPosition.Y;
+        bionic.Position.ZOffset = newPosition.Z;
+        bionic.Position.Normalize();
+    }
+
+    #endregion
+
+    private static RegionPosition ReadSource(Packet packet)
+    {
+        var result = new RegionPosition();
+        var regionId = new RegionId(packet.ReadUShort());
+        result.RegionId = new RegionId(regionId);
+
+        if (!regionId.IsDungeon)
+        {
+            result.XOffset = packet.ReadShort() / 10f * Constants.Scale;
+            result.YOffset = packet.ReadFloat();
+            result.ZOffset = packet.ReadShort() / 10f * Constants.Scale;
+        }
+        else
+        {
+            result.XOffset = packet.ReadInt() / 10f * Constants.Scale;
+            result.YOffset = packet.ReadFloat();
+            result.ZOffset = packet.ReadInt() / 10f * Constants.Scale;
         }
 
         return result;
     }
 
-    #region Tracking
-
-
-    public void Stop()
+    private static RegionPosition ReadDestination(Packet packet)
     {
-        Destination = new Destination()
+        var result = new RegionPosition();
+        var regionId = new RegionId(packet.ReadUShort());
+
+        result.RegionId = regionId;
+        if (!regionId.IsDungeon)
         {
-            RegionId = bionic.Position.RegionId,
-            XOffset = bionic.Position.XOffset,
-            YOffset = bionic.Position.YOffset,
-            ZOffset = bionic.Position.ZOffset
-        };
-    }
-
-    private DateTime _lastUpdate = DateTime.Now;
-    internal void Update()
-    {
-        if (AtDestination || Destination == null)
-            return;
-
-        var deltaTime = (float)(DateTime.Now - _lastUpdate).TotalMilliseconds;
-        var destination = RegionId.Transform(Destination.Local, Destination.RegionId, Source.RegionId);
-        var direction = Vector3.Normalize(destination - Source.Local);
-
-        var newPosition = Source.Local + direction * bionic.State.Speed * deltaTime; 
-        var newSource = new Source
+            result.XOffset = packet.ReadShort() * Constants.Scale;
+            result.YOffset = packet.ReadShort();
+            result.ZOffset = packet.ReadShort() * Constants.Scale;
+        }
+        else
         {
-            RegionId = Source.RegionId,
-            XOffset = newPosition.X,
-            YOffset = newPosition.Y,
-            ZOffset = newPosition.Z
-        };
-        newSource.Normalize();
+            result.XOffset = packet.ReadInt() * Constants.Scale;
+            result.YOffset = packet.ReadInt();
+            result.ZOffset = packet.ReadInt() * Constants.Scale;
+        }
 
-        bionic.Position = Source.ToOrientedPosition(Angle);
-
-        Source = newSource;
-
-        _lastUpdate = DateTime.Now;
+        return result;
     }
-
-    #endregion
-
+    
     public override string ToString()
     {
         return
-            $"Type: {Type}, Source: {Source.World}, Angle: {Angle}, Destination: {Destination?.World}, Speed: {bionic.State.Speed}";
+            $"Type: {Type}, Source: {bionic.Position.World}, Angle: {Angle}, Destination: {Destination?.World}";
     }
 }

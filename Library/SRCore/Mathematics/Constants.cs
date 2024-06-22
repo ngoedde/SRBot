@@ -1,6 +1,6 @@
 ﻿namespace SRCore.Mathematics;
 
-public class Constants
+public static class Constants
 {
     public const float Scale = 0.1f;
 }

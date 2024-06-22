@@ -8,7 +8,6 @@ using SRCore.Models.EntitySpawn;
 using SRCore.Models.Inventory;
 using SRCore.Models.Quests;
 using SRCore.Models.Skills;
-using SRCore.Service;
 using SRGame;
 using SRGame.Client;
 using SRGame.Client.Entity.RefObject;
@@ -23,7 +22,7 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 
     [Reactive] public EntityBionic Bionic { get; internal set; }
     [Reactive] public ObservableCollection<Item> Inventory { get; internal set; } = new();
-    [Reactive] public RefObjChar RefObjChar => EntityManager.GetCharacter(RefObjId)!;
+    public RefObjChar RefObjChar => EntityManager.GetCharacter(RefObjId)!;
     [Reactive] public ObservableCollection<Item> AvatarInventory { get; internal set; } = new();
     [Reactive] public ObservableCollection<Mastery> Masteries { get; internal set; } = new();
     [Reactive] public ObservableCollection<Skill> Skills { get; internal set; } = new();
@@ -95,14 +94,6 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
         Quests.Clear();
         CollectionBook.Clear();
         QuestMarks.Clear();
-
-        // Inventory = new ObservableCollection<Item>();
-        // AvatarInventory = new ObservableCollection<Item>();
-        // Masteries = new ObservableCollection<Mastery>();
-        // Skills = new ObservableCollection<Skill>();
-        // Quests = new ObservableCollection<Quest>();
-        // CollectionBook = new ObservableCollection<Theme>();
-        // QuestMarks = new ObservableCollection<QuestMark>();
 
         //Server time for some reason. Don't need this.
         packet.ReadUInt();

@@ -2,11 +2,11 @@ using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using Serilog;
 using SRCore.Botting;
-using Timer = System.Timers.Timer;
+using SRCore.Service;
 
 namespace SRCore;
 
-public class Bot(IEnumerable<BotBase> botBases) : ReactiveObject
+public class Bot : ReactiveObject
 {
     public delegate void BotStoppedEventHandler(BotBase bot);
 
@@ -22,29 +22,30 @@ public class Bot(IEnumerable<BotBase> botBases) : ReactiveObject
 
     [Reactive] public int TicksPerSecond { get; private set; } = 0;
     [Reactive] public int DesiredTicksPerSecond { get; set; } = 30;
-    [Reactive] public BotBase? CurrentBot { get; set; } = botBases.FirstOrDefault();
+    [Reactive] public BotBase? CurrentBot { get; set; }
 
-    public IEnumerable<BotBase> Bots { get; } = botBases;
+    public IEnumerable<BotBase> Bots { get; }
     public BotState State => CurrentBot?.State ?? BotState.Idle;
 
-    //used for ticks/sec calculation
-    private Task _tickTask = Task.CompletedTask;
-    private int _tickCount = 0;
-    private Timer _tickTimer = new(1000);
 
-    public async void Tick()
+    public Bot(IEnumerable<BotBase> botBases, MainLoopRegistry loopRegistry)
     {
-        var delayMilliseconds = 1000 / DesiredTicksPerSecond;
+        Bots = botBases;
+        CurrentBot = Bots.FirstOrDefault();
+        DesiredTicksPerSecond = 30;
 
-        while (State == BotState.Started)
-        {
-            //Error in bot tick?
-            if (!await CurrentBot!.Tick())
-                StopBot();
+        loopRegistry.Register(Tick);
+    }
 
-            await Task.Delay(delayMilliseconds);
-            _tickCount++;
-        }
+    public async void Tick(long delta)
+    {
+        if (State != BotState.Started)
+            return;
+
+        //Error in bot tick?
+        if (!await CurrentBot!.Tick())
+            StopBot();
+        
     }
 
     public void StartBot()
@@ -53,15 +54,6 @@ public class Bot(IEnumerable<BotBase> botBases) : ReactiveObject
             return;
 
         CurrentBot.Start();
-
-        _tickTask = new Task(Tick);
-        _tickTimer.Elapsed += (sender, e) =>
-        {
-            TicksPerSecond = _tickCount;
-            _tickCount = 0; // Reset the counter
-        };
-        _tickTimer.Start();
-        _tickTask.Start(TaskScheduler.Current);
 
         OnBotStarted(CurrentBot);
     }
@@ -72,9 +64,6 @@ public class Bot(IEnumerable<BotBase> botBases) : ReactiveObject
             return;
 
         CurrentBot.Stop();
-
-        _tickTask.Dispose();
-        _tickTimer.Stop();
 
         OnBotStopped(CurrentBot);
     }

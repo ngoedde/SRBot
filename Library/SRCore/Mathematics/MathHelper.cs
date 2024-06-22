@@ -140,7 +140,13 @@ public static class MathHelper
         MathF.Abs(a - b) < threshold;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsApproximately(this int a, int b, int threshold = 1) =>
+        Math.Abs(a - b) <= threshold;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsApproximatelyZero(this float value, float threshold = Epsilon) => MathF.Abs(value) < threshold;
+
+    public static bool IsApproximatelyZero(this int value, float threshold = Epsilon) => MathF.Abs(value) < threshold;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsBetween(this Vector2 p, Vector2 min, Vector2 max)

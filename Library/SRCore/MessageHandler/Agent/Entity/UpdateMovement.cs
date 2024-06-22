@@ -22,7 +22,7 @@ internal class UpdateMovement(Spawn spawn, Player player) : SRNetwork.MessageHan
             if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
                 return OnHandled(session, packet);
 
-            bionic!.Movement = Movement.FromPacketWithSource(bionic, packet);
+            bionic!.Movement.UpdateFromPacket(packet);
 
             return OnHandled(session, packet);
         }

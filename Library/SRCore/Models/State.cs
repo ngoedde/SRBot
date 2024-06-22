@@ -17,23 +17,6 @@ public class State : ReactiveObject
     [Reactive] public float RunSpeed { get; internal set; }
     [Reactive] public float HwanSpeed { get; internal set; }
     [Reactive] public ObservableCollection<Buff> Buffs { get; internal set; } = new();
-
-    public float Speed
-    {
-        get
-        {
-            if (MotionState == MotionState.Run)
-                return RunSpeed;
-
-            if (BodyState == BodyState.Hwan)
-                return HwanSpeed;
-
-            if (BodyState == BodyState.Berserker)
-                return HwanSpeed;
-
-            return WalkSpeed;
-        }
-    }
     
 
     internal static State FromPacket(Packet packet, EntityManager entityManager)

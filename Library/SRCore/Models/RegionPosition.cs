@@ -63,8 +63,8 @@ public class RegionPosition : ReactiveObject
     public Vector3 Local => new Vector3(XOffset, YOffset, ZOffset);
     public Vector3 World => Vector3.Transform(Local, RegionId.LocalToWorld);
 
-    public float XCoordinate => XOffset == 0 ? 0 : RegionId.IsDungeon ? XOffset / 10 : (RegionId.X - 135) * 192 + XOffset / 10;
-    public float YCoordinate => ZOffset == 0 ? 0 : RegionId.IsDungeon ? ZOffset / 10 : (RegionId.Z - 92) * 192 + ZOffset / 10;
+    public float XCoordinate => XOffset == 0 ? 0 : RegionId.IsDungeon ? XOffset : (RegionId.X - 135) * 192 + XOffset;
+    public float YCoordinate => ZOffset == 0 ? 0 : RegionId.IsDungeon ? ZOffset : (RegionId.Z - 92) * 192 + ZOffset;
 
     public static RegionPosition FromPacket(Packet packet)
     {
@@ -75,31 +75,20 @@ public class RegionPosition : ReactiveObject
         result.RegionId = new RegionId(regionId);
         if (regionId < short.MaxValue)
         {
-            result.XOffset = packet.ReadShort() / 10f;
+            result.XOffset = packet.ReadShort();
             result.YOffset = packet.ReadShort();
-            result.ZOffset = packet.ReadShort() / 10f;
+            result.ZOffset = packet.ReadShort();
         }
         else
         {
-            result.XOffset = packet.ReadInt() / 10f;
+            result.XOffset = packet.ReadInt();
             result.YOffset = packet.ReadInt();
-            result.ZOffset = packet.ReadInt() / 10f;
+            result.ZOffset = packet.ReadInt();
         }
 
         return result;
     }
 
-
-    public float DistanceTo(RegionPosition other)
-    {
-        return Vector3.Distance(World, other.World);
-    }
-
-    public float DistanceTo(Vector3 other)
-    {
-        return Vector3.Distance(World, other);
-    }
-    
     public OrientedRegionPosition ToOrientedPosition(float angle = 0)
     {
         return new OrientedRegionPosition
@@ -141,9 +130,16 @@ public class RegionPosition : ReactiveObject
         }
     }
 
+    public float DistanceTo(RegionPosition other)
+    {
+        var destination = RegionId.Transform(other.Local, other.RegionId, _regionId);
+
+        return Vector3.Distance(destination, this.Local);
+    }
+
     public void Normalize()
     {
-        if (RegionId.IsDungeon)
+        if (_regionId.IsDungeon)
             return;
 
         if (XOffset > RegionId.Width)

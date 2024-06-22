@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
+using Serilog;
 using Serilog.Events;
 using SRCore.Models.EntitySpawn;
 using SRCore.Models.EntitySpawn.Entities;
@@ -203,15 +205,17 @@ public class Spawn : GameModel
         return entity != null;
     }
 
-    private void UpdateEntityPositions()
+    private void UpdateEntityPositions(long delta)
     {
-        Player.Bionic?.Movement.Update();
+
+        Debug.WriteLine($"Updating entity positions (delta: {delta})");
+        Player.Bionic?.Movement.TackPosition(delta);
 
         foreach (var entity in Entities)
         {
             if (entity is EntityBionic bionic)
             {
-                bionic.Movement.Update();
+                bionic.Movement.TackPosition(delta);
             }
         }
     }
