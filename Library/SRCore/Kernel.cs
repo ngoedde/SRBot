@@ -100,10 +100,7 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
         var nextGameTick = _stopwatch.ElapsedTicks;
         var frames = 0;
         var nextSecond = nextGameTick + Stopwatch.Frequency;
-        int idleCount = 1;
-        double IdleTime = 0;
-        double totalIdleTime = 0;
-        
+
         Metrics.TargetFrameTime = 1000.0 / Metrics.TargetFPS; // in milliseconds
 
         while (!token.IsCancellationRequested)
@@ -119,6 +116,7 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
                 
                 //Time it took to process the frame
                 Metrics.FrameTime = (_stopwatch.ElapsedTicks - frameStart) * 1000.0 / Stopwatch.Frequency; // in milliseconds
+                Metrics.TotalFrames++;
                 
                 nextGameTick += ticksPerFrame;
                 lastGameTick = _stopwatch.ElapsedTicks;
@@ -133,18 +131,16 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
             }
             else
             {
+                // Calculate idle time
                 var idleTime = (int)((nextGameTick - _stopwatch.ElapsedTicks) * 1000 / Stopwatch.Frequency);
-                totalIdleTime += idleTime;
-                idleCount++;
-                
-                Metrics.IdleTime = totalIdleTime / idleCount;
-                
+                Metrics.IdleTime = idleTime;
+
                 Thread.Sleep(idleTime);
             }
 
             Debug.WriteLine($"FPS: {Metrics.FPS}, " +
-                            $"FrameTime: {Math.Round(Metrics.FrameTime)}ms ({Math.Round(Metrics.FrameTime / Metrics.TargetFrameTime * 100)}%), " +
-                            $"IdleTime: {Math.Round(Metrics.IdleTime)}ms ({Math.Round(Metrics.IdleTime / Metrics.TargetFrameTime * 100)}%)");
+                            $"FrameTime: {Math.Round(Metrics.FrameTime, 2)}ms ({Math.Round(Metrics.FrameTime / Metrics.TargetFrameTime * 100,2)}%), " +
+                            $"IdleTime: {Math.Round(Metrics.IdleTime, 2)}ms ({Math.Round(Metrics.IdleTime / Metrics.TargetFrameTime * 100,2)}%)");
         }
     }
 

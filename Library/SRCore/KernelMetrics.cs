@@ -11,4 +11,6 @@ public class KernelMetrics : ReactiveObject
     [Reactive] public double TargetFrameTime { get; internal set; }
     
     [Reactive] public double IdleTime { get; internal set; }
+    
+    [Reactive] public long TotalFrames { get; internal set; }
 }
