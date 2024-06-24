@@ -10,6 +10,7 @@ public class EntityBionic : Entity
     public EntityBionic(RefObjChar refObjChar) : base(refObjChar)
     {
         Movement = new Movement(this);
+        RefObjChar = refObjChar;
     }
 
     [Reactive] public RefObjChar RefObjChar { get; internal set; }
@@ -18,7 +19,7 @@ public class EntityBionic : Entity
 
     public void ParseBionic(Packet packet, EntityManager entityManager)
     {
-        Movement = Movement.FromPacketNoSource(this, packet);
-        State = State.FromPacket(packet, entityManager);
+        Movement.UpdateFromPacketNoSource(packet);
+        State.UpdateFromPacket(packet, entityManager);
     }
 }

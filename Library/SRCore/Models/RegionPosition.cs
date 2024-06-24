@@ -22,6 +22,7 @@ public class RegionPosition : ReactiveObject
             this.RaisePropertyChanged(nameof(YCoordinate));
             this.RaisePropertyChanged(nameof(World));
             this.RaisePropertyChanged(nameof(Local));
+            this.RaisePropertyChanged(nameof(Label));
         }
     }
 
@@ -34,6 +35,7 @@ public class RegionPosition : ReactiveObject
             this.RaisePropertyChanged(nameof(XCoordinate));
             this.RaisePropertyChanged(nameof(World));
             this.RaisePropertyChanged(nameof(Local));
+            this.RaisePropertyChanged(nameof(Label));
         }
     }
 
@@ -57,14 +59,16 @@ public class RegionPosition : ReactiveObject
             this.RaisePropertyChanged(nameof(World));
             this.RaisePropertyChanged(nameof(Local));
             this.RaisePropertyChanged(nameof(YCoordinate));
+            this.RaisePropertyChanged(nameof(Label));
         }
     }
 
     public Vector3 Local => new Vector3(XOffset, YOffset, ZOffset);
     public Vector3 World => Vector3.Transform(Local, RegionId.LocalToWorld);
-
-    public float XCoordinate => XOffset == 0 ? 0 : RegionId.IsDungeon ? XOffset : (RegionId.X - 135) * 192 + XOffset;
-    public float YCoordinate => ZOffset == 0 ? 0 : RegionId.IsDungeon ? ZOffset : (RegionId.Z - 92) * 192 + ZOffset;
+    
+    public string Label => $"X: {Math.Round(XCoordinate, 0, MidpointRounding.ToEven)} Y: {Math.Round(YCoordinate, 0, MidpointRounding.ToEven)}";
+    public float XCoordinate => XOffset == 0 ? 0 : RegionId.IsDungeon ? XOffset : (RegionId.X - RegionId.CenterX) * RegionId.Width + XOffset;
+    public float YCoordinate => ZOffset == 0 ? 0 : RegionId.IsDungeon ? ZOffset : (RegionId.Z - RegionId.CenterZ) * RegionId.Length + ZOffset;
 
     public static RegionPosition FromPacket(Packet packet)
     {
@@ -132,7 +136,7 @@ public class RegionPosition : ReactiveObject
 
     public float DistanceTo(RegionPosition other)
     {
-        var destination = RegionId.Transform(other.Local, other.RegionId, _regionId);
+        var destination = RegionId.TransformPoint(other.RegionId, this.RegionId, other.Local);
 
         return Vector3.Distance(destination, this.Local);
     }
@@ -150,7 +154,7 @@ public class RegionPosition : ReactiveObject
         else if (XOffset < 0.0f)
         {
             _regionId.X += (byte)(XOffset / RegionId.Width);
-            XOffset = RegionId.Width + (XOffset % RegionId.Width);
+            XOffset = RegionId.Width + XOffset % RegionId.Width;
         }
 
         if (ZOffset > RegionId.Length)
@@ -161,7 +165,7 @@ public class RegionPosition : ReactiveObject
         else if (ZOffset < 0.0f)
         {
             _regionId.Z += (byte)(ZOffset / RegionId.Length);
-            ZOffset = RegionId.Length + (ZOffset % RegionId.Length);
+            ZOffset = RegionId.Length + ZOffset % RegionId.Length;
         }
     }
 }

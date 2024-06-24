@@ -15,32 +15,41 @@ public class Movement(EntityBionic bionic) : ReactiveObject
     [Reactive] public MovementSourceType SourceType { get; internal set; } = MovementSourceType.Default;
     [Reactive] public float Angle { get; internal set; }
 
-    public bool AtDestination => (Destination != null && SourceType == MovementSourceType.Default) &&
-                                 bionic.Position.DistanceTo(Destination) < 0.01;
-
-    internal static Movement FromPacketNoSource(EntityBionic bionic, Packet packet)
+    public float Speed
     {
-        var result = new Movement(bionic);
+        get
+        {
+            return Type switch
+            {
+                MovementType.Walk => bionic.State.WalkSpeed * Constants.Scale,
+                MovementType.Run => bionic.State.RunSpeed * Constants.Scale,
+                _ => 0
+            };
+        }
+    }
 
+    public bool AtDestination => Destination != null 
+                                 && SourceType == MovementSourceType.Default
+                                 && Vector2.Distance(bionic.Position.World.ToVector2(), Destination.World.ToVector2()).IsApproximatelyZero();
+
+    internal void UpdateFromPacketNoSource(Packet packet)
+    {
         var hasDestination = packet.ReadBool();
-        result.Type = (MovementType)packet.ReadByte();
+        Type = (MovementType)packet.ReadByte();
 
         if (hasDestination)
-            result.Destination = ReadDestination(packet);
+            Destination = ReadDestination(packet);
         else
         {
-            result.SourceType = (MovementSourceType)packet.ReadByte();
-            result.Angle = packet.ReadUShort();
+            SourceType = (MovementSourceType)packet.ReadByte();
+            Angle = packet.ReadUShort();
         }
-
-        return result;
     }
 
     internal void UpdateFromPacket(Packet packet)
     {
-
         var hasDestination = packet.ReadBool();
-        if (hasDestination) 
+        if (hasDestination)
         {
             SourceType = MovementSourceType.Default;
             Destination = ReadDestination(packet);
@@ -54,73 +63,125 @@ public class Movement(EntityBionic bionic) : ReactiveObject
         }
 
         var hasSource = packet.ReadBool();
-        if (hasSource)
-        {
-            var source = ReadSource(packet).ToOrientedPosition(bionic.Position.Angle);
+        if (!hasSource)
+            return;
 
-            bionic.Position = source;
-        }
+        bionic.Position = ReadSource(packet).ToOrientedPosition(bionic.Position.Angle);
+    }
+
+    internal void UpdateAngleFromPacket(Packet packet)
+    {
+        Angle = packet.ReadUShort();
     }
 
     #region Tracking
 
-    internal void TackPosition(long deltaTime)
+    internal void Stop()
+    {
+        Destination = null;
+        SourceType = MovementSourceType.Default;
+    }
+
+    internal void TackPosition2D(long deltaTime)
     {
         if (AtDestination)
             return;
 
-        var speed = Type switch
-        {
-            MovementType.Walk => bionic.State.WalkSpeed * Constants.Scale,
-            MovementType.Run => bionic.State.RunSpeed * Constants.Scale,
-            _ => 0
-        };
-
-        var newPosition = bionic.Position.Local;
-        var source = bionic.Position.Local;
+        var newPosition = bionic.Position.World;
+        var source = newPosition with { Y = 0 };
+        var time = (float)deltaTime / TimeSpan.TicksPerSecond;
         
         if (SourceType == MovementSourceType.Default)
         {
             if (Destination == null)
                 return;
-            
-            if (bionic.Position.RegionId != Destination!.RegionId)
-            {
 
-            }
-
-            var destination = RegionId.Transform(Destination.Local, Destination.RegionId, bionic.Position.RegionId);
-            var distanceToDestination = Vector3.Distance(bionic.Position.Local, destination); //Distance between regions is too high! > 200 with actual 2
-            
+            var destination = Destination.World with { Y = 0 };
+            var distanceToDestination = Vector3.Distance(source, destination);
             var direction = Vector3.Normalize(destination - source);
-            var time = (float)deltaTime / TimeSpan.TicksPerSecond;
 
-            newPosition = source + direction * speed * time;
+            newPosition = source + direction * Speed * time;
 
             var distanceTraveled = Vector3.Distance(source, newPosition);
 
             //Destination reached
-            if (distanceTraveled == 0 || distanceTraveled >= distanceToDestination)
+            if (distanceTraveled.IsApproximatelyZero(0.001f) || distanceTraveled >= distanceToDestination)
             {
                 newPosition = destination;
-
                 Destination = null;
             }
-        } 
+        }
         else if (SourceType == MovementSourceType.SkyClick)
         {
             var angle = Angle * MathF.PI / short.MaxValue;
             var direction = new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle));
 
-            newPosition = source + direction * speed * deltaTime / TimeSpan.TicksPerSecond;
+            newPosition = source + direction * Speed * time;
         }
 
-        bionic.Position.XOffset = newPosition.X;
-        bionic.Position.YOffset = newPosition.Y;
-        bionic.Position.ZOffset = newPosition.Z;
-        bionic.Position.Normalize();
+        var localPosition = Vector3.Transform(newPosition, bionic.Position.RegionId.WorldToLocal);
+
+        bionic.Position.XOffset = localPosition.X;
+        bionic.Position.ZOffset = localPosition.Z;
     }
 
+    #region WIP!
+    //Attempts to handle position tracking by region positon transformation instead of using world coordinates (better accuracy due to floating point precision)
+    // internal void TackPosition(long deltaTime)
+    // {
+    //     if (AtDestination)
+    //         return;
+    //     
+    //     var newPosition = bionic.Position.Local;
+    //     var source = newPosition with { Y = 0 };
+    //     var time = (float)deltaTime / TimeSpan.TicksPerSecond;
+    //     
+    //     //ToDo: Better speed determination (e.g. Hwan is missing for now)
+    //     var speed = Type switch
+    //     {
+    //         MovementType.Walk => bionic.State.WalkSpeed * Constants.Scale,
+    //         MovementType.Run => bionic.State.RunSpeed * Constants.Scale,
+    //         _ => 0
+    //     };
+    //
+    //     if (SourceType == MovementSourceType.Default)
+    //     {
+    //         if (Destination == null)
+    //             return;
+    //
+    //         Vector3 destination;
+    //
+    //         // If the destination is in a different region, transform it to the source region
+    //        // destination = RegionId.TransformPoint(Destination.RegionId, bionic.Position.RegionId, Destination.Local);
+    //         destination = RegionId.TransformPoint(bionic.Position.RegionId, Destination.RegionId, Destination.Local);
+    //
+    //         var distanceToDestination = Vector3.Distance(source, destination);
+    //         var direction = Vector3.Normalize(destination - source);
+    //
+    //         newPosition = source + direction * speed * time;
+    //
+    //         var distanceTraveled = Vector3.Distance(source, newPosition);
+    //
+    //         //Destination reached
+    //         if (distanceTraveled.IsApproximatelyZero(0.001f) || distanceTraveled >= distanceToDestination)
+    //         {
+    //             newPosition = destination;
+    //             Destination = null;
+    //         }
+    //     } 
+    //     else if (SourceType == MovementSourceType.SkyClick)
+    //     {
+    //         var angle = Angle * MathF.PI / short.MaxValue;
+    //         var direction = new Vector3(MathF.Cos(angle), 0, MathF.Sin(angle));
+    //
+    //         newPosition = source + direction * speed * time;
+    //     }
+    //
+    //     bionic.Position.XOffset = newPosition.X;
+    //     bionic.Position.ZOffset = newPosition.Z;
+    //     bionic.Position.Normalize();
+    // }
+    #endregion
     #endregion
 
     private static RegionPosition ReadSource(Packet packet)
@@ -166,7 +227,7 @@ public class Movement(EntityBionic bionic) : ReactiveObject
 
         return result;
     }
-    
+
     public override string ToString()
     {
         return

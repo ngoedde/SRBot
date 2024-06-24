@@ -1,13 +1,14 @@
 ﻿using System.Diagnostics;
 using SRGame.Client.Repository;
+using SRGame.Mathematics;
 
 namespace SRGame.Client.Entity.RefObject;
 
 [DebuggerDisplay("ID = {Id}; Code = {CodeName}; Name = {ObjName}")]
 public abstract class RefObjCommon : Entity<int>
 {
-    public int Tid => CashItem | Bionic | (TypeID1 << 2) | (TypeID2 << 5) | (TypeID3 << 7) | (TypeID4 << 11);
-
+    public TypeId TypeID => new(TypeID1, TypeID2, TypeID3, TypeID4);
+    
     #region Fields
 
     private int _id = 0;

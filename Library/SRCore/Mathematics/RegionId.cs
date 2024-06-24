@@ -66,6 +66,7 @@ public struct RegionId : IEquatable<RegionId>
 
     public Matrix4x4 LocalToWorld => Matrix4x4.CreateTranslation(this.WorldX, 0, this.WorldZ);
     public Matrix4x4 WorldToLocal => Matrix4x4.CreateTranslation(-this.WorldX, 0, -this.WorldZ);
+
     public static Vector3 Transform(Vector3 value, RegionId sourceRegion, RegionId targetRegion)
     {
         if (sourceRegion != targetRegion)
@@ -73,11 +74,12 @@ public struct RegionId : IEquatable<RegionId>
             var localX = value.X + ((targetRegion.X - sourceRegion.X) * Width);
             var localZ = value.Z + ((targetRegion.Z - sourceRegion.Z) * Length);
 
-            value = new Vector3(localX, value.Y, localZ);
+            return new Vector3(localX, 0, localZ);
         }
-        
-        return value;
+
+        return value with { Y = 0 };
     }
+
     public float WorldX
     {
         get
@@ -237,12 +239,15 @@ public struct RegionId : IEquatable<RegionId>
     public static Vector3 TransformPoint(RegionId source, RegionId target, Vector3 offset)
     {
         if (source == target)
-            return offset;
+            return offset with { Y = 0 };
 
         var localX = ((target.X - source.X) * Width) + offset.X;
-        var localY = offset.Y;
         var localZ = ((target.Z - source.Z) * Length) + offset.Z;
-        return new Vector3(localX, localY, localZ);
+
+        offset.X = localX;
+        offset.Z = localZ;
+        offset.Y = 0;
+        return new Vector3(localX, 0, localZ);
     }
 
     public static Matrix4x4 TransformMatrix(RegionId source, RegionId target, Matrix4x4 matrix)

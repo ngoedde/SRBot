@@ -18,6 +18,6 @@ public abstract class Entity(RefObjCommon? refObjCommon) : ReactiveObject
     public void ParseEntity(Packet packet)
     {
         UniqueId = packet.ReadUInt();
-        Position = OrientedRegionPosition.FromPacket(packet);
+        Position.UpdateFromPacket(packet);
     }
 }

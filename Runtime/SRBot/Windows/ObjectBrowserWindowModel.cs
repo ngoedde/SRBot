@@ -42,7 +42,7 @@ public class ObjectBrowserWindowModel(EntityManager entityManager): ViewModel
             x.Name.Contains(_filter) ||
             x.CodeName.Contains(_filter) ||
             x.Id.ToString().Contains(_filter) ||
-            x.Tid.ToString().Contains(_filter)
+            x.TypeID.ToString().Contains(_filter)
         ));
     }
 }

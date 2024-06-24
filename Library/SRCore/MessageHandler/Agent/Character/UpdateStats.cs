@@ -16,7 +16,7 @@ internal class UpdateStats(Player player) : MessageHandler
     {
         try
         {
-            player.Attributes = Attributes.FromPacket(packet);
+            player.Attributes.UpdateFromPacket(packet);
 
             return OnHandled(session, packet);
         }

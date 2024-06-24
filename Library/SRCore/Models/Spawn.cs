@@ -209,13 +209,13 @@ public class Spawn : GameModel
     {
 
         Debug.WriteLine($"Updating entity positions (delta: {delta})");
-        Player.Bionic?.Movement.TackPosition(delta);
+        Player.Bionic?.Movement.TackPosition2D(delta);
 
         foreach (var entity in Entities)
         {
             if (entity is EntityBionic bionic)
             {
-                bionic.Movement.TackPosition(delta);
+                bionic.Movement.TackPosition2D(delta);
             }
         }
     }

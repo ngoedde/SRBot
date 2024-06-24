@@ -20,7 +20,8 @@ internal class UpdatePosition(Spawn spawn, Player player) : SRNetwork.MessageHan
             if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
                 return OnHandled(session, packet);
 
-            bionic!.Position = OrientedRegionPosition.FromPacket(packet);
+            bionic!.Position.UpdateFromPacket(packet);
+            bionic.Movement.Stop();
 
             return OnHandled(session, packet);
         }

@@ -54,10 +54,18 @@
                                    BusyText="{ Binding LoadingState.Message }">
                     </suki:BusyArea>
                     <Grid ColumnDefinitions="*,*" HorizontalAlignment="Center">
-                        <TextBlock IsVisible="{Binding IsBotRunning}">TPS:</TextBlock>
-                        <TextBlock Grid.Column="1" IsVisible="{Binding IsBotRunning}"
-                                   Text="{Binding Bot.TicksPerSecond}">
-                        </TextBlock>
+                        <TextBlock IsVisible="{Binding IsBotRunning}">FPS:</TextBlock>
+                        <Grid Grid.Column="1" ColumnDefinitions="*,*,15">
+                            <TextBlock Grid.Column="0" IsVisible="{Binding IsBotRunning}"
+                                       FontWeight="Heavy"
+                                       Text="{Binding Kernel.Metrics.FPS}">
+                            </TextBlock>
+                            <TextBlock Grid.Column="1" IsVisible="{Binding IsBotRunning}"
+                                       Margin="16 0 0 0"
+                                       Text="{Binding Kernel.Metrics.FrameTime}">
+                            </TextBlock>
+                        </Grid>
+       
                     </Grid>
                 </StackPanel>
             </suki:SukiSideMenu.FooterContent>
@@ -68,8 +76,7 @@
             <suki:GroupBox Header="Game" Margin="16" DockPanel.Dock="Top">
                 <StackPanel>
                     <TextBlock Classes="h4" Text="{Binding Player.Name}" />
-                    <TextBlock Text="{Binding Player.Bionic.Position.XCoordinate}" />
-                    <TextBlock Text="{Binding Player.Bionic.Position.YCoordinate}" />
+                    <TextBlock Text="{Binding Player.Bionic.Position.Label}" />
                     <ProgressBar Value="{Binding Player.Health}" Maximum="{Binding Player.Attributes.MaxHealth}"
                                  ShowProgressText="False">
                     </ProgressBar>

@@ -1,6 +1,8 @@
-﻿using System.Reactive.Concurrency;
+﻿using System.Diagnostics;
+using System.Reactive.Concurrency;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using Serilog;
 using Serilog.Events;
 using SRCore.Botting;
@@ -50,7 +52,10 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
     private readonly Bot _bot = serviceProvider.GetRequiredService<Bot>();
     private readonly MainLoopRegistry _mainLoopRegistry = serviceProvider.GetRequiredService<MainLoopRegistry>();
 
+    private Stopwatch _stopwatch = new();
+
     public bool IsInitialized { get; private set; }
+    public KernelMetrics Metrics { get; } = new();
 
     /// <summary>
     /// Initializes required services used by SRCore. This method should be called before using any other services.
@@ -79,67 +84,68 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
         IsInitialized = true;
 
         OnKernelInitialized(this);
-
+        
         Log.Debug("SRKernel initialized.");
 
-        Tick();
+        _stopwatch.Start();
+        
+        Run(token);
         //Task.Run(Tick, token);
     }
 
-    private void Tick()
+    private void Run(CancellationToken token)
     {
-        if (OperatingSystem.IsWindows())
-            _ = TimerHelper.timeBeginPeriod(1);
+        var ticksPerFrame = Stopwatch.Frequency / Metrics.TargetFPS;
+        var lastGameTick = _stopwatch.ElapsedTicks;
+        var nextGameTick = _stopwatch.ElapsedTicks;
+        var frames = 0;
+        var nextSecond = nextGameTick + Stopwatch.Frequency;
+        int idleCount = 1;
+        double IdleTime = 0;
+        double totalIdleTime = 0;
         
-        if (!IsInitialized)
-            return;
+        Metrics.TargetFrameTime = 1000.0 / Metrics.TargetFPS; // in milliseconds
 
-        var prevTime = DateTime.Now.Ticks;
-        var spinner = new SpinWait();
-        const int targetVariableTime = 16666; // 60fps
-        
-        try
+        while (!token.IsCancellationRequested)
         {
-            while (true)
+            var frameStart = _stopwatch.ElapsedTicks;
+            
+            if (frameStart > nextGameTick)
             {
-                var curTime = TimerHelper.GetTimestamp();
-                var elaspedTime = TimerHelper.GetElaspedTime(prevTime, curTime);
+                var ticksElapsed = frameStart - lastGameTick;
                 
-                prevTime = curTime;
-                _mainLoopRegistry.Run(elaspedTime);
+                // Update game state
+                _mainLoopRegistry.Run(ticksElapsed);
                 
-                const int sleepAccuracyCompensation = 0; // 0 = slightly inaccurate, 1 = highly accurate
-                var updateDueTime = (int)((prevTime + targetVariableTime - TimerHelper.GetTimestamp()));
-                if (updateDueTime > 0 && updateDueTime <= (int)(targetVariableTime))
-                    Thread.Sleep(updateDueTime - sleepAccuracyCompensation);
+                //Time it took to process the frame
+                Metrics.FrameTime = (_stopwatch.ElapsedTicks - frameStart) * 1000.0 / Stopwatch.Frequency; // in milliseconds
+                
+                nextGameTick += ticksPerFrame;
+                lastGameTick = _stopwatch.ElapsedTicks;
+                frames++;
 
-                while (TimerHelper.GetElaspedTime(prevTime) < targetVariableTime)
-                    spinner.SpinOnce(-1); // -1 to disable Sleep(1+) because we already slept
-
-                spinner.Reset();
+                if (_stopwatch.ElapsedTicks > nextSecond)
+                {
+                    Metrics.FPS = frames;
+                    frames = 0;
+                    nextSecond += Stopwatch.Frequency;
+                }
             }
+            else
+            {
+                var idleTime = (int)((nextGameTick - _stopwatch.ElapsedTicks) * 1000 / Stopwatch.Frequency);
+                totalIdleTime += idleTime;
+                idleCount++;
+                
+                Metrics.IdleTime = totalIdleTime / idleCount;
+                
+                Thread.Sleep(idleTime);
+            }
+
+            Debug.WriteLine($"FPS: {Metrics.FPS}, " +
+                            $"FrameTime: {Math.Round(Metrics.FrameTime)}ms ({Math.Round(Metrics.FrameTime / Metrics.TargetFrameTime * 100)}%), " +
+                            $"IdleTime: {Math.Round(Metrics.IdleTime)}ms ({Math.Round(Metrics.IdleTime / Metrics.TargetFrameTime * 100)}%)");
         }
-        catch (Exception e)
-        {
-            _ = Panic(e.Message);
-
-#if DEBUG
-            throw;
-#endif
-        }
-
-        //sleep
-
-
-        //    const int sleepAccuracyCompensation = 0; // 0 = slightly inaccurate, 1 = hightly accurate
-        //    var updateDueTime = (int)((prevTime + TARGET_VARIABLE_TIME - TimerHelper.GetTimestamp()));
-        //    if (updateDueTime > 0 && updateDueTime <= (int)(TARGET_VARIABLE_TIME))
-        //        Thread.Sleep(updateDueTime - sleepAccuracyCompensation);
-
-        //    while (TimerHelper.GetElaspedTime(prevTime) < TARGET_VARIABLE_TIME)
-        //        spinner.SpinOnce(-1); // -1 to disable Sleep(1+) because we already slept
-
-        //    spinner.Reset();
     }
 
     private void ProfileServiceOnActiveProfileChanged(Profile profile)

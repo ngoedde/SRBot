@@ -17,18 +17,22 @@ public class State : ReactiveObject
     [Reactive] public float RunSpeed { get; internal set; }
     [Reactive] public float HwanSpeed { get; internal set; }
     [Reactive] public ObservableCollection<Buff> Buffs { get; internal set; } = new();
-    
 
-    internal static State FromPacket(Packet packet, EntityManager entityManager)
+    internal void UpdateSpeedFromPacket(Packet packet)
     {
-        var result = new State();
-        result.LifeState = (LifeState)packet.ReadByte();
+        WalkSpeed = packet.ReadFloat();
+        RunSpeed = packet.ReadFloat();
+    }
+
+    internal void UpdateFromPacket(Packet packet, EntityManager entityManager)
+    {
+        LifeState = (LifeState)packet.ReadByte();
         packet.ReadByte(); //Unknown
-        result.MotionState = (MotionState)packet.ReadByte();
-        result.BodyState = (BodyState)packet.ReadByte();
-        result.WalkSpeed = packet.ReadFloat();
-        result.RunSpeed = packet.ReadFloat();
-        result.HwanSpeed = packet.ReadFloat();
+        MotionState = (MotionState)packet.ReadByte();
+        BodyState = (BodyState)packet.ReadByte();
+        WalkSpeed = packet.ReadFloat();
+        RunSpeed = packet.ReadFloat();
+        HwanSpeed = packet.ReadFloat();
 
         var buffCount = packet.ReadByte();
         for (var i = 0; i < buffCount; i++)
@@ -48,9 +52,7 @@ public class State : ReactiveObject
                 buff.IsCreator = packet.ReadBool();
             }
 
-            result.Buffs.Add(buff);
+            Buffs.Add(buff);
         }
-
-        return result;
     }
 }

@@ -46,6 +46,7 @@ public class MainWindowModel : ViewModel
     public ClientFileSystem FileSystem => _serviceProvider.GetRequiredService<ClientFileSystem>();
     public ViewLocator ViewLocator => _serviceProvider.GetRequiredService<ViewLocator>();
 
+    public Kernel Kernel => _serviceProvider.GetRequiredService<Kernel>();
     #region Properties
 
     /// <summary>

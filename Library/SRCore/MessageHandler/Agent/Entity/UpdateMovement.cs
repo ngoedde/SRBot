@@ -16,8 +16,7 @@ internal class UpdateMovement(Spawn spawn, Player player) : SRNetwork.MessageHan
         try
         {
             var uniqueId = packet.ReadUInt();
-
-                     
+            
             var bionic = uniqueId == player.Bionic.UniqueId ? player.Bionic : null;
             if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
                 return OnHandled(session, packet);

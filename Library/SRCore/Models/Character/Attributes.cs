@@ -19,22 +19,19 @@ public class Attributes : ReactiveObject
     [Reactive] public ushort Strength { get; internal set; }
     [Reactive] public ushort Intelligence { get; internal set; }
 
-    public static Attributes FromPacket(Packet packet)
+    public void UpdateFromPacket(Packet packet)
     {
-        return new Attributes
-        {
-            PhysicalAttackMin = packet.ReadUInt(),
-            PhysicalAttackMax = packet.ReadUInt(),
-            MagicalAttackMin = packet.ReadUInt(),
-            MagicalAttackMax = packet.ReadUInt(),
-            PhysicalDefence = packet.ReadUShort(),
-            MagicalDefence = packet.ReadUShort(),
-            HitRate = packet.ReadUShort(),
-            ParryRate = packet.ReadUShort(),
-            MaxHealth = packet.ReadUInt(),
-            MaxMana = packet.ReadUInt(),
-            Strength = packet.ReadUShort(),
-            Intelligence = packet.ReadUShort()
-        };
+        PhysicalAttackMin = packet.ReadUInt();
+        PhysicalAttackMax = packet.ReadUInt();
+        MagicalAttackMin = packet.ReadUInt();
+        MagicalAttackMax = packet.ReadUInt();
+        PhysicalDefence = packet.ReadUShort();
+        MagicalDefence = packet.ReadUShort();
+        HitRate = packet.ReadUShort();
+        ParryRate = packet.ReadUShort();
+        MaxHealth = packet.ReadUInt();
+        MaxMana = packet.ReadUInt();
+        Strength = packet.ReadUShort();
+        Intelligence = packet.ReadUShort();
     }
 }

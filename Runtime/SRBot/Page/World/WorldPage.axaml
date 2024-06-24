@@ -22,7 +22,7 @@
 				<DataGrid.Columns>
 					<DataGridTextColumn Header="Id" Binding="{Binding UniqueId}" />
 					<DataGridTextColumn Header="Name" Binding="{Binding Name}" />
-					<DataGridTextColumn Header="Position" Binding="{Binding Position.World}"/>
+					<DataGridTextColumn Header="Position" Binding="{Binding Position.Label}"/>
 				</DataGrid.Columns>
 			</DataGrid>
 		</StackPanel>
