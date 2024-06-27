@@ -92,7 +92,7 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
         Run(token);
     }
 
-    private void Run(CancellationToken token)
+    private async Task Run(CancellationToken token)
     {
         var lastGameTick = _stopwatch.ElapsedTicks;
         var nextGameTick = _stopwatch.ElapsedTicks;
@@ -113,7 +113,7 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
                     var ticksElapsed = frameStart - lastGameTick;
                 
                     // Update game state
-                    _mainLoopRegistry.Run(ticksElapsed);
+                    await _mainLoopRegistry.Run(ticksElapsed);
                 
                     //Time it took to process the frame
                     Metrics.FrameTime = (_stopwatch.ElapsedTicks - frameStart) * 1000.0 / Stopwatch.Frequency; // in milliseconds

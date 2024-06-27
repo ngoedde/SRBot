@@ -2,18 +2,18 @@
 {
     public class MainLoopRegistry
     {
-        private List<Action<long>> _actions = new();
+        private List<Func<long, Task>> _actions = new();
 
-        public void Register(Action<long> action)
+        public void Register(Func<long, Task> action)
         {
             _actions.Add(action);
         }
 
-        public void Run(long delta)
+        public async Task Run(long delta)
         {
             foreach (var action in _actions)
             {
-                action(delta);
+                await action(delta);
             }
         }
     }

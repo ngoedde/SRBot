@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using SRPack.SRAdapter.Struct;
 using SRPack.SRAdapter.Utils;
 
@@ -146,6 +147,7 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
 
     public async Task<FileSystemEntryInfo> GetEntryAsync(string path)
     {
+        Debug.WriteLine($"GetEntryAsync: {path}");
         if (!_pack.Initialized)
         {
             throw new IOException("SRPack is not initialized.");
@@ -165,6 +167,8 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
 
     public async Task<IEnumerable<FileSystemEntryInfo>> GetEntriesAsync(string folderPath)
     {
+        Debug.WriteLine($"GetEntriesAsync: {folderPath}");
+        
         if (!_pack.Initialized)
         {
             throw new IOException("SRPack is not initialized.");

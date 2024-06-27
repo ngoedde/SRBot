@@ -217,7 +217,7 @@ public class Spawn : GameModel
         return entity != null;
     }
 
-    private void UpdateEntityPositions(long delta)
+    private async Task UpdateEntityPositions(long delta)
     {
         Player.Bionic?.Movement.TackPosition2D(delta);
 

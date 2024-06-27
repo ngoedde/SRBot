@@ -63,6 +63,8 @@ public struct RegionId : IEquatable<RegionId>
     }
 
     public Vector3 Position => new Vector3(this.WorldX, 0.0f, this.WorldZ);
+    
+    public Vector2 LocalPosition => new Vector2(this.X, this.Z);
 
     public Matrix4x4 LocalToWorld => Matrix4x4.CreateTranslation(this.WorldX, 0, this.WorldZ);
     public Matrix4x4 WorldToLocal => Matrix4x4.CreateTranslation(-this.WorldX, 0, -this.WorldZ);

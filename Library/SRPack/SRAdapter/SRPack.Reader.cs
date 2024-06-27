@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
 using SRPack.SRAdapter.Struct;
 using SRPack.SRAdapter.Utils;
 
@@ -169,32 +170,36 @@ internal partial class SRPack
 
         return currentBlock;
     }
-
+    
+    //ORIGINAL!
     private async Task<SRPackBlock[]> GetOrReadBlocksAt(long position)
     {
         if (_index.TryGetValue(position, out var blocksFromIndex))
         {
             return blocksFromIndex;
         }
-
+        
+        var tempId = Random.Shared.Next(100);
+        Debug.WriteLine($"START [{tempId}] GetOrReadBlocksAt: {position}");
+        
         var blockBuffer = new byte[SRPackBlock.BlockSize];
         var block = await ReadBlockAt(position, blockBuffer).ConfigureAwait(false);
         var blockCollection = new List<SRPackBlock> { block };
         var nextBlockEntry = block.Entries[19];
-
+    
         var sw = Stopwatch.StartNew();
         while (nextBlockEntry.NextBlock > 0)
         {
             block = await ReadBlockAt(nextBlockEntry.NextBlock, blockBuffer).ConfigureAwait(false);
             blockCollection.Add(block);
-
+    
             nextBlockEntry = block.Entries[19];
         }
-        Debug.WriteLine($"GetOrReadBlocksAt took {sw.ElapsedMilliseconds}ms for {blockCollection.Count}.");
-
+        Debug.WriteLine($"END [{tempId}]GetOrReadBlocksAt took {sw.ElapsedMilliseconds}ms for {blockCollection.Count}.");
+    
         var blocks = blockCollection.ToArray();
         _index.Add(position, blocks);
-
+    
         return blocks;
     }
 

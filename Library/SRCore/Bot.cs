@@ -37,7 +37,7 @@ public class Bot : ReactiveObject
         loopRegistry.Register(Tick);
     }
 
-    public async void Tick(long delta)
+    public async Task Tick(long delta)
     {
         if (State != BotState.Started)
             return;

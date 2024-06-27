@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Numerics;
+using System.Threading.Tasks;
 using System.Timers;
 using Avalonia;
 using Avalonia.Controls;
@@ -40,12 +41,22 @@ public partial class MinimapCanvas : UserControl
         _initialized = true;
     }
 
-    public void Update(long delta)
+    public async Task Update(long delta)
     {
         if (_isPainting)
             return;
+
+        // Get the current region id
+        ViewportTransform = _player.Bionic != null
+            ? new MapTransform(_player.Bionic.Position.RegionId, _player.Bionic.Position.Local)
+            : new MapTransform(new RegionId(RegionId.Center), new Vector3(0, 0, 0));
         
-        Dispatcher.UIThread.InvokeAsync(this.InvalidateVisual).Wait();
+        //Warm up cache before rendering -> Since we are running rendering in UI thread,
+        //this might otherwise cause parallel IO operations on the asset pack.
+        foreach (var regionId in ViewportTransform.Region.Get9Neighbors())
+            _= await _imageCache.GetOrAddMinimapImage(regionId);
+        
+        Dispatcher.UIThread.InvokeAsync(this.InvalidateVisual);
     }
     
     private bool _isPainting;
@@ -54,39 +65,42 @@ public partial class MinimapCanvas : UserControl
     {
         base.Render(context);
 
-        if (!IsVisible || !_initialized) 
+        if (!IsVisible || !_initialized)
             return;
-        
+
         _isPainting = true;
-        
-        ViewportTransform = _player.Bionic == null ?
-            new MapTransform(new RegionId(25000), new Vector3(0, 0, 0)) 
-            : new MapTransform(_player.Bionic.Position.Local);
-        
+
+        // Get the current and surrounding region ids
+        var regionIds = ViewportTransform.Region.Get9Neighbors();
+
+        int imageWidth = 256, imageHeight = 256;
+        var regionSize = new Vector3(RegionId.Width, 0, RegionId.Length);
+        var minimapSize = new Vector3(imageWidth, 0, imageHeight);
+        var canvasCenter = new Vector3((float) Width / 2, 0, (float) Height / 2);
+
         try
         {
-            // var transX = ((float) Width - ViewportTransform.Offset.X);
-            // var transY = ((float) Height - ViewportTransform.Offset.Z);
-
-            var bitmap = await _imageCache.GetOrAddMinimapImage(ViewportTransform.Region);
-            if (bitmap == null)
-                return;
-            
             // Iterate over the region ids
-            foreach (RegionId regionId in ViewportTransform.Region.Get9Neighbors())
+            foreach (RegionId regionId in regionIds)
             {
                 // Fetch the corresponding image from the MinimapImageCache
                 var image = await _imageCache.GetOrAddMinimapImage(regionId);
-
                 if (image == null)
                     continue;
+
+                // Calculate the position of the region relative to the ViewportTransform region
+                var regionOffsetToSource = RegionId.Transform(ViewportTransform.Offset, ViewportTransform.Region, regionId);
+
+                // Scale the position to fit within the minimap
+                var minimapPosition = regionOffsetToSource / regionSize * minimapSize;
+
+                // Calculate the draw position relative to the center of the canvas
+                var drawPosition = canvasCenter + minimapPosition;
+                drawPosition = drawPosition with { Z = (float) Height - drawPosition.Z }; //flip Y axis
                 
-                // Use the ViewportTransform property to transform the coordinates of the region to the viewport's coordinate system
-                var transformedPosition = regionId.TransformPoint(ViewportTransform.Region, ViewportTransform.Offset);
-                // Draw the image at the transformed coordinates
-                context.DrawImage(image, new Rect( transformedPosition.X, 1920 - transformedPosition.Z, 256, 256));
+                // Draw the image
+                context.DrawImage(image, new Rect(drawPosition.X, drawPosition.Z, imageWidth, imageHeight));
             }
-        
         }
         catch (Exception exception)
         {
