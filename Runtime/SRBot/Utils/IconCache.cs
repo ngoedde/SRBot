@@ -29,21 +29,9 @@ public class IconCache(ClientFileSystem fileSystem)
             return icon;
         }
 
-        // var entry = Index.Find(x => x.Path == path);
-        // if (entry == null)
-        // {
-        //     Log.Debug("Icon not found in index: {Path}", path);
-        //     return null;
-        // }
-
         try
         {
-            // while (locked)
-            //     await Task.Delay(10);
-
-            locked = true;
-            //var iconDDJStream =  await fileSystem.ReadFileBytes(AssetPack.Media, Path.Combine("icon", item.RefObjItem.AssocFileIcon)).ConfigureAwait(false);
-            var iconDDJStream = await fileSystem.ReadFileBytes(AssetPack.Media, path).ConfigureAwait(false);
+            var iconDDJStream = await fileSystem.ReadFileStream(AssetPack.Media, path).ConfigureAwait(false);
             var iconDDJ = iconDDJStream.ToArray();
             var iconDDS = iconDDJ[20..];
             var iconBMP = DDSImage.ToBitmap(iconDDS);
@@ -57,10 +45,6 @@ public class IconCache(ClientFileSystem fileSystem)
             Log.Debug($"Error reading RefObjItem icon: {e.Message}");
 
             return null;
-        }
-        finally
-        {
-            locked = false;
         }
     }
 

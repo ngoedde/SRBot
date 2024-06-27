@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using Avalonia;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using SkiaSharp;
 
 namespace SRBot.Drawing;
 
@@ -158,6 +159,34 @@ public class DDSImage
             }
             
             return writeableBitmap;
+        }
+        
+        public static SKBitmap ToSKBitmap(byte[] ddsBytes)
+        {
+            int width = GetWidth(ddsBytes);
+            int height = GetHeight(ddsBytes);
+            int[] pixelsData = Read(ddsBytes, Colour.ARGB, 0);
+
+            if (pixelsData == null)
+            {
+                return null;
+            }
+
+            var bitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Opaque);
+
+            // Copy the pixel data to the bitmap
+            for (int i = 0; i < pixelsData.Length; i++)
+            {
+                int pixel = pixelsData[i];
+                byte a = (byte)((pixel >> 24) & 0xFF);
+                byte r = (byte)((pixel >> 16) & 0xFF);
+                byte g = (byte)((pixel >> 8) & 0xFF);
+                byte b = (byte)(pixel & 0xFF);
+
+                bitmap.SetPixel(i % width, i / width, new SKColor(r, g, b, a));
+            }
+
+            return bitmap;
         }
 
         private static int[] decodeDXT1(int width, int height, int offset, byte[] buffer, Colour color)

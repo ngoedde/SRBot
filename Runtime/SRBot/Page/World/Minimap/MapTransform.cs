@@ -135,4 +135,9 @@ public class MapTransform
             Offset.Z %= RegionId.Length;
         }
     }
+    
+    public Vector3 Transform(Vector3 point)
+    {
+        return RegionId.TransformPoint(this.Region, this.Region, point);
+    }
 }

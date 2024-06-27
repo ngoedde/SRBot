@@ -88,60 +88,67 @@ public sealed class Kernel(IServiceProvider serviceProvider, IScheduler schedule
         Log.Debug("SRKernel initialized.");
 
         _stopwatch.Start();
-        
+
         Run(token);
-        //Task.Run(Tick, token);
     }
 
     private void Run(CancellationToken token)
     {
-        var ticksPerFrame = Stopwatch.Frequency / Metrics.TargetFPS;
         var lastGameTick = _stopwatch.ElapsedTicks;
         var nextGameTick = _stopwatch.ElapsedTicks;
         var frames = 0;
         var nextSecond = nextGameTick + Stopwatch.Frequency;
 
-        Metrics.TargetFrameTime = 1000.0 / Metrics.TargetFPS; // in milliseconds
-
-        while (!token.IsCancellationRequested)
+        try
         {
-            var frameStart = _stopwatch.ElapsedTicks;
+            while (!token.IsCancellationRequested)
+            {
+                var frameStart = _stopwatch.ElapsedTicks;
+                var ticksPerFrame = Stopwatch.Frequency / Metrics.TargetFPS;
             
-            if (frameStart > nextGameTick)
-            {
-                var ticksElapsed = frameStart - lastGameTick;
-                
-                // Update game state
-                _mainLoopRegistry.Run(ticksElapsed);
-                
-                //Time it took to process the frame
-                Metrics.FrameTime = (_stopwatch.ElapsedTicks - frameStart) * 1000.0 / Stopwatch.Frequency; // in milliseconds
-                Metrics.TotalFrames++;
-                
-                nextGameTick += ticksPerFrame;
-                lastGameTick = _stopwatch.ElapsedTicks;
-                frames++;
+                Metrics.TargetFrameTime = 1000.0 / Metrics.TargetFPS; // in milliseconds
 
-                if (_stopwatch.ElapsedTicks > nextSecond)
+                if (frameStart > nextGameTick)
                 {
-                    Metrics.FPS = frames;
-                    frames = 0;
-                    nextSecond += Stopwatch.Frequency;
+                    var ticksElapsed = frameStart - lastGameTick;
+                
+                    // Update game state
+                    _mainLoopRegistry.Run(ticksElapsed);
+                
+                    //Time it took to process the frame
+                    Metrics.FrameTime = (_stopwatch.ElapsedTicks - frameStart) * 1000.0 / Stopwatch.Frequency; // in milliseconds
+                    Metrics.TotalFrames++;
+                
+                    nextGameTick += ticksPerFrame;
+                    lastGameTick = _stopwatch.ElapsedTicks;
+                    frames++;
+
+                    if (_stopwatch.ElapsedTicks > nextSecond)
+                    {
+                        Metrics.FPS = frames;
+                        frames = 0;
+                        nextSecond += Stopwatch.Frequency;
+                    }
                 }
-            }
-            else
-            {
-                // Calculate idle time
-                var idleTime = (int)((nextGameTick - _stopwatch.ElapsedTicks) * 1000 / Stopwatch.Frequency);
-                Metrics.IdleTime = idleTime;
+                else
+                {
+                    // Calculate idle time
+                    var idleTime = (int)((nextGameTick - _stopwatch.ElapsedTicks) * 1000 / Stopwatch.Frequency);
+                    Metrics.IdleTime = idleTime;
 
-                Thread.Sleep(idleTime);
+                    Thread.Sleep(idleTime);
+                }
+                //
+                // Debug.WriteLine($"FPS: {Metrics.FPS}, " +
+                //                 $"FrameTime: {Math.Round(Metrics.FrameTime, 2)}ms ({Math.Round(Metrics.FrameTime / Metrics.TargetFrameTime * 100,2)}%), " +
+                //                 $"IdleTime: {Math.Round(Metrics.IdleTime, 2)}ms ({Math.Round(Metrics.IdleTime / Metrics.TargetFrameTime * 100,2)}%)");
             }
-
-            Debug.WriteLine($"FPS: {Metrics.FPS}, " +
-                            $"FrameTime: {Math.Round(Metrics.FrameTime, 2)}ms ({Math.Round(Metrics.FrameTime / Metrics.TargetFrameTime * 100,2)}%), " +
-                            $"IdleTime: {Math.Round(Metrics.IdleTime, 2)}ms ({Math.Round(Metrics.IdleTime / Metrics.TargetFrameTime * 100,2)}%)");
         }
+        catch (Exception e)
+        {
+            _ = Panic(e.Message, LogEventLevel.Fatal);
+        }
+
     }
 
     private void ProfileServiceOnActiveProfileChanged(Profile profile)

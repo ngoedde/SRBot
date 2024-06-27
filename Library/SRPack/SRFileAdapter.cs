@@ -122,7 +122,7 @@ public class SRFileAdapter(string fileName, string password, byte[] salt) : IAsy
 
         var stream = await ReadAllAsync(filePath).ConfigureAwait(false);
 
-        return stream.GetBuffer();
+        return stream.ToArray();
     }
 
     public async Task<bool> ExistsAsync(string filePath)

@@ -31,6 +31,7 @@
         <PackageReference Include="Material.Icons.Avalonia" Version="2.1.9"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0-preview.4.24266.19"/>
         <PackageReference Include="ReactiveUI.Fody" Version="19.5.41"/>
+        <PackageReference Include="ScottPlot.Avalonia" Version="5.0.35" />
         <PackageReference Include="SukiUI" Version="6.0.0-beta6"/>
     </ItemGroup>
 
@@ -67,6 +68,10 @@
         </Compile>
         <Compile Update="Page\World\WorldPage.axaml.cs">
           <DependentUpon>InventoryPage.axaml</DependentUpon>
+          <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Windows\PerformanceWindow.axaml.cs">
+          <DependentUpon>PerformanceMonitorWindow.axaml</DependentUpon>
           <SubType>Code</SubType>
         </Compile>
     </ItemGroup>

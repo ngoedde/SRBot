@@ -1,8 +1,6 @@
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI.Fody.Helpers;
-using Serilog;
 using Serilog.Events;
 using SRCore.Models.EntitySpawn;
 using SRCore.Models.EntitySpawn.Entities;
@@ -193,6 +191,13 @@ public class Spawn : GameModel
 
     public bool TryGetEntity(uint uniqueId, out Entity? entity)
     {
+        if (uniqueId == Player.Bionic.UniqueId)
+        {
+            entity = Player.Bionic;
+            
+            return true;
+        }
+
         entity = Entities.FirstOrDefault(x => x.UniqueId == uniqueId);
 
         return entity != null;
@@ -200,6 +205,13 @@ public class Spawn : GameModel
 
     public bool TryGetEntity<TEntityType>(uint uniqueId, out TEntityType? entity) where TEntityType : Entity
     {
+        if (uniqueId == Player.Bionic.UniqueId)
+        {
+            entity = Player.Bionic as TEntityType;
+            
+            return true;
+        }
+        
         entity = Entities.FirstOrDefault(x => x.UniqueId == uniqueId) as TEntityType;
 
         return entity != null;
@@ -207,8 +219,6 @@ public class Spawn : GameModel
 
     private void UpdateEntityPositions(long delta)
     {
-
-        Debug.WriteLine($"Updating entity positions (delta: {delta})");
         Player.Bionic?.Movement.TackPosition2D(delta);
 
         foreach (var entity in Entities)

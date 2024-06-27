@@ -43,7 +43,7 @@ public class ClientFileSystem
         }
     }
 
-    public async Task<MemoryStream> ReadFileBytes(AssetPack assetPack, string path)
+    public async Task<MemoryStream> ReadFileStream(AssetPack assetPack, string path)
     {
         if (!IsInitialized)
             throw new Exception("FileSystem is not initialized!");
@@ -64,6 +64,29 @@ public class ClientFileSystem
             return new MemoryStream();
         }
     }
+    
+    public async Task<byte[]> ReadFile(AssetPack assetPack, string path)
+    {
+        if (!IsInitialized)
+            throw new Exception("FileSystem is not initialized!");
+
+        try
+        {
+            return assetPack switch
+            {
+                AssetPack.Media => await Media!.ReadAllBytesAsync(path),
+                AssetPack.Data => await Data!.ReadAllBytesAsync(path),
+                _ => throw new ArgumentOutOfRangeException(nameof(assetPack), assetPack, null)
+            };
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Error loading asset {path}: {e.Message}");
+
+            return [];
+        }
+    }
+
 
     public async Task<bool> FileExists(AssetPack assetPack, string path)
     {

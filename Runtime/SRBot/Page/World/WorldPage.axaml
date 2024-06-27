@@ -4,18 +4,21 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="800"
              xmlns:vm="clr-namespace:SRBot.Page.World"
+             xmlns:minimap="clr-namespace:SRBot.Page.World.Minimap"
              x:DataType="vm:WorldPageModel"
              VerticalAlignment="Stretch"
              HorizontalAlignment="Stretch"
              MaxWidth="800"
              Margin="16"
+             Loaded="Control_OnLoaded"
              x:Class="SRBot.Page.World.WorldPage">
 	<ScrollViewer MaxHeight="800" Width="800">
 		<StackPanel>
 
 			<TextBlock Classes="h4" Margin="0 0 0 16" HorizontalAlignment="Center">Minimap</TextBlock>
 
-			<Panel Background="Black" Width="512" Height="512" Margin="0 0 0 32" />
+			<minimap:MinimapCanvas Name="Minimap" Width="512" Height="512" Margin="0 0 0 32" />
+			
 			<DataGrid MaxHeight="400" Height="400" Background="Red" Width="600" ItemsSource="{Binding Spawn.Entities}"
                       AutoGenerateColumns="False" IsReadOnly="True">
 

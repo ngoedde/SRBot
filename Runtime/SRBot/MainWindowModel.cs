@@ -237,6 +237,16 @@ public class MainWindowModel : ViewModel
         // window.Show();
         //SukiHost.ShowDialog(ObjectBrowserWindowModel, allowBackgroundClose: true);
     }
+    
+    public async void ShowPerformanceWindow()
+    {
+        var vm = new PerformanceWindowModel(Kernel);
+        var window = ViewLocator.Build(vm) as PerformanceWindow;
+        
+        window.Show();
+        // window.Show();
+        //SukiHost.ShowDialog(ObjectBrowserWindowModel, allowBackgroundClose: true);
+    }
 
     #endregion
 }

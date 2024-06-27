@@ -1,0 +1,42 @@
+<suki:SukiWindow xmlns="https://github.com/avaloniaui"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="450"
+                 xmlns:suki="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                 xmlns:windows="clr-namespace:SRBot.Windows"
+                 x:Class="SRBot.Windows.PerformanceWindow"
+                 x:DataType="windows:PerformanceWindowModel"
+                 xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
+                 CanResize="False"
+                 d:Height="400"
+                 d:Width="600"
+                 MinHeight="400"
+                 MinWidth="400"
+                 MaxHeight="400"
+                 MaxWidth="600"
+                 Loaded="Control_OnLoaded"
+                 Title="SRBot - Performance monitor">
+    <Grid ColumnDefinitions="250, 450">
+        <Grid ColumnDefinitions="*, *" Margin="16">
+            <StackPanel>
+                <TextBlock>FPS:</TextBlock>
+                <TextBlock>Target:</TextBlock>
+                <TextBlock>Frametime (ms):</TextBlock>
+                <TextBlock>Target(ms):</TextBlock>
+                <TextBlock>Idletime (ms):</TextBlock>
+                <Slider Minimum="1" Maximum="1000" Value="{Binding Kernel.Metrics.TargetFPS}"></Slider>
+            </StackPanel>
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="{Binding Kernel.Metrics.FPS}"/>
+                <TextBlock Text="{Binding Kernel.Metrics.TargetFPS, StringFormat={}{0:F4}}"/>
+                <TextBlock Text="{Binding Kernel.Metrics.FrameTime, StringFormat={}{0:F4}}"/>
+                <TextBlock Text="{Binding Kernel.Metrics.TargetFrameTime, StringFormat={}{0:F4}}"/>
+                <TextBlock Text="{Binding Kernel.Metrics.IdleTime, StringFormat={}{0:F4}}"/>
+            </StackPanel>
+        </Grid>
+        <Panel Grid.Column="1" Background="Black">
+            <ScottPlot:AvaPlot Name="PerformancePlot"></ScottPlot:AvaPlot>
+        </Panel>
+    </Grid>
+</suki:SukiWindow>

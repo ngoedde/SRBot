@@ -1,10 +1,11 @@
 ﻿using SRCore.Models;
+using SRCore.Models.EntitySpawn;
 using SRNetwork;
 using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.MessageHandler.Agent.Entity;
 
-internal class UpdatePosition(Spawn spawn, Player player) : SRNetwork.MessageHandler
+internal class UpdatePosition(Spawn spawn) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
@@ -16,8 +17,7 @@ internal class UpdatePosition(Spawn spawn, Player player) : SRNetwork.MessageHan
         {
             var uniqueId = packet.ReadUInt();
             
-            var bionic = uniqueId == player.Bionic.UniqueId ? player.Bionic : null;
-            if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
+            if (!spawn.TryGetEntity(uniqueId, out EntityBionic? bionic))
                 return OnHandled(session, packet);
 
             bionic!.Position.UpdateFromPacket(packet);

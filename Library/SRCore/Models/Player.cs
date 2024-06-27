@@ -20,7 +20,7 @@ public class Player(IServiceProvider serviceProvider) : GameModel(serviceProvide
 {
     #region Properties
 
-    [Reactive] public EntityBionic Bionic { get; internal set; }
+    [Reactive] public EntityBionic? Bionic { get; internal set; }
     [Reactive] public ObservableCollection<Item> Inventory { get; internal set; } = new();
     public RefObjChar RefObjChar => EntityManager.GetCharacter(RefObjId)!;
     [Reactive] public ObservableCollection<Item> AvatarInventory { get; internal set; } = new();

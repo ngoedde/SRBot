@@ -5,7 +5,7 @@ using SRNetwork.SilkroadSecurityApi;
 
 namespace SRCore.MessageHandler.Agent.Entity;
 
-internal class UpdateMovement(Spawn spawn, Player player) : SRNetwork.MessageHandler
+internal class UpdateMovement(Spawn spawn) : SRNetwork.MessageHandler
 {
     public override PacketHandler Handler => Handle;
 
@@ -17,8 +17,7 @@ internal class UpdateMovement(Spawn spawn, Player player) : SRNetwork.MessageHan
         {
             var uniqueId = packet.ReadUInt();
             
-            var bionic = uniqueId == player.Bionic.UniqueId ? player.Bionic : null;
-            if (bionic == null && !spawn.TryGetEntity(uniqueId, out bionic))
+            if (!spawn.TryGetEntity(uniqueId, out EntityBionic? bionic))
                 return OnHandled(session, packet);
 
             bionic!.Movement.UpdateFromPacket(packet);

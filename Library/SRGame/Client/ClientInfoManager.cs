@@ -30,7 +30,7 @@ public class ClientInfoManager(ClientFileSystem fileSystem)
 
     private async Task<DivisionInfo> LoadDivisionInfoAsync()
     {
-        var divisionFile = await fileSystem.ReadFileBytes(AssetPack.Media, "divisioninfo.txt");
+        var divisionFile = await fileSystem.ReadFileStream(AssetPack.Media, "divisioninfo.txt");
         using var reader = new BinaryReader(divisionFile);
 
         var locale = reader.ReadByte();
@@ -66,7 +66,7 @@ public class ClientInfoManager(ClientFileSystem fileSystem)
 
     private async Task<uint> LoadVersion()
     {
-        var versionFile = await fileSystem.ReadFileBytes(AssetPack.Media, "SV.T");
+        var versionFile = await fileSystem.ReadFileStream(AssetPack.Media, "SV.T");
 
         using var reader = new BinaryReader(versionFile);
 
