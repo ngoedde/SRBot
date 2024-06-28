@@ -262,6 +262,7 @@ public struct RegionId : IEquatable<RegionId>
         return Matrix4x4.CreateTranslation(localX, 0, localZ) * matrix;
     }
 
+    public static Vector3 Size => new Vector3(Width, 0, Length);
     #region Operators
 
     public static implicit operator short(RegionId region) => unchecked((short)region._value);
